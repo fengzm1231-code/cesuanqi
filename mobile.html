@@ -1,0 +1,3200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1e5442">
+<meta name="application-name" content="木片台账">
+<meta name="apple-mobile-web-app-title" content="木片台账">
+<title>木片台账</title>
+<style>
+:root{
+  --bg:#f4f6f3; --card:#fff; --line:#e4e8e1; --line2:#eef1ec;
+  --ink:#1b241f; --sub:#66706a; --muted:#98a098;
+  --p:#1e5442; --p2:#2a7a5f; --p-soft:#eaf3ee;
+  --dang:#b93b2f; --warn:#a2650e;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font:15px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:0;
+}
+input,select,button{font-family:inherit}
+
+/* ---------- 顶栏 ---------- */
+header{
+  position:sticky;top:0;z-index:20;
+  background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+  padding:calc(8px + env(safe-area-inset-top)) 14px 0;
+}
+.hrow{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.brand{font-size:15px;font-weight:700;letter-spacing:.2px;color:var(--p);white-space:nowrap}
+.brand em{font-style:normal;font-weight:400;font-size:11.5px;color:var(--muted);margin-left:6px}
+.tabs{display:flex;justify-content:space-between;gap:8px;margin-top:6px}
+.tabs button{
+  border:0;background:none;padding:8px 0 9px;font-size:14.5px;color:var(--sub);
+  position:relative;font-weight:500;
+}
+.tabs button.on{color:var(--p);font-weight:600}
+.tabs button.on::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:2.5px;border-radius:2px;background:var(--p);
+}
+
+/* ---------- 布局 ---------- */
+main{padding:12px 14px calc(96px + env(safe-area-inset-bottom))}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:13px 14px;margin-bottom:11px;
+}
+.card-h{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:12.5px;color:var(--muted);margin-bottom:10px;letter-spacing:.3px;
+}
+.card-h b{font-size:13.5px;color:var(--ink);font-weight:600;letter-spacing:0}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.g2+.g2{margin-top:10px}
+.f{display:flex;flex-direction:column;gap:5px;min-width:0}
+.f>span{font-size:12.5px;color:var(--sub);display:flex;align-items:center;gap:4px}
+.f>span i{font-style:normal;font-size:11px;color:var(--muted)}
+.f input,.f select{
+  width:100%;min-width:0;height:46px;border:1px solid #dde2da;border-radius:11px;
+  padding:0 12px;font-size:16px;color:var(--ink);background:#fbfcf9;
+  appearance:none;-webkit-appearance:none;
+}
+.f input::placeholder{color:#c2c8c1}
+.f input:focus,.f select:focus{
+  outline:none;border-color:var(--p2);background:#fff;
+  box-shadow:0 0 0 3px rgba(42,122,95,.13);
+}
+.f select{
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%2366706a' stroke-width='1.6' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
+}
+
+/* 模式切换 */
+.seg{display:flex;gap:3px;background:#ecefe9;border-radius:11px;padding:3px;margin-bottom:12px}
+.seg button{
+  flex:1;border:0;background:none;padding:9px 2px;border-radius:9px;
+  font-size:13px;color:#5c665f;line-height:1.25;
+}
+.seg button b{display:block;font-size:13px;font-weight:600}
+.seg button span{display:block;font-size:10.5px;opacity:.72;margin-top:1px}
+.seg button.on{background:#fff;color:var(--p);box-shadow:0 1px 4px rgba(24,40,32,.1)}
+.seg button.on b{font-weight:700}
+
+/* 绝干吨提示 */
+.calc-line{
+  display:flex;align-items:baseline;gap:8px;margin-top:10px;
+  padding:9px 11px;background:var(--p-soft);border-radius:10px;
+  font-size:13px;color:#2c5f4d;
+}
+.calc-line b{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--p)}
+.calc-line small{margin-left:auto;color:#6f8e80;font-size:11.5px}
+
+/* 折叠 */
+details{border-top:1px solid var(--line2);margin-top:12px;padding-top:2px}
+details summary{
+  list-style:none;cursor:pointer;font-size:13px;color:var(--sub);
+  padding:10px 0 8px;display:flex;align-items:center;justify-content:space-between;
+}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"展开";font-size:11.5px;color:var(--muted)}
+details[open] summary::after{content:"收起"}
+details .body{padding-bottom:2px}
+
+/* 按钮 */
+.btns{display:flex;gap:10px;margin-top:2px}
+.btn{
+  flex:1;height:48px;border-radius:12px;border:1px solid #dde2da;background:#fff;
+  color:var(--ink);font-size:15px;font-weight:600;
+}
+.btn.pri{background:var(--p);border-color:var(--p);color:#fff}
+.btn:active{transform:scale(.985)}
+.btn.gh{color:var(--sub);font-weight:500;flex:0 0 33%}
+
+/* 底部结果条 */
+.dock{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  display:none;align-items:center;gap:12px;
+  padding:9px 14px calc(9px + env(safe-area-inset-bottom));
+  background:linear-gradient(135deg,#1e5442,#17483a);color:#fff;
+  box-shadow:0 -8px 24px rgba(18,40,32,.18);
+}
+.dock.on{display:flex}
+.dock.loss{background:linear-gradient(135deg,#a8342a,#8c2a22)}
+.dock-l .t{font-size:11.5px;opacity:.78;letter-spacing:.4px}
+.dock-l .v{font-size:25px;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums}
+.dock-l .v small{font-size:14px;font-weight:500;margin-right:1px;opacity:.9}
+.dock-m{display:flex;flex-direction:column;gap:3px;margin-left:auto;font-size:11.5px;opacity:.92;text-align:right}
+.dock-m b{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.dock-x{
+  flex:0 0 auto;height:36px;padding:0 13px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.1);
+  color:#fff;font-size:13px;
+}
+.dock.tip .v{font-size:15px;font-weight:500;opacity:.92}
+.dock.tip .dock-m,.dock.tip .dock-x{display:none}
+
+/* 明细 / 选择 面板 */
+.sheet{position:fixed;inset:0;z-index:50;display:none}
+.sheet.on{display:block}
+.sheet .mask{position:absolute;inset:0;background:rgba(16,24,20,.38);animation:fade .18s ease}
+.sheet .panel{
+  position:absolute;left:0;right:0;bottom:0;max-height:84vh;overflow:auto;
+  background:#fff;border-radius:18px 18px 0 0;
+  padding:6px 16px calc(20px + env(safe-area-inset-bottom));
+  animation:up .22s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
+.sheet-h{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0 12px;position:sticky;top:0;background:#fff;z-index:2;
+}
+.sheet-h b{font-size:15.5px}
+.sheet-h .x{border:0;background:#f2f4f0;width:30px;height:30px;border-radius:50%;font-size:17px;color:var(--sub);line-height:1}
+.sheet-t{font-size:12px;color:var(--muted);margin:14px 0 2px;letter-spacing:.4px}
+.line{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line2);font-size:14px}
+.line .k{color:var(--sub)}
+.line .v{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.line.total{border-bottom:0;border-top:1px solid var(--line);margin-top:4px;padding-top:11px}
+.line.total .k{color:var(--ink);font-weight:600}
+.line.total .v{font-size:17px;color:var(--p)}
+.line.total.bad .v{color:var(--dang)}
+.alert{
+  margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.55;
+  background:#fdf6e8;color:#7a5410;border:1px solid #f3e3c2;
+}
+.alert.d{background:#fdeeea;color:#8c2a22;border-color:#f5d6d0}
+.alert.g{background:var(--p-soft);color:#2c5f4d;border-color:#d5e8df}
+
+.pi{display:flex;align-items:center;justify-content:space-between;padding:14px 2px;border-bottom:1px solid var(--line2);font-size:15px}
+.pi:last-child{border:0}
+.pi .n{color:var(--ink)}
+.pi .a{color:#b6bdb5;font-size:18px}
+.pi.on .n{color:var(--p);font-weight:600}
+.pi .ck{color:var(--p);font-size:15px;font-weight:700}
+.pi.empty{color:var(--muted);font-size:13.5px;padding:22px 2px;justify-content:center}
+
+/* 记录 */
+.sum{
+  background:linear-gradient(135deg,#1e5442,#1a4a3c);color:#fff;border-radius:14px;
+  padding:15px 16px;margin-bottom:12px;
+}
+.sum .t{font-size:12px;opacity:.78;letter-spacing:.4px}
+.sum .v{font-size:27px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.sum .r{display:flex;gap:20px;margin-top:8px;font-size:12px;opacity:.9}
+.sum .r b{font-size:14px;font-weight:600;display:block;margin-top:1px}
+.rec{
+  background:#fff;border:1px solid var(--line);border-radius:13px;
+  padding:12px 14px;margin-bottom:9px;display:flex;align-items:center;gap:10px;
+}
+.rec-l{min-width:0;flex:1}
+.rec-t{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-s{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-r{text-align:right;flex:0 0 auto}
+.rec-r b{display:block;font-size:16px;font-variant-numeric:tabular-nums;color:var(--p)}
+.rec-r b.neg{color:var(--dang)}
+.rec-r span{font-size:11.5px;color:var(--muted)}
+.empty{
+  text-align:center;color:var(--muted);font-size:13.5px;padding:52px 20px;line-height:1.8;
+}
+
+/* 档案标签 */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;background:var(--p-soft);color:#235b48;
+  border-radius:999px;padding:5px 6px 5px 11px;font-size:12.5px;max-width:100%;
+}
+.chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip button{border:0;background:rgba(30,84,66,.12);color:#2c5f4d;width:18px;height:18px;border-radius:50%;font-size:12px;line-height:1;padding:0}
+.addrow{display:flex;gap:8px;margin-top:9px}
+.addrow input{
+  flex:1;height:42px;border:1px solid #dde2da;border-radius:10px;padding:0 12px;font-size:16px;background:#fbfcf9;
+}
+.addrow button{
+  flex:0 0 auto;height:42px;padding:0 16px;border-radius:10px;border:1px solid var(--p);
+  background:#fff;color:var(--p);font-size:13.5px;font-weight:600;
+}
+/* 点框即选：整块输入框当选择器，不再单设按钮 */
+.sel{position:relative;min-width:0}
+.sel input{padding-right:32px}
+.sel input[readonly]{cursor:pointer}
+.sel .cv{
+  position:absolute;right:13px;top:50%;margin-top:-3px;
+  width:0;height:0;border-left:4.5px solid transparent;border-right:4.5px solid transparent;
+  border-top:6px solid #8d978f;pointer-events:none;
+}
+.sel input.typing{border-color:var(--p2);background:#fff;box-shadow:0 0 0 3px rgba(42,122,95,.13)}
+.hint{font-size:11.5px;color:var(--muted);line-height:1.6;margin-top:8px}
+
+/* 备份提醒条 */
+.bkbar{
+  display:none;align-items:center;gap:8px;margin:0 0 10px;
+  padding:9px 11px;border-radius:11px;background:#fdf6e8;border:1px solid #f3e3c2;
+  color:#7a5410;font-size:12px;line-height:1.45;
+}
+.bkbar.on{display:flex}
+.bkbar .t{flex:1;min-width:0}
+.bkbar button{
+  flex:0 0 auto;border:0;border-radius:8px;padding:7px 10px;font-size:12px;
+  font-weight:600;background:#8a6220;color:#fff;
+}
+.bkbar button.x{background:transparent;color:#a08453;font-weight:400;font-size:17px;padding:0 3px}
+/* 导入预览 */
+.imp{margin-top:2px}
+.imp .r{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line2);font-size:14px}
+.imp .r:last-child{border:0}
+.imp .r span{color:var(--sub)}
+.imp .r b{font-weight:600;color:var(--ink)}
+.imp .r.hi b{color:var(--p)}
+.imp .r.warn b{color:var(--dang)}
+
+/* 纸厂参考价 */
+.pxn{font-size:11.5px;color:var(--muted);line-height:1.55;margin:9px 0 0}
+.pxn.off{color:#9a5a12}
+.pxg{margin:12px 0 2px;font-size:12.5px;font-weight:600;color:var(--ink)}
+.pxr{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0}
+.pxr span{font-size:12.5px;color:var(--sub);min-width:0}
+.pxr span em{font-style:normal;font-size:11px;color:#9aa39a;margin-left:6px;white-space:nowrap}
+.pxr span em.man{color:#b0742a}
+.pxr input{
+  width:104px;height:38px;border:1px solid #dde2da;border-radius:9px;padding:0 10px;
+  font-size:15px;text-align:right;background:#fbfcf9;color:var(--ink);
+}
+.pxr input:focus{outline:none;border-color:var(--p2);background:#fff}
+/* 报价更新 */
+.pxu{font-size:11.5px;color:var(--muted);line-height:1.65;margin:2px 0 10px}
+.pxu.warn{color:#9a5a12}
+.mini{border:1px solid #cfe0d6;background:#fff;color:var(--p);font-size:11.5px;padding:3px 9px;border-radius:8px;line-height:1.4;font-family:inherit}
+.mini:active{background:#eef5f0}
+.ch-r{display:flex;align-items:center;gap:8px}
+.pxu b{color:var(--p)}
+.pxr-h{font-size:15px;font-weight:700;color:var(--ink)}
+.pxr-h .pxr-hop{font-weight:400;font-size:11.5px;color:var(--muted);margin-left:6px}
+.pxr-s{font-size:12px;color:var(--sub);line-height:1.75;margin-top:5px}
+.pxr-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
+.pxr-row .m{font-size:12.5px;color:var(--ink);min-width:0;line-height:1.5}
+.pxr-row .m em{font-style:normal;color:var(--muted);margin-left:6px;font-size:11.5px}
+.pxr-row .v{font-size:14px;white-space:nowrap;text-align:right;color:var(--sub)}
+.pxr-row .v b{color:var(--ink)}
+.pxr-row .v i{font-style:normal;font-size:11px;margin-left:5px}
+.pxr-row .v i.up{color:#c0392b}
+.pxr-row .v i.dt{color:var(--muted);font-family:inherit}
+.pxr-row .v i.dn{color:#2e7d5b}
+.ta{
+  width:100%;min-height:120px;border:1px solid var(--line);border-radius:11px;
+  padding:10px 12px;font-size:13px;line-height:1.65;font-family:inherit;
+  background:#fbfcf9;color:var(--ink);resize:vertical;
+}
+.ta:focus{outline:none;border-color:var(--p2);background:#fff}
+/* 台账工具行 / 筛选 */
+.tool{display:flex;gap:8px;margin:0 0 9px}
+.tool input{
+  flex:1;min-width:0;height:42px;border:1px solid var(--line);border-radius:11px;
+  padding:0 12px;font-size:15px;background:#fff;color:var(--ink);
+}
+.tool input:focus{outline:none;border-color:var(--p2)}
+.fs{display:flex;gap:7px;overflow-x:auto;margin:0 0 10px;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.fs button{
+  flex:0 0 auto;height:32px;padding:0 13px;border-radius:16px;
+  border:1px solid var(--line);background:#fff;color:var(--sub);font-size:12.5px;
+}
+.fs button.on{background:var(--p);border-color:var(--p);color:#fff;font-weight:600}
+
+/* 修改提示条 */
+.editbar{
+  display:none;align-items:center;gap:8px;margin-bottom:10px;
+  background:#fdf6e8;border:1px solid #f3e3c2;color:#7a5410;
+  border-radius:11px;padding:9px 12px;font-size:12.5px;line-height:1.4;
+}
+.editbar.on{display:flex}
+.editbar button{
+  flex:0 0 auto;margin-left:auto;height:26px;padding:0 10px;border-radius:8px;
+  border:0;background:rgba(122,84,16,.12);color:#7a5410;font-size:12px;
+}
+
+/* 汇总：分布条 */
+.bar{display:grid;grid-template-columns:74px 1fr 66px;align-items:center;gap:8px;margin-bottom:9px;font-size:12.5px}
+.bar:last-child{margin-bottom:0}
+.bar .n{color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .t{height:9px;border-radius:5px;background:#ecefe9;overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:5px;background:var(--p2)}
+.bar .t i.neg{background:#c0504a}
+.bar .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.bar.neg .v{color:var(--dang)}
+
+/* 汇总：分组卡 */
+.grp{background:#fff;border:1px solid var(--line);border-radius:13px;padding:11px 13px;margin-bottom:8px}
+.grp-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.grp-h b{font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grp-h b.neg{color:var(--dang)}
+.grp-h span{flex:0 0 auto;font-size:11.5px;color:var(--muted)}
+.grp-s{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:7px;font-size:11.5px;color:var(--sub)}
+.grp-s em{font-style:normal;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* 面板内输入与反算行 */
+.sf{display:flex;align-items:center;gap:8px;margin:8px 0 2px}
+.sf input{
+  flex:1;min-width:0;height:42px;border:1px solid #dde2da;border-radius:10px;
+  padding:0 12px;font-size:16px;background:#fbfcf9;color:var(--ink);
+}
+.sf input:focus{outline:none;border-color:var(--p2);background:#fff}
+.sf span{flex:0 0 auto;font-size:12.5px;color:var(--sub)}
+.rv{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line2);font-size:13.5px}
+.rv:last-child{border-bottom:0}
+.rv .k{color:var(--sub)}
+.rv .v{font-weight:600;font-variant-numeric:tabular-nums;color:var(--p)}
+.rv .v.bad{color:var(--dang)}
+
+.toast{
+  position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);
+  background:rgba(24,32,28,.9);color:#fff;font-size:13px;padding:9px 16px;border-radius:20px;
+  z-index:60;opacity:0;pointer-events:none;transition:opacity .2s;white-space:nowrap;max-width:90vw;
+}
+.toast.on{opacity:1}
+
+/* 周转页 */
+.sum.loss{background:linear-gradient(135deg,#a8342a,#8c2a22)}
+.sg{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;margin-top:2px}
+.sg th{font-size:11px;font-weight:500;color:var(--muted);text-align:right;padding:4px 3px;white-space:nowrap}
+.sg th:first-child{text-align:left}
+.sg td{font-size:11.5px;text-align:right;padding:6px 3px;border-top:1px solid var(--line2);line-height:1.35}
+.sg td:first-child{text-align:left;color:var(--sub);font-size:11px;white-space:nowrap}
+.sg td b{display:block;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+.sg td i{font-style:normal;font-size:10.5px;color:var(--muted)}
+.sg td.cur{background:var(--p-soft);border-radius:8px}
+.sg td.cur b{color:var(--p);font-weight:700}
+.sg td.cur i{color:var(--p);opacity:.8}
+.sg td.bad b{color:var(--dang)}
+.tip{font-size:12.5px;line-height:1.7;color:var(--sub);margin-top:7px}
+.tip b{color:var(--ink);font-weight:600}
+.flab{font-size:12.5px;color:var(--sub);margin:0 0 7px;display:flex;align-items:center;gap:4px}
+.flab i{font-style:normal;font-size:11px;color:var(--muted)}
+.covbar{height:6px;border-radius:4px;background:var(--line2);overflow:hidden;margin:2px 0 9px}
+.covbar i{display:block;height:100%;background:var(--p);border-radius:4px;transition:width .25s}
+.covbar.warn i{background:var(--dang)}
+.covbar.over i{background:var(--warn)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hrow">
+    <div class="brand">木片台账<em>鹏淼国贸林业部专用</em></div>
+  </div>
+  <div class="tabs">
+    <button data-nav="calc" class="on">测算</button>
+    <button data-nav="turn">周转</button>
+    <button data-nav="ledger">台账</button>
+    <button data-nav="sum">汇总</button>
+    <button data-nav="set">设置</button>
+  </div>
+</header>
+
+<main>
+
+  <div class="bkbar" id="bkBar">
+    <span class="t" id="bkTxt"></span>
+    <button type="button" id="bkNow">导出备份</button>
+    <button type="button" class="x" id="bkHide" aria-label="关闭">×</button>
+  </div>
+
+  <!-- ================= 测算 ================= -->
+  <section data-page="calc">
+    <div class="editbar" id="editBar">
+      <span id="editTxt">正在修改</span>
+      <button id="btnCancelEdit" type="button">退出修改</button>
+    </div>
+    <div class="seg" id="seg">
+      <button data-mode="1" class="on"><b>到场价</b><span>厂家直送</span></button>
+      <button data-mode="2"><b>车板价</b><span>自找车</span></button>
+      <button data-mode="3"><b>原木加工</b><span>委托代加工</span></button>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>计量</b><span>湿吨进，绝干吨出</span></div>
+      <div class="g2">
+        <label class="f"><span>到厂湿重 <i>吨</i></span>
+          <input type="text" inputmode="decimal" id="wIn" placeholder="0"></label>
+        <label class="f"><span>实测含水率 <i>%</i></span>
+          <input type="text" inputmode="decimal" id="m" placeholder="0"></label>
+      </div>
+      <div class="g2" style="margin-top:10px">
+        <label class="f"><span>出厂湿重 <i>吨 · 选填</i></span>
+          <input type="text" inputmode="decimal" id="wOut" placeholder="0"></label>
+        <label class="f"><span>采购按哪个重量算</span>
+          <select id="basis">
+            <option value="in">按到厂湿重</option>
+            <option value="out">按出厂湿重</option>
+          </select></label>
+      </div>
+      <div class="calc-line">
+        <span>绝干吨</span><b id="dryOut">—</b>
+        <small id="dryHint">填湿重与含水率自动换算</small>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>纸厂与价格</b><span class="ch-r"><span id="priceHint">元 / 湿吨</span><button class="mini" id="btnPxFetch2" type="button">查最新价</button></span></div>
+      <label class="f"><span>纸厂</span><select id="mill"></select></label>
+      <label class="f" style="margin-top:10px"><span>品类 / 等级</span><select id="cat"></select></label>
+      <div class="pxn" id="pxNote">选纸厂和品类，自动带出挂牌价；也可直接手填成交价</div>
+      <div class="g2" style="margin-top:10px">
+        <label class="f" id="fPw"><span id="lbPw">采购价 <i>元/湿吨</i></span>
+          <input type="text" inputmode="decimal" id="pw" placeholder="0"></label>
+        <label class="f"><span>纸厂结算价 <i>元/绝干吨</i></span>
+          <input type="text" inputmode="decimal" id="pd" placeholder="0"></label>
+      </div>
+
+      <!-- 模式2：运费 -->
+      <div class="g2" id="rowFreight">
+        <label class="f"><span>运费 <i id="frUnit">元/湿吨</i></span>
+          <input type="text" inputmode="decimal" id="freight" placeholder="0"></label>
+        <label class="f"><span>运费怎么算</span>
+          <select id="freightMode">
+            <option value="perTon">按吨计</option>
+            <option value="perTruck">按车计</option>
+          </select></label>
+      </div>
+
+      <!-- 模式3：原木 -->
+      <div class="g2" id="rowLog" style="display:none">
+        <label class="f"><span>原木价 <i>元/湿吨</i></span>
+          <input type="text" inputmode="decimal" id="plog" placeholder="0"></label>
+        <label class="f"><span>原木含水率 <i>%</i></span>
+          <input type="text" inputmode="decimal" id="mlog" placeholder="0"></label>
+      </div>
+      <div class="g2" id="rowLog2" style="display:none">
+        <label class="f"><span>绝干出片率 <i>%</i></span>
+          <input type="text" inputmode="decimal" id="r" placeholder="0"></label>
+        <label class="f"><span>加工费 <i>元/绝干吨</i></span>
+          <input type="text" inputmode="decimal" id="process" placeholder="0"></label>
+      </div>
+      <div class="g2" id="rowLog3" style="display:none">
+        <label class="f"><span>木片运费 <i>元/湿吨</i></span>
+          <input type="text" inputmode="decimal" id="freight3" placeholder="0"></label>
+        <label class="f"><span>原木运费 <i>元/湿吨原木</i></span>
+          <input type="text" inputmode="decimal" id="logFreight" placeholder="0"></label>
+      </div>
+
+      <details id="detMore">
+        <summary>更多选项（票种 · 扣杂 · 费用 · 车号 · 供应商）</summary>
+        <div class="body">
+          <div class="g2">
+            <label class="f" id="fTicket"><span>上游票种</span>
+              <select id="ticket">
+                <option value="13">13% 专票</option>
+                <option value="3">3% 专票</option>
+                <option value="1">1% 专票</option>
+              </select></label>
+            <label class="f" id="fLogTicket" style="display:none"><span>原木票种</span>
+              <select id="logTicket">
+                <option value="free">免税发票 / 收购发票</option>
+                <option value="9">9% 专票</option>
+              </select></label>
+            <label class="f"><span>扣杂 <i>吨</i></span>
+              <input type="text" inputmode="decimal" id="impurity" placeholder="0"></label>
+            <label class="f"><span>其他费用 <i>元/车</i></span>
+              <input type="text" inputmode="decimal" id="other" placeholder="0"></label>
+            <label class="f"><span>期间费用分摊 <i>元/车</i></span>
+              <input type="text" inputmode="decimal" id="periodCost" placeholder="0"></label>
+            <label class="f"><span>日期</span>
+              <input type="date" id="date"></label>
+            <label class="f"><span>车号</span>
+              <div class="sel">
+                <input type="text" id="plate" placeholder="点这里选车号" readonly>
+                <span class="cv" aria-hidden="true"></span>
+              </div></label>
+            <label class="f"><span>供应商</span>
+              <div class="sel">
+                <input type="text" id="supplier" placeholder="点这里选供应商" readonly>
+                <span class="cv" aria-hidden="true"></span>
+              </div></label>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="btns">
+      <button class="btn pri" id="btnSave">保存这车</button>
+      <button class="btn gh" id="btnClear">清空</button>
+    </div>
+  </section>
+
+  <!-- ================= 周转 ================= -->
+  <section data-page="turn" style="display:none">
+
+    <div class="sum" id="tSumCard">
+      <div class="t" id="tHead">一年净赚</div>
+      <div class="v" id="tProfit">—</div>
+      <div class="r">
+        <div>年化<b id="tRate">—</b></div>
+        <div>一轮周转<b id="tT">—</b></div>
+        <div>每月<b id="tMonth">—</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>投多少钱</b><span id="tBadge">—</span></div>
+      <div class="g2">
+        <label class="f"><span>投入资金 <i>万元</i></span>
+          <input type="text" id="fCap" inputmode="decimal" placeholder="如 50"></label>
+        <label class="f"><span>资金年化利率 <i>% · 手填</i></span>
+          <input type="text" id="fRate" inputmode="decimal" placeholder="自有填 0"></label>
+      </div>
+      <div class="fs" id="fRateChips">
+        <button data-fr="0">自有 0%</button>
+        <button data-fr="5">借 5%</button>
+        <button data-fr="6">借 6%</button>
+        <button data-fr="8">借 8%</button>
+      </div>
+      <div class="hint">自有资金利率填 0；用流贷或托盘资金，填实际年化。</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>钱什么时候回来</b><span>按纸厂结算</span></div>
+      <div class="hint" style="margin:0 0 10px"><b>一轮周期</b> = 从货款付给上游，到这车的钱（预付款 + 尾款）全部收回来的天数。钱回来后能立刻再投下一车，所以一年能滚 365 ÷ 一轮天数 次。</div>
+      <div class="g2">
+        <label class="f"><span>在途运输 <i>天</i></span>
+          <input type="text" id="fTransit" inputmode="decimal" placeholder="2"></label>
+        <label class="f"><span>上游付款占用 <i>天</i></span>
+          <input type="text" id="fUp" inputmode="decimal" placeholder="0"></label>
+      </div>
+      <div class="flab">出磅单时段 <i>决定预付款哪天到</i></div>
+      <div class="fs" id="fPreChips">
+        <button data-fp="0">14 点前 · 当天结</button>
+        <button data-fp="1">14 点后 · 次日结</button>
+      </div>
+      <div class="g2">
+        <label class="f"><span>化验出结果 <i>天</i></span>
+          <input type="text" id="fLab" inputmode="decimal" placeholder="3"></label>
+        <label class="f"><span>付尾款 <i>天</i></span>
+          <input type="text" id="fTail" inputmode="decimal" placeholder="3"></label>
+      </div>
+      <div class="g2">
+        <label class="f"><span>纸厂账期 <i>天 · 手填</i></span>
+          <input type="text" id="fMill" inputmode="decimal" placeholder="6"></label>
+        <label class="f"><span>回款在途 <i>承兑填这里</i></span>
+          <input type="text" id="fCollect" inputmode="decimal" placeholder="0"></label>
+      </div>
+      <div class="fs" id="fMillChips">
+        <button data-fmc="seq">按节奏重算</button>
+        <button data-fmc="15">15 天</button>
+        <button data-fmc="30">30 天</button>
+        <button data-fmc="45">45 天</button>
+      </div>
+      <div class="hint" id="fTHint">一轮 = 上游 + 在途 + 账期 + 回款</div>
+      <div class="hint">账期指「到厂 → 收齐尾款」的天数（化验 + 付尾款 + 回款在途）；一轮周期再往前加在途。预付款按 湿吨 × 50% × 当日厂价 估算，在出磅单当天或次日到账。</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>单车口径</b><span>默认跟随测算</span></div>
+      <div class="g2">
+        <label class="f"><span>单车净利 <i>元</i></span>
+          <input type="text" id="fNet" inputmode="decimal" placeholder="自动"></label>
+        <label class="f"><span>单车垫资 <i>元 · 含税</i></span>
+          <input type="text" id="fCost" inputmode="decimal" placeholder="自动"></label>
+      </div>
+      <div class="g2">
+        <label class="f"><span>含水率 <i>% · 算预付款</i></span>
+          <input type="text" id="fMoist" inputmode="decimal" placeholder="自动"></label>
+        <div class="f"><span>联动</span>
+          <button class="mini" data-act="fund-sync" style="height:46px">取当前测算</button></div>
+      </div>
+      <div class="g2">
+        <label class="f"><span>实际日发车 <i>0 = 按台账自动</i></span>
+          <input type="text" id="fReal" inputmode="decimal" placeholder="0"></label>
+        <div class="f"><span>台账实际</span>
+          <button class="mini" id="btnRealFromLedger" data-act="real-from-ledger" style="height:46px">按台账日均</button></div>
+      </div>
+      <div class="hint" id="fBaseHint">—</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>这笔账怎么跑</b><span id="tMode">—</span></div>
+      <div id="tLines"><div class="hint" style="margin:0">先填投入资金</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>几句实在话</b><span>按当前参数</span></div>
+      <div id="tTips"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>资金 × 账期</b><span>年利润 / 年化</span></div>
+      <div id="tGrid"></div>
+      <div class="hint">账期拉长不影响利润，只影响「同时在途多少车」——因为本金靠预付款就回来了。</div>
+    </div>
+
+  </section>
+
+  <!-- ================= 台账 ================= -->
+  <section data-page="ledger" style="display:none">
+    <div class="sum">
+      <div class="t" id="lgT">净利合计</div>
+      <div class="v" id="sumNet">—</div>
+      <div class="r">
+        <div>车数<b id="sumCnt">0</b></div>
+        <div>净利/车<b id="sumAvg">—</b></div>
+        <div>净利/吨<b id="sumPer">—</b></div>
+      </div>
+    </div>
+
+    <div class="tool">
+      <input type="text" id="qLed" placeholder="搜车号 / 供应商 / 纸厂">
+    </div>
+    <div class="fs" id="fMode">
+      <button data-fm="" class="on">全部</button>
+      <button data-fm="1">到场价</button>
+      <button data-fm="2">车板价</button>
+      <button data-fm="3">原木加工</button>
+    </div>
+
+    <div id="recList"></div>
+
+    <div class="btns" style="margin-top:12px">
+      <button class="btn" id="btnCsvRec">导出明细 CSV</button>
+    </div>
+  </section>
+
+  <!-- ================= 汇总 ================= -->
+  <section data-page="sum" style="display:none">
+    <div class="seg" id="grp">
+      <button data-g="month" class="on">按月</button>
+      <button data-g="supplier">供应商</button>
+      <button data-g="mill">纸厂</button>
+      <button data-g="mode">模式</button>
+    </div>
+
+    <div class="sum">
+      <div class="t">净利润合计</div>
+      <div class="v" id="smNet">—</div>
+      <div class="r">
+        <div>车数<b id="smCnt">0</b></div>
+        <div>绝干吨<b id="smD">—</b></div>
+        <div>全口径税负<b id="smTax">—</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>净利分布</b><span id="smDim">按月</span></div>
+      <div id="smBars"><div class="hint" style="margin:0">还没有数据</div></div>
+    </div>
+
+    <div id="smList"></div>
+
+    <div class="btns" style="margin-top:12px">
+      <button class="btn" id="btnCsvSum">导出汇总 CSV</button>
+    </div>
+  </section>
+
+  <!-- ================= 设置 ================= -->
+  <section data-page="set" style="display:none">
+    <div class="card">
+      <div class="card-h"><b>默认价</b><span>保存后同步到测算页</span></div>
+      <div class="g2">
+        <label class="f"><span>采购价 <i>元/湿吨</i></span><input type="text" inputmode="decimal" id="sPw" placeholder="0"></label>
+        <label class="f"><span>纸厂价 <i>元/绝干吨</i></span><input type="text" inputmode="decimal" id="sPd" placeholder="0"></label>
+        <label class="f"><span>运费 <i>元/湿吨</i></span><input type="text" inputmode="decimal" id="sFreight" placeholder="0"></label>
+        <label class="f"><span>原木价 <i>元/湿吨</i></span><input type="text" inputmode="decimal" id="sPlow" placeholder="0"></label>
+        <label class="f"><span>出片率 <i>%</i></span><input type="text" inputmode="decimal" id="sR" placeholder="0"></label>
+        <label class="f"><span>加工费 <i>元/绝干吨</i></span><input type="text" inputmode="decimal" id="sProcess" placeholder="0"></label>
+        <label class="f"><span>基准含水率 <i>%</i></span><input type="text" inputmode="decimal" id="sM0" placeholder="0"></label>
+        <label class="f"><span>原木含水率 <i>%</i></span><input type="text" inputmode="decimal" id="sMlog" placeholder="0"></label>
+        <label class="f"><span>默认上游票种</span>
+          <select id="sTicket">
+            <option value="13">13% 专票</option>
+            <option value="3">3% 专票</option>
+            <option value="1">1% 专票</option>
+          </select></label>
+      </div>
+      <div class="hint">基准含水率用于算水分奖罚；留空则按实测水分结算，不做奖罚。</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>税率</b><span>政策参数</span></div>
+      <div class="g2">
+        <label class="f"><span>附加税费率 <i>%</i></span><input type="text" inputmode="decimal" id="sSurtax" placeholder="12"></label>
+        <label class="f"><span>企业所得税 <i>%</i></span><input type="text" inputmode="decimal" id="sItax" placeholder="25"></label>
+        <label class="f"><span>印花税率 <i>%</i></span><input type="text" inputmode="decimal" id="sStamp" placeholder="0.03"></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>基础档案</b><span>点框直接选，不用手打</span></div>
+
+      <details open>
+        <summary>供应商</summary>
+        <div class="body">
+          <div class="chips" id="chips-supplier"></div>
+          <div class="addrow">
+            <input type="text" id="add-supplier" placeholder="名称，回车添加">
+            <button data-add="supplier">添加</button>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>车号</summary>
+        <div class="body">
+          <div class="chips" id="chips-plate"></div>
+          <div class="addrow">
+            <input type="text" id="add-plate" placeholder="车牌，回车添加">
+            <button data-add="plate">添加</button>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <div class="card" style="margin-top:11px">
+      <div class="card-h"><b>纸厂参考价</b><span id="pxAtTxt">采集 2026-11-20</span></div>
+      <div class="btns" style="margin:0 0 9px">
+        <button class="btn pri" id="btnPxFetch">一键查最新报价</button>
+        <button class="btn" id="btnPxPaste">粘贴日报更新</button>
+      </div>
+      <div class="pxu" id="pxUpd">还没查过。内置价截至 2026-11-20，点上面按钮可联网取最新一版。</div>
+      <div class="hint" style="margin:0">含税绝干到厂挂牌价，留空＝停收。品类名后面是这条价的<b>报价日期</b>；带 <b style="color:#b0742a">*</b> 的表示你手工改过，日期为改价那天。来源：广西太阳纸业国内木片部公众号、木片价格日报（2026-11-20 采集）。</div>
+      <details style="margin-top:8px">
+        <summary>展开修改（4 家纸厂）</summary>
+        <div class="body" id="pxBox"></div>
+        <label class="f" style="margin-top:10px"><span>整表采集日</span>
+          <input type="date" id="pxAt"></label>
+        <div class="btns" style="margin-top:10px">
+          <button class="btn" id="btnPxReset">恢复采集值</button>
+        </div>
+      </details>
+      <div class="hint">改完立即生效，不用点下面的「保存设置」。留空表示该品类停收。</div>
+    </div>
+
+    <div class="btns">
+      <button class="btn pri" id="btnSaveSet">保存设置</button>
+    </div>
+
+    <div class="card" style="margin-top:11px">
+      <div class="card-h"><b>数据与备份</b><span>存在本机，不上传</span></div>
+      <div class="btns">
+        <button class="btn" id="btnBackup">导出备份</button>
+        <button class="btn" id="btnRestore">导入备份</button>
+      </div>
+      <input type="file" id="fileRestore" accept=".json,application/json" style="display:none">
+      <div class="hint" id="dataHint">—</div>
+      <div class="btns" style="margin-top:10px">
+        <button class="btn" id="btnCsvAll">导出全部明细 CSV</button>
+      </div>
+      <div class="hint" id="snapHint" style="margin-top:10px">—</div>
+      <div class="btns" style="margin-top:8px">
+        <button class="btn" id="btnSnap">回到上一份快照</button>
+        <button class="btn" id="btnWipe" style="color:#b93b2f">清空全部台账</button>
+      </div>
+      <div class="hint">导入默认是「合并」：日期＋车号＋供应商＋到厂湿重相同的视为同一车，取修改时间较新的那条；基础档案取并集，已有参数不会被覆盖。要整份替换时可选「覆盖导入」。<br>电脑版导出的备份可直接导进来，本页导出的也能给电脑版用。清理浏览器数据会连带清掉记录，建议每周导出一次。</div>
+    </div>
+
+    <div class="card" style="margin-top:11px">
+      <div class="card-h"><b>按年归档</b><span>跨年清理用</span></div>
+      <label class="f"><span>年份</span><select id="arcYear"></select></label>
+      <div class="btns" style="margin-top:10px">
+        <button class="btn" id="btnArcExport">导出这一年</button>
+        <button class="btn" id="btnArcClean" style="color:#b93b2f">导出并清理</button>
+      </div>
+      <div class="hint" id="arcHint">归档会先导出一份当年备份，再从本机删除；删除前自动留一份快照，可回滚。</div>
+    </div>
+
+    <div class="card" style="margin-top:11px">
+      <div class="card-h"><b>版本</b><span>当前：手机全能版</span></div>
+      <div class="btns">
+        <a class="btn" href="index.html?pc=1" style="display:flex;align-items:center;justify-content:center;text-decoration:none">打开电脑完整版</a>
+      </div>
+      <div class="hint">本页已包含测算、台账、汇总、参数、备份合并、按年归档全部功能，日常只用这一页即可。电脑版适合横屏看汇总；两边数据各存本机，靠「导出 → 另一台合并导入」互传，合并不会冲掉对方已有的记录。</div>
+    </div>
+  </section>
+
+</main>
+
+<!-- 底部结果条 -->
+<div class="dock tip" id="dock">
+  <div class="dock-l">
+    <div class="t">本车净利</div>
+    <div class="v" id="dockNet"><small>¥</small>—</div>
+  </div>
+  <div class="dock-m">
+    <div>每吨 <b id="dockPer">—</b></div>
+    <div>净利率 <b id="dockMargin">—</b></div>
+  </div>
+  <button class="dock-x" id="btnSheet">明细</button>
+</div>
+
+<!-- 弹出面板 -->
+<div class="sheet" id="sheet">
+  <div class="mask" data-close></div>
+  <div class="panel">
+    <div class="sheet-h"><b id="sheetT">明细</b><button class="x" data-close>×</button></div>
+    <div id="sheetB"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ==ENGINE-START==
+function num(v){ const n = parseFloat(v); return isFinite(n) ? n : 0; }
+
+function compute(inp, P, mOv){
+  const M = (mOv !== undefined) ? mOv : num(inp.m)/100;
+  const M0 = num(P.m0) > 0 ? num(P.m0)/100 : M;
+  const wIn = num(inp.wIn), wOut = num(inp.wOut), imp = num(inp.impurity);
+  const mode = String(inp.mode);
+  const pd = mode === '3' ? num(inp.pd3) : num(inp.pd);
+  const dryBase = Math.max(0, wIn - imp);
+  const D = dryBase * (1 - M);
+
+  let items = [];
+  let extra = {};
+
+  if(mode === '3'){
+    const R = num(inp.r)/100;
+    const Mlog = num(inp.mlog)/100;
+    const logDry = R > 0 && R <= 1 ? D / R : 0;
+    const logWet = Mlog < 1 ? logDry / (1 - Mlog) : 0;
+    const logAmt = logWet * num(inp.plog);
+    const logIn = inp.logTicket === '9' ? logAmt/1.09*0.09 : logAmt*0.09;
+    const procAmt = num(inp.process) * D;
+    const procIn = procAmt/1.13*0.13;
+    const frAmt = num(inp.freight3) * wIn;
+    const frIn = frAmt/1.09*0.09;
+    const frLogAmt = num(inp.logFreight) * logWet;
+    const frLogIn = frLogAmt/1.09*0.09;
+    items = [
+      {k:'原木', amt:logAmt, vat:logIn},
+      {k:'加工费', amt:procAmt, vat:procIn},
+      {k:'木片运费', amt:frAmt, vat:frIn}
+    ];
+    if(frLogAmt > 0) items.push({k:'原木运费', amt:frLogAmt, vat:frLogIn});
+    extra = {logWet, logDry, logAmt, logIn, procAmt, procIn, frAmt, frLogAmt};
+  } else {
+    const settleWet = inp.basis === 'out' ? wOut : wIn;
+    const buyAmt = settleWet * num(inp.pw);
+    const rate = inp.ticket === '13' ? 0.13 : inp.ticket === '3' ? 0.03 : 0.01;
+    const buyIn = buyAmt/(1+rate)*rate;
+    let frAmt = 0;
+    if(mode === '2'){
+      frAmt = inp.freightMode === 'perTruck' ? num(inp.freight) : num(inp.freight)*wIn;
+    }
+    const frIn = frAmt/1.09*0.09;
+    items = [{k:'木片采购', amt:buyAmt, vat:buyIn}];
+    if(frAmt > 0) items.push({k:'运费', amt:frAmt, vat:frIn});
+    extra = {settleWet, buyAmt, buyIn, frAmt, frIn};
+  }
+
+  const other = num(inp.other);
+  if(other > 0) items.push({k:'其他费用', amt:other, vat:0, noVat:true});
+
+  const costTax = items.reduce((s,x)=>s+x.amt,0);
+  const costIn  = items.reduce((s,x)=>s+x.vat,0);
+  const costNet = costTax - costIn;
+
+  const revTax = D * pd;
+  const outVat = revTax/1.13*0.13;
+  const revNet = revTax - outVat;
+
+  const grossTax = revTax - costTax;
+  const gross = revNet - costNet;
+
+  const vatPay = Math.max(0, outVat - costIn);
+  const vatCredit = Math.max(0, costIn - outVat);
+
+  const surtax = vatPay * num(P.surtax)/100;
+  const stamp = (costNet + revNet) * num(P.stamp)/100;
+  const period = num(inp.periodCost);
+  const ebt = gross - surtax - stamp - period;
+  const itax = Math.max(0, ebt) * num(P.incomeTax)/100;
+  const net = ebt - itax;
+
+  const lossPct = (wOut > 0 && mode !== '3') ? (wOut - wIn - imp)/wOut : 0;
+  const moistureLoss = (M - M0) * dryBase * pd;
+
+  return {
+    D, dryBase, M, M0, pd, revTax, revNet, outVat,
+    items, costTax, costIn, costNet,
+    grossTax, gross, vatPay, vatCredit, surtax, stamp, period, ebt, itax, net,
+    perDry: D > 0 ? net/D : 0,
+    vatRate: revNet > 0 ? vatPay/revNet : 0,
+    allRate: revNet > 0 ? (vatPay+surtax+stamp+itax)/revNet : 0,
+    netMargin: revNet > 0 ? net/revNet : 0,
+    lossPct, moistureLoss, extra,
+    perDryGrossTax: D > 0 ? grossTax/D : 0
+  };
+}
+
+function mStar(inp, P){
+  if(num(inp.wIn) <= 0 || (String(inp.mode)==='3' ? num(inp.pd3) : num(inp.pd)) <= 0) return null;
+  const f = m => compute(inp, P, m).net;
+  if(f(0.02) <= 0) return null;
+  if(f(0.72) > 0) return null;
+  let lo = 0.02, hi = 0.72;
+  for(let i=0;i<50;i++){
+    const mid = (lo+hi)/2;
+    if(f(mid) > 0) lo = mid; else hi = mid;
+  }
+  return (lo+hi)/2*100;
+}
+
+function logStar(inp, P){
+  if(String(inp.mode) !== '3' || num(inp.wIn) <= 0 || num(inp.pd3) <= 0) return null;
+  const f = p => { const c = Object.assign({}, inp, {plog:p}); return compute(c, P).net; };
+  if(f(0) <= 0) return null;
+  let lo = 0, hi = 2000;
+  if(f(hi) > 0) return null;
+  for(let i=0;i<50;i++){
+    const mid = (lo+hi)/2;
+    if(f(mid) > 0) lo = mid; else hi = mid;
+  }
+  return (lo+hi)/2;
+}
+// ==ENGINE-END==
+
+/* ================= 手机版应用层 ================= */
+const $ = id => document.getElementById(id);
+const K = {
+  P:'wp_m_params_v1', R:'wp_m_records_v1', B:'wp_m_lastbackup',
+  S:'wp_m_snapshot_v1', H:'wp_m_bkbar_hide'
+};
+
+/* 存储层：现在落在 localStorage。将来要换 IndexedDB 时只改 ST 的 get/set/del，
+   业务代码和计算内核都不用动。set 失败（多为配额满）返回 false 并提示归档。 */
+const ST = {
+  backend:'localStorage',
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k, v){ try{ localStorage.setItem(k, v); return true; }catch(e){ quotaWarn(); return false; } },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+let _quotaWarned = false;
+function quotaWarn(){
+  if(_quotaWarned) return;
+  _quotaWarned = true;
+  if(typeof toast === 'function') toast('本机存储快满了，建议先按年归档');
+}
+
+const DEF = {
+  m0:'', surtax:12, incomeTax:25, stamp:0.03,
+  pw:'', pd:'', freight:'', plow:'', r:'', process:'', mlog:'',
+  ticket:'13', supList:[], millList:[], plateList:[],
+  px:{}, pxAt:'', pxSrc:'', pxMeta:{}, catAdd:{},
+  fund: {
+    ver:2,
+    cap:0,          // 投入资金（元），表单按万元输入
+    rate:0,         // 资金年化利率 %
+    upDays:0,       // 上游付款占用天数
+    transitDays:2,  // 在途运输天数
+    preDay:0,       // 出磅单时段：0 = 当天结预付，1 = 次日结预付
+    labDays:3,      // 化验出结果（2~3 天）
+    tailDays:3,     // 付尾款（2~3 天）
+    millDays:6,     // 纸厂账期 = 到厂到收齐尾款（手填，seq = 按节奏重算）
+    collectDays:0,  // 回款在途 / 承兑
+    realCapDay:0,   // 实际日发车，0 = 按资金自动
+    moistOv:'',     // 含水率手工覆盖（%），'' = 自动
+    netOv:'',       // 单车净利手工覆盖，'' = 自动
+    costOv:''       // 单车垫资手工覆盖，'' = 自动
+  }
+};
+
+function load(key, def){
+  try{
+    const raw = ST.get(key);
+    if(!raw) return JSON.parse(JSON.stringify(def));
+    const v = JSON.parse(raw);
+    return Array.isArray(def) ? (Array.isArray(v)?v:def) : Object.assign({}, def, v);
+  }catch(e){ return JSON.parse(JSON.stringify(def)); }
+}
+function save(key, v){
+  return ST.set(key, JSON.stringify(v));
+}
+
+let P = load(K.P, DEF);
+let REC = load(K.R, []);
+let mode = '1';
+let editingId = null;
+let filtMode = '';
+let grpBy = 'month';
+let _revCtx = null;
+let _sheetId = null;
+
+/* ---- 小工具 ---- */
+function fmt(n, d){
+  if(!isFinite(n)) return '—';
+  const dd = (d === undefined) ? 2 : d;
+  const neg = n < 0;
+  const s = Math.abs(n).toLocaleString('zh-CN', {minimumFractionDigits:dd, maximumFractionDigits:dd});
+  return (neg ? '-' : '') + s;
+}
+function pct(x){ return isFinite(x) ? (x*100).toFixed(2) + '%' : '—'; }
+function today(){
+  const d = new Date();
+  const p = n => (n<10?'0':'') + n;
+  return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate());
+}
+function esc(s){
+  return String(s === undefined || s === null ? '' : s).replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+let toastT = null;
+function toast(msg){
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>el.classList.remove('on'), 1900);
+}
+
+/* ---- 表单读写 ---- */
+function pxAtForInput(){
+  const m = millByName($('mill').value);
+  const cat = $('cat') ? $('cat').value : '';
+  return m && cat ? (pxEntry(m.id, cat).at || '') : '';
+}
+
+function readInp(){
+  return {
+    mode,
+    date: $('date').value,
+    plate: $('plate').value.trim(),
+    supplier: $('supplier').value.trim(),
+    mill: $('mill').value.trim(),
+    cat: $('cat') ? $('cat').value : '',
+    pdAt: pxAtForInput(),
+    ticket: $('ticket').value,
+    wOut: num($('wOut').value),
+    wIn: num($('wIn').value),
+    impurity: num($('impurity').value),
+    m: num($('m').value),
+    m0: num(P.m0),
+    basis: $('basis').value,
+    pw: num($('pw').value),
+    pd: num($('pd').value),
+    pd3: num($('pd').value),
+    freightMode: $('freightMode').value,
+    freight: num($('freight').value),
+    plog: num($('plog').value),
+    mlog: num($('mlog').value),
+    r: num($('r').value),
+    process: num($('process').value),
+    logTicket: $('logTicket').value,
+    freight3: num($('freight3').value),
+    logFreight: num($('logFreight').value),
+    other: num($('other').value),
+    periodCost: num($('periodCost').value)
+  };
+}
+
+function setMode(m){
+  mode = m;
+  document.querySelectorAll('#seg button').forEach(b=> b.classList.toggle('on', b.dataset.mode === m));
+  const is3 = m === '3', is2 = m === '2';
+  $('rowFreight').style.display = is2 ? '' : 'none';
+  $('rowLog').style.display = is3 ? '' : 'none';
+  $('rowLog2').style.display = is3 ? '' : 'none';
+  $('rowLog3').style.display = is3 ? '' : 'none';
+  $('fLogTicket').style.display = is3 ? '' : 'none';
+  $('fTicket').style.display = is3 ? 'none' : '';
+  $('fPw').style.display = is3 ? 'none' : '';
+  $('fPw').parentElement.style.gridTemplateColumns = is3 ? '1fr' : '';
+  $('priceHint').textContent = is3 ? '木片按绝干吨结算' : '采购按湿吨计价';
+  render();
+}
+
+/* ---- 底部结果 ---- */
+function render(){
+  const inp = readInp();
+  const R = compute(inp, P);
+  const mRaw = $('m').value.trim();
+  const mBlank = mRaw === '';
+  const is3 = mode === '3';
+  const priceOk = is3 ? (inp.plog > 0 && inp.r > 0) : inp.pw > 0;
+  const wetOk = inp.basis !== 'out' || inp.wOut > 0;
+  const ready = inp.wIn > 0 && inp.pd > 0 && !mBlank && priceOk && wetOk && R.D > 0;
+
+  $('dryOut').textContent = R.D > 0 ? fmt(R.D, 3) + ' 吨' : '—';
+  $('dryHint').textContent = R.D > 0
+    ? (inp.wIn - inp.impurity).toFixed(2) + ' 湿吨 × ' + ((1 - R.M)*100).toFixed(0) + '%'
+    : '填湿重与含水率自动换算';
+
+  const dock = $('dock');
+  if(!ready){
+    dock.classList.add('tip');
+    dock.classList.remove('loss');
+    $('dockPer').textContent = '—';
+    $('dockMargin').textContent = '—';
+    let tip = '填湿重与含水率，自动出净利';
+    if(inp.wIn > 0 && mBlank) tip = '还差实测含水率';
+    else if(inp.wIn > 0 && !mBlank && !wetOk) tip = '按出厂湿重结算，还差出厂湿重';
+    else if(inp.wIn > 0 && !mBlank && !priceOk) tip = is3 ? '还差原木价与出片率' : '还差采购价';
+    else if(inp.wIn > 0 && !mBlank && !inp.pd) tip = '还差纸厂结算价';
+    $('dockNet').innerHTML = '<small></small>' + tip;
+    return;
+  }
+
+  dock.classList.remove('tip');
+  dock.classList.toggle('loss', R.net < 0);
+  $('dockNet').innerHTML = '<small>¥</small>' + fmt(R.net);
+  $('dockPer').textContent = '¥' + fmt(R.perDry);
+  $('dockMargin').textContent = pct(R.netMargin);
+}
+
+/* ---- 反算：目标净利 → 价格上限 / 水分红线 ---- */
+function bisect(f, lo, hi){
+  if(!(f(lo) > 0)) return null;
+  if(!(f(hi) < 0)) return null;
+  for(let i=0;i<60;i++){
+    const mid = (lo+hi)/2;
+    if(f(mid) > 0) lo = mid; else hi = mid;
+  }
+  return (lo+hi)/2;
+}
+function pwFor(inp, P, target){
+  if(String(inp.mode) === '3') return null;
+  return bisect(p => compute(Object.assign({}, inp, {pw:p}), P).net - target, 0, 6000);
+}
+function logFor(inp, P, target){
+  if(String(inp.mode) !== '3') return null;
+  return bisect(p => compute(Object.assign({}, inp, {plog:p}), P).net - target, 0, 3000);
+}
+function pdFor(inp, P, target){
+  return bisect(p => target - compute(Object.assign({}, inp, {pd:p, pd3:p}), P).net, 0, 30000);
+}
+function mFor(inp, P, target){
+  return bisect(m => compute(inp, P, m).net - target, 0.02, 0.78);
+}
+function revUpdate(v){
+  const box = $('revOut');
+  if(!box || !_revCtx) return;
+  const inp = _revCtx.inp, R = _revCtx.R;
+  const tgt = num(v);
+  const is3 = String(inp.mode) === '3';
+  const buy = is3 ? logFor(inp, P, tgt) : pwFor(inp, P, tgt);
+  const sell = pdFor(inp, P, tgt);
+  const mm = mFor(inp, P, tgt);
+  let h = '';
+  h += '<div class="rv"><span class="k">' + (is3 ? '最高原木价' : '最高采购价') + '</span><span class="v'
+    + (buy === null ? ' bad' : '') + '">'
+    + (buy === null ? '达不到' : '¥' + fmt(buy, 0) + (is3 ? ' /湿吨原木' : ' /湿吨')) + '</span></div>';
+  h += '<div class="rv"><span class="k">最低纸厂价</span><span class="v'
+    + (sell === null ? ' bad' : '') + '">'
+    + (sell === null ? '达不到' : '¥' + fmt(sell, 0) + ' /绝干吨') + '</span></div>';
+  h += '<div class="rv"><span class="k">含水率上限</span><span class="v'
+    + (mm === null ? ' bad' : '') + '">'
+    + (mm === null ? '无解' : (mm*100).toFixed(2) + '%'
+        + (mm > R.M ? '（还有 ' + ((mm - R.M)*100).toFixed(1) + ' 个点）' : '（已经超了）')) + '</span></div>';
+  if(!tgt) h += '<div class="hint" style="margin-top:6px">目标填 0 就是打平价；填 500 就是这车至少要赚 500 时的价格上限。</div>';
+  box.innerHTML = h;
+}
+
+/* ---- 明细面板 ---- */
+function lineHTML(k, v, cls){
+  return '<div class="line ' + (cls||'') + '"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>';
+}
+
+function detailHTML(inp, R){
+  let h = '';
+  h += '<div class="sheet-t">收入</div>';
+  if(num(inp.wOut) > 0){
+    h += lineHTML('出厂 → 到厂湿重', fmt(inp.wOut,2) + ' → ' + fmt(inp.wIn,2) + ' 吨');
+    if(R.lossPct) h += lineHTML('运输损耗', (R.lossPct*100).toFixed(2) + '%');
+  }
+  if(inp.basis === 'out') h += lineHTML('采购计价依据', '出厂湿重 ' + fmt(inp.wOut,2) + ' 吨');
+  if(inp.mill) h += lineHTML('纸厂 / 品类',
+    inp.mill + (inp.cat ? ' · ' + inp.cat : '') + (inp.pdAt ? '　报价 ' + dFull(inp.pdAt) : ''));
+  h += lineHTML('绝干吨 × 纸厂价', fmt(R.D,3) + ' 吨 × ¥' + fmt(R.pd,0));
+  h += lineHTML('不含税收入', '¥' + fmt(R.revNet));
+
+  h += '<div class="sheet-t">成本（不含税）</div>';
+  (R.items || []).forEach(it=>{
+    h += lineHTML(it.k + (it.noVat ? '（无进项）' : '（含税 ¥' + fmt(it.amt) + '）'), '−¥' + fmt(it.amt - it.vat));
+  });
+  h += lineHTML('成本合计（含税）', '¥' + fmt(R.costTax));
+
+  h += '<div class="sheet-t">利润</div>';
+  h += lineHTML('不含税毛利', '¥' + fmt(R.gross));
+  if(R.period > 0) h += lineHTML('期间费用', '−¥' + fmt(R.period));
+  h += lineHTML('附加税费', '−¥' + fmt(R.surtax));
+  h += lineHTML('印花税', '−¥' + fmt(R.stamp));
+  h += lineHTML('企业所得税', '−¥' + fmt(R.itax));
+  h += '<div class="line total ' + (R.net < 0 ? 'bad' : '') + '"><span class="k">本车净利</span><span class="v">¥' + fmt(R.net) + '</span></div>';
+
+  h += '<div class="sheet-t">税</div>';
+  h += lineHTML('销项税额（13%）', '¥' + fmt(R.outVat));
+  h += lineHTML('进项税额', '−¥' + fmt(R.costIn));
+  h += lineHTML(R.vatCredit > 0 ? '留抵税额' : '应纳增值税', '¥' + fmt(R.vatCredit > 0 ? R.vatCredit : R.vatPay));
+  h += lineHTML('全口径税负率', pct(R.allRate));
+  h += lineHTML('每绝干吨净利', '¥' + fmt(R.perDry));
+
+  const tips = [];
+  if(R.net < 0){
+    const bp = String(inp.mode) === '3' ? logFor(inp, P, 0) : pwFor(inp, P, 0);
+    if(bp !== null) tips.push((String(inp.mode) === '3' ? '原木价压到 <b>¥' + fmt(bp,0) + '/湿吨</b>' : '采购价压到 <b>¥' + fmt(bp,0) + '/湿吨</b>') + ' 以下这车才不亏。');
+  } else {
+    const ms = mFor(inp, P, 0);
+    if(ms !== null && ms < 0.62){
+      const room = (ms - R.M)*100;
+      if(room < 6) tips.push('含水率涨到 <b>' + (ms*100).toFixed(1) + '%</b> 就要亏，现在 ' + (R.M*100).toFixed(1) + '%，只剩 <b>' + room.toFixed(1) + ' 个点</b>。');
+      else tips.push('含水率红线 <b>' + (ms*100).toFixed(1) + '%</b>，当前 ' + (R.M*100).toFixed(1) + '%，还有 ' + room.toFixed(1) + ' 个点空间。');
+    }
+    if(String(inp.mode) !== '3' && inp.ticket !== '13'){
+      tips.push('上游开的不是 13% 票，进项会少一大块——报价要按票种压价。');
+    }
+  }
+  if(tips.length) h += '<div class="alert ' + (R.net < 0 ? 'd' : '') + '">' + tips.join('<br>') + '</div>';
+
+  if(R.D > 0){
+    h += '<div class="sheet-t">反算 · 填目标净利出上限</div>';
+    h += '<div class="sf"><span>目标净利</span><input type="text" inputmode="decimal" id="tgtNet" value="0"><span>元/车</span></div>';
+    h += '<div id="revOut"></div>';
+  }
+  return h;
+}
+
+function openSheet(title, html){
+  $('sheetT').textContent = title;
+  $('sheetB').innerHTML = html;
+  $('sheet').classList.add('on');
+  const t = $('tgtNet');
+  if(t){ revUpdate(t.value); t.addEventListener('input', ()=> revUpdate(t.value)); }
+}
+function closeSheet(){ $('sheet').classList.remove('on'); }
+
+$('btnSheet').onclick = ()=>{
+  const inp = readInp();
+  const R = compute(inp, P);
+  const ready = inp.wIn > 0 && inp.pd > 0 && $('m').value.trim() !== '' && R.D > 0;
+  if(!ready){ toast('先把湿重、含水率、价格填上'); return; }
+  _revCtx = {inp, R};
+  _sheetId = null;
+  openSheet('本车明细', detailHTML(inp, R));
+  $('sheetB').insertAdjacentHTML('beforeend',
+    '<div class="btns" style="margin-top:14px"><button class="btn" data-act="copy">复制结算单</button></div>');
+};
+
+/* ---- 台账 ---- */
+function recFiltered(){
+  const q = ($('qLed').value || '').trim().toLowerCase();
+  return REC.filter(r=>{
+    const i = r.inp || {};
+    if(filtMode && String(i.mode) !== filtMode) return false;
+    if(!q) return true;
+    return [i.plate, i.supplier, i.mill, i.cat, i.date].join(' ').toLowerCase().includes(q);
+  }).sort((a,b)=>{
+    const da = (a.inp||{}).date || '', db = (b.inp||{}).date || '';
+    if(da !== db) return db.localeCompare(da);
+    return String(b.savedAt||'').localeCompare(String(a.savedAt||''));
+  });
+}
+
+function renderRec(){
+  const list = recFiltered();
+  const net = list.reduce((s,r)=> s + ((r.out && r.out.net) || 0), 0);
+  const tons = list.reduce((s,r)=> s + ((r.out && r.out.D) || 0), 0);
+  const filtering = filtMode || ($('qLed').value || '').trim();
+  $('lgT').textContent = filtering ? '净利合计（已筛选）' : '净利合计';
+  $('sumNet').textContent = '¥' + fmt(net);
+  $('sumCnt').textContent = list.length;
+  $('sumAvg').textContent = '¥' + fmt(list.length ? net/list.length : 0);
+  $('sumPer').textContent = '¥' + fmt(tons > 0 ? net/tons : 0);
+
+  if(!list.length){
+    $('recList').innerHTML = '<div class="empty">' + (REC.length
+      ? '这个筛选条件下没有记录'
+      : '还没有记录<br>在「测算」页填好一车后点保存') + '</div>';
+    return;
+  }
+  $('recList').innerHTML = list.map(r=>{
+    const i = r.inp || {}, o = r.out || {};
+    const md = i.mode === '3' ? '原木加工' : i.mode === '2' ? '车板价' : '到场价';
+    const sub = [i.supplier, i.mill].filter(Boolean).join(' → ') || md;
+    const neg = (o.net || 0) < 0;
+    return '<div class="rec" data-id="' + r.id + '">'
+      + '<div class="rec-l"><div class="rec-t">' + (i.date || '未填日期') + (i.plate ? ' · ' + esc(i.plate) : '') + '</div>'
+      + '<div class="rec-s">' + esc(sub) + (i.cat ? ' · ' + esc(i.cat) : '') + ' · ' + md + ' · ' + (o.D ? fmt(o.D,3) + ' 吨' : '—') + '</div></div>'
+      + '<div class="rec-r"><b class="' + (neg ? 'neg' : '') + '">' + (neg ? '−' : '') + '¥' + fmt(Math.abs(o.net || 0)) + '</b>'
+      + '<span>¥' + fmt(o.perDry || 0) + '/吨</span></div></div>';
+  }).join('');
+}
+
+function openRec(r){
+  const i = r.inp || {}, o = r.out || {};
+  _revCtx = {inp:i, R:o};
+  _sheetId = r.id;
+  openSheet((i.date || '未填日期') + (i.plate ? ' · ' + i.plate : ''), detailHTML(i, o));
+  $('sheetB').insertAdjacentHTML('beforeend',
+    '<div class="btns" style="margin-top:14px">'
+    + '<button class="btn" data-act="copy">复制结算单</button>'
+    + '<button class="btn" data-act="edit">修改</button></div>'
+    + '<div class="btns" style="margin-top:9px">'
+    + '<button class="btn" data-act="del" style="color:#b93b2f">删除这条</button></div>');
+}
+
+$('recList').onclick = e=>{
+  const card = e.target.closest('.rec');
+  if(!card) return;
+  const r = REC.find(x=> x.id === card.dataset.id);
+  if(r) openRec(r);
+};
+
+/* ---- 结算单文本 ---- */
+function receiptText(i, o){
+  const ex = o.extra || {};
+  const md = i.mode === '3' ? '原木加工（委托代加工）' : i.mode === '2' ? '车板价（自找车）' : '到场价（厂家直送）';
+  const L = [];
+  L.push('木片每车结算  ' + (i.date || ''));
+  L.push('车号：' + (i.plate || '—'));
+  L.push('供应商：' + (i.supplier || '—') + '　纸厂：' + (i.mill || '—') + (i.cat ? '（' + i.cat + '）' : ''));
+  L.push('模式：' + md);
+  L.push('到厂湿重 ' + fmt(i.wIn,2) + ' 吨｜扣杂 ' + fmt(i.impurity||0,2) + ' 吨｜含水率 ' + fmt(i.m,2) + '%');
+  L.push('结算绝干吨 ' + fmt(o.D,3) + ' 吨 × ¥' + fmt(o.pd,0));
+  if(i.mode === '3'){
+    L.push('原木 ' + fmt(ex.logWet||0,2) + ' 湿吨 × ¥' + fmt(i.plog,0) + '｜出片率 ' + fmt(i.r,1) + '%');
+    L.push('加工费 ¥' + fmt(ex.procAmt||0) + '｜木片运费 ¥' + fmt(ex.frAmt||0));
+  } else {
+    L.push('采购价 ¥' + fmt(i.pw,0) + '/湿吨（' + i.ticket + '% 票）' + (ex.frAmt ? '｜运费 ¥' + fmt(ex.frAmt) : ''));
+  }
+  L.push('不含税收入 ¥' + fmt(o.revNet) + '｜不含税毛利 ¥' + fmt(o.gross));
+  L.push('销项 ¥' + fmt(o.outVat) + '｜进项 ¥' + fmt(o.costIn) + '｜' + (o.vatCredit > 0 ? '留抵 ¥' + fmt(o.vatCredit) : '应纳增值税 ¥' + fmt(o.vatPay)));
+  L.push('全口径税负 ' + pct(o.allRate) + '｜净利率 ' + pct(o.netMargin));
+  L.push('本车净利 ¥' + fmt(o.net) + '｜每绝干吨 ¥' + fmt(o.perDry));
+  L.push('口径：绝干吨=（到厂湿重−扣杂）×（1−含水率）；木片销项 13%，运费 9%，加工费 13%。');
+  return L.join('\n');
+}
+function copyText(t){
+  const ok = ()=> toast('已复制，可直接粘到微信');
+  const fb = ()=>{
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); ta.remove(); ok();
+    }catch(e){ toast('复制失败，请长按选择'); }
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(ok, fb);
+  } else fb();
+}
+
+/* ---- 修改 ---- */
+function updateEditBar(rec){
+  const bar = $('editBar');
+  if(!rec){
+    bar.classList.remove('on');
+    $('btnSave').textContent = '保存这车';
+    return;
+  }
+  bar.classList.add('on');
+  $('editTxt').textContent = '正在修改 ' + ((rec.inp||{}).date || '') + ((rec.inp||{}).plate ? ' · ' + rec.inp.plate : '') + ' 这车';
+  $('btnSave').textContent = '更新这车';
+}
+
+function loadForEdit(r){
+  const i = r.inp || {};
+  const sv = (id, v)=>{
+    const el = $(id);
+    if(!el) return;
+    el.value = (v === 0 || v === null || v === undefined) ? '' : v;
+  };
+  setMode(String(i.mode || '1'));
+  $('date').value = i.date || today();
+  $('plate').value = i.plate || '';
+  $('supplier').value = i.supplier || '';
+  lockSel();
+  fillMillSelect(i.mill || '');
+  fillCatSelect(i.cat || '');
+  sv('wIn', i.wIn); sv('m', i.m); sv('impurity', i.impurity); sv('wOut', i.wOut);
+  if($('basis')) $('basis').value = i.basis || 'in';
+  sv('pw', i.pw); sv('pd', i.pd3 || i.pd); sv('freight', i.freight);
+  sv('plog', i.plog); sv('mlog', i.mlog); sv('r', i.r); sv('process', i.process);
+  sv('freight3', i.freight3); sv('logFreight', i.logFreight);
+  sv('other', i.other); sv('periodCost', i.periodCost);
+  $('ticket').value = i.ticket || '13';
+  $('logTicket').value = i.logTicket || 'free';
+  $('freightMode').value = i.freightMode || 'perTon';
+  editingId = r.id;
+  updateEditBar(r);
+  closeSheet();
+  go('calc');
+  render();
+  toast('已载入，改完点「更新这车」');
+}
+
+$('btnCancelEdit').onclick = ()=>{
+  editingId = null;
+  updateEditBar(null);
+  toast('已退出修改，再保存会新增一车');
+};
+
+/* ---- 保存 ---- */
+$('btnSave').onclick = ()=>{
+  const inp = readInp();
+  const R = compute(inp, P);
+  const problems = [];
+  if(inp.wIn <= 0) problems.push('到厂湿重');
+  if($('m').value.trim() === '') problems.push('含水率');
+  if(inp.pd <= 0) problems.push('纸厂结算价');
+  if(mode === '3'){ if(inp.plog <= 0) problems.push('原木价'); if(inp.r <= 0) problems.push('出片率'); }
+  else if(inp.pw <= 0) problems.push('采购价');
+  if(inp.basis === 'out' && inp.wOut <= 0) problems.push('出厂湿重');
+  if(problems.length){ toast('还差：' + problems.join('、')); return; }
+
+  const now = new Date().toISOString();
+  const rec = {id: editingId || ('r' + Date.now()), inp, out: R, savedAt: now, updatedAt: now};
+  const wasEdit = editingId;
+  if(editingId){
+    const idx = REC.findIndex(x=> x.id === editingId);
+    if(idx >= 0){ rec.savedAt = REC[idx].savedAt || now; REC[idx] = rec; }
+    else REC.push(rec);
+  } else {
+    REC.push(rec);
+  }
+
+  if(inp.supplier && !P.supList.includes(inp.supplier)) P.supList.push(inp.supplier);
+  if(inp.mill && !P.millList.includes(inp.mill)) P.millList.push(inp.mill);
+  if(inp.plate && !P.plateList.includes(inp.plate)) P.plateList.push(inp.plate);
+  save(K.P, P); save(K.R, REC);
+  renderChips(); renderRec(); renderSum(); dataInfo();
+  editingId = null;
+  updateEditBar(null);
+  toast((wasEdit ? '已更新 · 净利 ¥' : '已保存 · 净利 ¥') + fmt(R.net));
+};
+
+$('btnClear').onclick = ()=>{
+  ['wIn','wOut','m','pw','pd','freight','plog','mlog','r','process','freight3','logFreight','impurity','other','periodCost']
+    .forEach(id=>{ $(id).value = ''; });
+  $('plate').value = ''; $('supplier').value = '';
+  lockSel();
+  fillMillSelect('');
+  fillCatSelect('');
+  $('pd').value = '';
+  $('date').value = today();
+  editingId = null; updateEditBar(null);
+  render();
+  toast('已清空');
+};
+
+/* ---- 档案 ---- */
+const DICTS = {
+  supplier: {k:'supList', label:'供应商'},
+  mill:     {k:'millList', label:'纸厂'},
+  plate:    {k:'plateList', label:'车号'}
+};
+
+/* ---- 固定纸厂与品类报价 ----------------------------------------------
+   口径：含税、绝干吨、到厂现汇（元/吨）。留空/0 表示该品类停收。
+   来源：① 太阳纸业（南宁/北海）国内木片部公众号厂方挂牌；
+        ② 广西建晖、广西仙鹤取自《木片价格日报》转述的厂方挂牌
+          （仙鹤 6 档为 2026-11-11 挂牌，其中桉木片 1130 经 11-17
+           厂方报价复核仍持平，故报价日记为 11-17）；
+        ③ 木讯网《木片市场调研日报》2026-11-20 用于复核广西四厂。
+   注意：仙鹤不在木讯网日报的监测名单内，其价位属二手转述，可能滞后或
+        有转述误差；实际结算以厂方当日挂牌价、化验扣重与合同为准。 */
+const PX_AT = '2026-11-20';
+const MILLS = [
+  {id:'tynn', name:'太阳纸业（南宁）', cats:[
+    {n:'桉木片', p:0, at:'2026-11-01'},
+    {n:'桉木轴木片', p:1030, at:'2026-11-01'},
+    {n:'松木一级', p:1170, at:'2026-11-01'},
+    {n:'松木二级', p:1020, at:'2026-11-01'},
+    {n:'杂木片', p:990, at:'2026-11-01'},
+    {n:'广西相思木片', p:1170, at:'2026-11-01'},
+    {n:'苦楝木木片', p:1000, at:'2026-11-01'},
+    {n:'构木木片', p:1000, at:'2026-11-01'},
+    {n:'竹片A', p:990, at:'2026-11-01'},
+    {n:'竹片B', p:860, at:'2026-11-01'}
+  ]},
+  {id:'tybh', name:'太阳纸业（北海）', cats:[
+    {n:'桉木片A级', p:1180, at:'2026-11-11'},
+    {n:'桉木片B级', p:1200, at:'2026-11-11'},
+    {n:'桉木轴木片', p:1060, at:'2026-10-28'},
+    {n:'松木一级', p:1180, at:'2026-10-28'},
+    {n:'广西相思木片', p:1180, at:'2026-11-11'}
+  ]},
+  {id:'xh', name:'广西仙鹤新材料有限公司', cats:[
+    {n:'桉木片', p:1130, at:'2026-11-17'},
+    {n:'桉木片（3级）', p:1000, at:'2026-11-11'},
+    {n:'松木片', p:1130, at:'2026-11-11'},
+    {n:'松木片（2级）', p:1020, at:'2026-11-11'},
+    {n:'杂木片', p:980, at:'2026-11-11'},
+    {n:'桉木白皮', p:770, at:'2026-11-11'}
+  ]},
+  {id:'jh', name:'广西建晖纸业有限公司', cats:[
+    {n:'松木精片', p:1120, at:'2026-11-04'},
+    {n:'杂木精片', p:910, at:'2026-10-27'},
+    {n:'竹木精片', p:920, at:'2026-10-27'}
+  ]}
+];
+
+function millById(id){ return MILLS.find(m=> m.id === id) || null; }
+function millByName(n){ return MILLS.find(m=> m.name === n) || null; }
+/* 一条报价的取值与日期。
+   P.px 允许三种存法：旧版纯数字、{p,at}、{p,at,src:'net'}（联网/粘贴更新而来）。
+   manual = 用户自己在设置里改过；net = 来自报价更新。 */
+function pxEntry(mid, cat){
+  if(!mid || !cat) return {p:0, at:'', manual:false, net:false};
+  const key = mid + '|' + cat;
+  if(P.px && Object.prototype.hasOwnProperty.call(P.px, key)){
+    const raw = P.px[key];
+    if(raw && typeof raw === 'object'){
+      const p = (raw.p === '' || raw.p === null || raw.p === undefined) ? 0 : num(raw.p);
+      const net = raw.src === 'net';
+      return {p, at: raw.at || P.pxAt || PX_AT, manual: !net, net};
+    }
+    return {p: raw === '' || raw === null || raw === undefined ? 0 : num(raw),
+            at: P.pxAt || PX_AT, manual:true, net:false};
+  }
+  const m = millById(mid);
+  const c = m && m.cats.find(x=> x.n === cat);
+  return c ? {p:c.p, at:c.at, manual:false, net:false} : {p:0, at:'', manual:false, net:false};
+}
+/* 某纸厂的全部品类：内置 + 联网/粘贴新增的 */
+function catsOf(mill){
+  if(!mill) return [];
+  const extra = (P.catAdd && P.catAdd[mill.name]) || [];
+  if(!extra.length) return mill.cats;
+  const out = mill.cats.slice();
+  extra.forEach(c=>{ if(!out.some(x=> x.n === c.n)) out.push(c); });
+  return out;
+}
+function refPrice(mid, cat){ return pxEntry(mid, cat).p; }
+function refDate(mid, cat){ return pxEntry(mid, cat).at; }
+
+/* 报价日期的显示：short = 11/01（窄处用，跨年带年后缀 25/11/01），full = 2026-11-01 */
+function dShort(iso){
+  const s = String(iso || '');
+  if(s.length < 10) return '';
+  const y = String(new Date().getFullYear());
+  return s.slice(0,4) === y
+    ? s.slice(5,7) + '/' + s.slice(8,10)
+    : s.slice(2,4) + '/' + s.slice(5,7) + '/' + s.slice(8,10);
+}
+function dFull(iso){
+  const s = String(iso || '');
+  return s.length >= 10 ? s.slice(0,10) : s;
+}
+
+function fillMillSelect(keep){
+  const sel = $('mill');
+  if(!sel) return;
+  const cur = keep === undefined ? sel.value : keep;
+  let h = '<option value="">选择纸厂</option>';
+  MILLS.forEach(m=>{ h += '<option value="' + esc(m.name) + '">' + esc(m.name) + '</option>'; });
+  if(cur && !MILLS.some(m=> m.name === cur)) h += '<option value="' + esc(cur) + '">' + esc(cur) + '（旧记录）</option>';
+  sel.innerHTML = h;
+  sel.value = cur || '';
+}
+
+function fillCatSelect(keep){
+  const sel = $('cat');
+  if(!sel) return;
+  const m = millByName($('mill').value);
+  if(!m){
+    sel.innerHTML = '<option value="">先选纸厂</option>';
+    sel.disabled = true;
+    updatePxNote();
+    return;
+  }
+  sel.disabled = false;
+  let h = '<option value="">选择品类</option>';
+  catsOf(m).forEach(c=>{
+    const e = pxEntry(m.id, c.n);
+    const dt = dShort(e.at);
+    const tag = e.p > 0 ? dt : ('停收' + (dt ? ' ' + dt : ''));
+    h += '<option value="' + esc(c.n) + '">' + esc(c.n)
+      + (tag ? '（' + tag + '）' : '') + '</option>';
+  });
+  if(keep && !catsOf(m).some(c=> c.n === keep)) h += '<option value="' + esc(keep) + '">' + esc(keep) + '（原记录）</option>';
+  sel.innerHTML = h;
+  sel.value = keep || '';
+  updatePxNote();
+}
+
+function updatePxNote(){
+  const el = $('pxNote');
+  if(!el) return;
+  const m = millByName($('mill').value);
+  const cat = $('cat') ? $('cat').value : '';
+  if(!m){
+    el.textContent = '选纸厂和品类，自动带出挂牌价与报价日期；也可直接手填成交价';
+    el.className = 'pxn';
+    return;
+  }
+  const c = catsOf(m).find(x=> x.n === cat);
+  if(!c){
+    el.textContent = '选一个品类，自动带出该厂挂牌价和它的报价日期';
+    el.className = 'pxn';
+    return;
+  }
+  const e = pxEntry(m.id, c.n);
+  const d = dFull(e.at);
+  if(e.p <= 0){
+    el.textContent = '该品类' + (d ? ' ' + d + ' 起' : '') + '停收，如已复收请手填价格';
+    el.className = 'pxn off';
+    return;
+  }
+  el.textContent = '参考价 ' + fmt(e.p, 0) + ' 元/绝干吨 · '
+    + (d ? (e.manual ? '手工价，' + d + ' 更新' : d + ' 挂牌') : '未标日期')
+    + ' · 含税到厂，可改';
+  el.className = 'pxn';
+}
+
+/* 设置页：reference price editor */
+function renderPx(){
+  const box = $('pxBox');
+  if(!box) return;
+  box.innerHTML = MILLS.map(m=>{
+    const rows = catsOf(m).map(c=>{
+      const e = pxEntry(m.id, c.n);
+      const dt = dShort(e.at);
+      return '<label class="pxr"><span>' + esc(c.n)
+        + (dt ? '<em class="' + (e.manual ? 'man' : '') + '">' + dt + (e.manual ? '*' : '') + '</em>' : '')
+        + '</span>'
+        + '<input type="text" inputmode="decimal" data-px="' + esc(m.id + '|' + c.n) + '"'
+        + ' placeholder="停收" value="' + (e.p > 0 ? e.p : '') + '"></label>';
+    }).join('');
+    return '<div class="pxg">' + esc(m.name) + '</div>' + rows;
+  }).join('');
+  if($('pxAt')) $('pxAt').value = P.pxAt || PX_AT;
+  if($('pxAtTxt')) $('pxAtTxt').textContent = '采集 ' + (P.pxAt || PX_AT);
+}
+
+$('mill').onchange = ()=>{
+  fillCatSelect('');
+  $('pd').value = '';
+  updatePxNote();
+  render();
+};
+$('cat').onchange = ()=>{
+  const m = millByName($('mill').value);
+  const c = m && m.cats.find(x=> x.n === $('cat').value);
+  if(c){
+    const p = refPrice(m.id, c.n);
+    $('pd').value = p > 0 ? p : '';
+  }
+  updatePxNote();
+  render();
+};
+$('pxBox').addEventListener('change', e=>{
+  const el = e.target.closest('[data-px]');
+  if(!el) return;
+  P.px = Object.assign({}, P.px || {});
+  const p = el.value.trim() === '' ? 0 : num(el.value);
+  P.px[el.dataset.px] = {p, at: today()};
+  save(K.P, P);
+  renderPx();
+  updatePxNote();
+  toast('参考价已更新 · 报价日 ' + today());
+});
+$('pxAt').onchange = ()=>{
+  P.pxAt = $('pxAt').value || PX_AT;
+  save(K.P, P);
+  renderPx();
+};
+$('btnPxReset').onclick = ()=>{
+  if(!confirm('把 4 家纸厂的参考价恢复成采集值？手工改过的价格会丢掉。')) return;
+  P.px = {};
+  P.pxAt = PX_AT;
+  save(K.P, P);
+  renderPx();
+  updatePxNote();
+  toast('已恢复采集值');
+};
+
+/* ---- 报价更新：一键联网 / 粘贴日报 -------------------------------------
+   数据源是一个 JSON（默认同目录 prices.json），结构：
+   { at:'2026-11-16', src:'木讯网 木片市场调研日报',
+     mills:[{name:'广西北海', cats:[{n:'松木一级', p:1180, at:'2026-11-16'}]}] }
+   纸厂按 name 或 id 匹配；品类按名称匹配，没见过的自动加进 P.catAdd。 */
+
+const PX_SRC_DEF = 'prices.json';
+let _pxUndo = null;
+
+/* 品类别名：日报里的简写与正文写法 */
+const CAT_ALIAS = {
+  '广西相思木片': ['相思木片', '相思'],
+  '桉木轴木片':   ['桉木轴木片', '桉木轴', '轴木片'],
+  '桉木片A级':    ['桉木片A级', '桉木片A', '桉木A级', 'A级桉木片'],
+  '桉木片B级':    ['桉木片B级', '桉木片B', '桉木B级', 'B级桉木片'],
+  '桉木片（3级）': ['桉木片3级', '桉木片（3级）', '桉木片(3级)'],
+  '松木片（2级）': ['松木片2级', '松木片（2级）', '松木片(2级)'],
+  '松木一级':     ['松木一级', '松木1级', '松一'],
+  '松木二级':     ['松木二级', '松木2级', '松二'],
+  '竹片A':        ['竹片A', '竹A'],
+  '竹片B':        ['竹片B', '竹B'],
+  '苦楝木木片':   ['苦楝木片', '苦楝木木片'],
+  '构木木片':     ['构木木片', '构木片'],
+  '松木精片':     ['松木精片', '松精片'],
+  '杂木精片':     ['杂木精片', '杂精片']
+};
+
+function pxSrcUrl(){
+  const s = String(P.pxSrc || '').trim();
+  return s || PX_SRC_DEF;
+}
+function absUrl(u){
+  try{ return new URL(u, location.href).href; }catch(e){ return u; }
+}
+
+async function pxFetchLatest(){
+  if(typeof fetch !== 'function') throw new Error('这个浏览器不支持联网更新');
+  if(location.protocol === 'file:'){
+    throw new Error('本地文件打开时不能联网，请用 https 地址打开，或改用「粘贴日报更新」');
+  }
+  const url = absUrl(pxSrcUrl());
+  const bust = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_=' + Date.now();
+  const r = await fetch(bust, {cache:'no-store'});
+  if(!r.ok) throw new Error('取不到报价文件（HTTP ' + r.status + '）');
+  const d = await r.json();
+  if(!d || !Array.isArray(d.mills)) throw new Error('报价文件格式不对，缺 mills 列表');
+  return d;
+}
+
+/* 名称归一：去空格、全角括号转半角，用于宽松匹配 */
+function pxNorm(s){
+  return String(s || '').replace(/\s+/g, '')
+    .replace(/（/g, '(').replace(/）/g, ')')
+    .replace(/[·・]/g, '').toLowerCase();
+}
+
+/* 归一化同时记住每个字符在原串中的位置，便于回切片 */
+function normMap(s){
+  let out = '', idx = [];
+  for(let i = 0; i < s.length; i++){
+    const ch = s[i];
+    if(/\s/.test(ch)) continue;
+    out += pxNorm(ch);
+    idx.push(i);
+  }
+  return {out, idx};
+}
+
+/* 在一行文字里找该厂的一个品类；返回品类与它在原串中的起止 */
+function findCat(line, cats){
+  const {out, idx} = normMap(line);
+  const cand = [];
+  cats.forEach(c=>{
+    if(/原木|湿吨|木屑|板皮/.test(c.n)) return;
+    const names = [c.n].concat(CAT_ALIAS[c.n] || []);
+    names.forEach(nm=>{
+      const n = pxNorm(nm);
+      if(n) cand.push({c, n});
+    });
+  });
+  cand.sort((a,b)=> b.n.length - a.n.length);
+  for(const k of cand){
+    let pos = out.indexOf(k.n);
+    while(pos >= 0){
+      const nxt = out[pos + k.n.length] || '';
+      /* 短名（≤3 字）后面紧跟 a/b 或数字，说明是更长品类的前半截，跳过 */
+      if(k.n.length <= 3 && /[a-z0-9]/.test(nxt)){
+        pos = out.indexOf(k.n, pos + 1);
+        continue;
+      }
+      const s = idx[pos], e = idx[pos + k.n.length - 1] + 1;
+      return {cat:k.c, s, e};
+    }
+  }
+  return null;
+}
+
+/* 一行文字属于哪家厂；不是我们的 4 家就返回 null。
+   东莞建晖、玖龙、植护、贵糖等必须排除，别把别家价算进来。 */
+function pxMillOfLine(line){
+  if(/东莞|玖龙|植护|贵糖|石首|山东太阳|骏泰|岳阳|五洲|联盛|冠豪|晨鸣|聊城|濮阳|焦作|新亚|唐山|黄冈|金桂|亚太森博/.test(line)) return null;
+  if(/广西南宁|南宁太阳|太阳纸业\s*[（(]\s*南宁/.test(line)) return millByName('太阳纸业（南宁）');
+  if(/广西北海|北海太阳|太阳纸业\s*[（(]\s*北海/.test(line)) return millByName('太阳纸业（北海）');
+  if(/仙鹤/.test(line)) return millByName('广西仙鹤新材料有限公司');
+  if(/广西建晖|建晖\s*[（(]\s*广西/.test(line)) return millByName('广西建晖纸业有限公司');
+  return null;
+}
+
+/* 文本里的基准日期：优先 2026年11月16日，其次 11 月 16 日 */
+function pxBaseDate(txt){
+  const s = String(txt || '');
+  let m = s.match(/(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+  if(m) return m[1] + '-' + String(m[2]).padStart(2,'0') + '-' + String(m[3]).padStart(2,'0');
+  m = s.match(/(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+  if(m){
+    const now = new Date();
+    const mo = +m[1];
+    const yy = mo > now.getMonth() + 2 ? now.getFullYear() - 1 : now.getFullYear();
+    return yy + '-' + String(mo).padStart(2,'0') + '-' + String(m[2]).padStart(2,'0');
+  }
+  return '';
+}
+
+/* 从一段文字里抽出「厂 × 品类 × 价格 × 日期」。
+   支持表格（制表符/空格分隔），也支持正文里一行写多个品类。 */
+function parsePriceText(txt){
+  const raw = String(txt || '').replace(/\r/g, '');
+  const base = pxBaseDate(raw);
+  const found = new Map();
+
+  raw.split(/[\n；;。]/).forEach(seg=>{
+    const line = seg.trim();
+    if(!line || line.length > 400) return;
+    const mill = pxMillOfLine(line);
+    if(!mill) return;
+    const cats = catsOf(mill);
+    let rest = line;
+    for(let guard = 0; guard < 16; guard++){
+      const hit = findCat(rest, cats);
+      if(!hit) break;
+      const tail = rest.slice(hit.e, hit.e + 26);
+      const am = tail.match(/(?:→|->|⇒)\s*(\d{3,4})/);
+      const pm = am || tail.match(/(\d{3,4})/);
+      rest = rest.slice(0, hit.s) + rest.slice(hit.e);
+      if(!pm) continue;
+      const p = +pm[1];
+      if(!(p >= 300 && p <= 3000)) continue;
+      const dm = line.match(/(\d{1,2})\s*月\s*(\d{1,2})\s*日/)
+             || line.match(/(?:^|\s)(\d{1,2})\s*\/\s*(\d{1,2})(?=\s|$)/);
+      let at = base;
+      if(dm){
+        const y = base ? +base.slice(0,4) : new Date().getFullYear();
+        at = y + '-' + String(dm[1]).padStart(2,'0') + '-' + String(dm[2]).padStart(2,'0');
+      }
+      found.set(mill.id + '|' + hit.cat.n, {mill, cat:hit.cat.n, p, at});
+    }
+  });
+  return [...found.values()];
+}
+
+/* 把一批报价写进 P。返回摘要，供面板显示和撤销。 */
+function applyPxItems(items, meta){
+  meta = meta || {};
+  const snap = {
+    px: JSON.parse(JSON.stringify(P.px || {})),
+    catAdd: JSON.parse(JSON.stringify(P.catAdd || {})),
+    pxAt: P.pxAt || '', pxMeta: JSON.parse(JSON.stringify(P.pxMeta || {}))
+  };
+  const changed = [], added = [], same = [], dated = [];
+  const seen = new Set();
+
+  items.forEach(it=>{
+    let mill = it.mill || millById(it.mid) || millByName(it.millName);
+    if(!mill) return;
+    const name = String(it.cat || '').trim();
+    if(!name) return;
+    const key = mill.id + '|' + name;
+    if(seen.has(key)) return;
+    seen.add(key);
+
+    const p = num(it.p);
+    const at = String(it.at || meta.at || '').slice(0, 10);
+    const before = pxEntry(mill.id, name);
+    const isNewCat = !mill.cats.some(x=> x.n === name);
+
+    if(isNewCat){
+      P.catAdd = P.catAdd || {};
+      const add = (P.catAdd[mill.name] = P.catAdd[mill.name] || []);
+      if(!add.some(x=> x.n === name)) add.push({n:name, p, at});
+      added.push({mill:mill.name, cat:name, to:p, at});
+    }
+    if(!isNewCat && before.p === p && dFull(before.at) === at){
+      same.push({mill:mill.name, cat:name, p, at});
+    } else if(!isNewCat && before.p === p){
+      /* 价没动、只是纸厂重新报了一次（或日报把报价日推后了）——不算调价 */
+      dated.push({mill:mill.name, cat:name, p, at, fromAt: dFull(before.at)});
+    } else {
+      changed.push({mill:mill.name, cat:name, from:before.p, to:p, at, isNewCat});
+    }
+    P.px = Object.assign({}, P.px || {});
+    P.px[key] = {p, at, src:'net'};
+  });
+
+  const stamps = items.map(it=> String(it.at || meta.at || '')).filter(s=> s.length >= 10).sort();
+  const at = stamps.length ? stamps[stamps.length - 1].slice(0, 10) : (meta.at || '');
+  if(at) P.pxAt = at;
+  P.pxMeta = {
+    at: at || (P.pxMeta && P.pxMeta.at) || '',
+    srcAt: meta.at || '',
+    src: meta.src || '',
+    by: meta.by || '',
+    checked: new Date().toISOString(),
+    n: changed.length + dated.length + added.length
+  };
+  save(K.P, P);
+  _pxUndo = snap;
+  return {at, srcAt: meta.at || '', src: meta.src || '', changed, dated, added, same};
+}
+
+/* 摘要面板 */
+function pxResultHTML(res){
+  const n = res.changed.length, a = res.added.length, s = res.same.length;
+  const dt = (res.dated || []).length;
+  let h = '<div class="pxr-h">更新到 ' + esc(dFull(res.at) || '未标日期')
+    + (res.srcAt && dFull(res.srcAt) !== dFull(res.at) ? '<span class="pxr-hop">· ' + esc(dShort(res.srcAt)) + ' 日报</span>' : '')
+    + '</div>';
+  h += '<div class="pxr-s">' + (res.src ? esc(res.src) + '<br>' : '')
+    + '价格变动 <b>' + n + '</b> 项'
+    + (dt ? ' · 仅刷新报价日 <b>' + dt + '</b> 项' : '')
+    + ' · 新增品类 <b>' + a + '</b> 项 · 未变 <b>' + s + '</b> 项</div>';
+  if(n){
+    h += '<div class="sheet-t">价格变动</div>';
+    h += res.changed.map(c=>{
+      const up = c.to > c.from;
+      const diff = c.to - c.from;
+      return '<div class="pxr-row"><span class="m">' + esc(c.mill) + '<em>' + esc(c.cat) + '</em></span>'
+        + '<span class="v">' + (c.from > 0 ? fmt(c.from,0) + ' → ' : '') + '<b>' + fmt(c.to,0) + '</b>'
+        + (diff ? '<i class="' + (up ? 'up' : 'dn') + '">' + (up ? '▲' : '▼') + fmt(Math.abs(diff),0) + '</i>' : '')
+        + '</span></div>';
+    }).join('');
+  }
+  if(a){
+    h += '<div class="sheet-t">新增品类</div>';
+    h += res.added.map(c=> '<div class="pxr-row"><span class="m">' + esc(c.mill) + '<em>' + esc(c.cat)
+      + '</em></span><span class="v"><b>' + fmt(c.to,0) + '</b></span></div>').join('');
+  }
+  if(dt){
+    h += '<div class="sheet-t">报价日刷新（价未变）</div>';
+    h += res.dated.map(c=> '<div class="pxr-row"><span class="m">' + esc(c.mill) + '<em>' + esc(c.cat) + '</em></span>'
+      + '<span class="v"><b>' + fmt(c.p,0) + '</b><i class="dt">'
+      + esc(dShort(c.fromAt) || '—') + ' → ' + esc(dShort(c.at) || '—') + '</i></span></div>').join('');
+  }
+  if(!n && !a && !dt) h += '<div class="hint" style="margin-top:10px">价格和本机一致，没有需要改的。</div>';
+  h += '<div class="btns" style="margin-top:14px">'
+    + '<button class="btn" data-act="pxundo">撤销这次更新</button>'
+    + '<button class="btn pri" data-act="pxclose">知道了</button></div>';
+  return h;
+}
+
+function pxShowResult(res){
+  openSheet('报价已更新', pxResultHTML(res));
+  renderPx(); updatePxNote(); renderPxUpd();
+  const n2 = res.changed.length + (res.dated || []).length + res.added.length;
+  toast(n2 ? '已更新 ' + n2 + ' 项 · 报价日 ' + (dFull(res.at) || '未标') : '已是最新，没有变化');
+}
+
+function renderPxUpd(){
+  const el = $('pxUpd');
+  if(!el) return;
+  const m = P.pxMeta || {};
+  if(!m.checked){
+    el.className = 'pxu';
+    el.textContent = '还没查过。内置价截至 ' + PX_AT + '，点上面按钮可联网取最新一版。';
+    return;
+  }
+  const when = String(m.checked).slice(0, 16).replace('T', ' ');
+  const days = m.at ? Math.floor((Date.now() - new Date(m.at + 'T00:00:00').getTime()) / 86400000) : null;
+  /* 木讯网日报只在工作日发，周末与节假日不出；阈值定 6 天，
+     这样周五查过、周一早上打开不会误报「过期」。 */
+  const stale = days !== null && days >= 6;
+  el.className = 'pxu' + (stale ? ' warn' : '');
+  el.innerHTML = '上次更新：<b>' + esc(dFull(m.at) || '—') + '</b> 的报价'
+    + (m.srcAt && dFull(m.srcAt) !== dFull(m.at) ? ' · ' + esc(dShort(m.srcAt)) + ' 日报' : '')
+    + ' · ' + esc(when) + ' 获取' + (m.src ? '，来源 ' + esc(m.src) : '')
+    + (stale ? '<br>已经是 ' + days + ' 天前的价，建议用「粘贴日报更新」贴一份最新日报。' : '');
+}
+
+/* 粘贴面板 */
+function pxOpenPaste(){
+  const box = '<div class="hint" style="margin:0 0 8px">把日报里「纸厂 品类 价格 日期」那几行复制过来，或整篇粘进来也行。只认广西这 4 家厂，东莞建晖、玖龙等会自动跳过。</div>'
+    + '<textarea id="pxPasteTa" class="ta" placeholder="例：&#10;广西北海 桉木片A级 1180 11月16日&#10;广西南宁 松木一级 1170 11月16日"></textarea>'
+    + '<div class="btns" style="margin-top:12px"><button class="btn pri" data-act="pxparse">解析并更新</button></div>';
+  openSheet('粘贴日报更新', box);
+}
+
+async function pxDoFetch(btn){
+  if(!btn) return;
+  const old = btn.textContent;
+  btn.disabled = true; btn.textContent = '查询中…';
+  try{
+    const d = await pxFetchLatest();
+    const items = [];
+    (d.mills || []).forEach(m=>{
+      const mill = millByName(m.name) || millById(m.id);
+      if(!mill) return;
+      (m.cats || []).forEach(c=>{
+        items.push({mill, cat:c.n, p:c.p, at:c.at || d.at});
+      });
+    });
+    if(!items.length) throw new Error('报价文件里没有可用的品类');
+    const res = applyPxItems(items, {at:d.at, src:d.src || '联网报价', by:'net'});
+    pxShowResult(res);
+  }catch(e){
+    openSheet('没查成', '<div class="hint" style="margin:0">' + esc(e.message || '未知错误')
+      + '</div><div class="hint">本机价格照旧可用，不影响测算。<br>也可以点「粘贴日报更新」，把日报文字粘进来更新。</div>'
+      + '<div class="btns" style="margin-top:12px"><button class="btn" data-act="pxclose">关闭</button>'
+      + '<button class="btn pri" data-act="pxpaste">改用粘贴更新</button></div>');
+  }finally{
+    btn.disabled = false; btn.textContent = old;
+  }
+}
+if($('btnPxFetch')) $('btnPxFetch').onclick = ()=> pxDoFetch($('btnPxFetch'));
+if($('btnPxFetch2')) $('btnPxFetch2').onclick = ()=> pxDoFetch($('btnPxFetch2'));
+
+$('btnPxPaste').onclick = ()=> pxOpenPaste();
+
+document.addEventListener('click', e=>{
+  const el = e.target.closest('[data-act]');
+  if(!el) return;
+  const a = el.dataset.act;
+  if(a === 'pxpaste'){ pxOpenPaste(); return; }
+  if(a === 'pxclose'){ closeSheet(); return; }
+  if(a === 'pxparse'){
+    const ta = $('pxPasteTa');
+    const txt = ta ? ta.value : '';
+    const items = parsePriceText(txt);
+    if(!items.length){
+      toast('没认出这 4 家厂的价格，检查文字里有没有厂名和数字');
+      return;
+    }
+    const res = applyPxItems(items, {at:pxBaseDate(txt), src:'粘贴日报', by:'paste'});
+    pxShowResult(res);
+    return;
+  }
+  if(a === 'pxundo'){
+    if(!_pxUndo){ closeSheet(); return; }
+    P.px = _pxUndo.px; P.catAdd = _pxUndo.catAdd;
+    P.pxAt = _pxUndo.pxAt; P.pxMeta = _pxUndo.pxMeta;
+    save(K.P, P);
+    _pxUndo = null;
+    closeSheet();
+    renderPx(); updatePxNote(); renderPxUpd();
+    toast('已撤销，回到更新前的价格');
+  }
+});
+
+function arrOf(kind){
+  const key = DICTS[kind].k;
+  if(!Array.isArray(P[key])) P[key] = [];
+  return P[key];
+}
+function renderChips(){
+  Object.keys(DICTS).forEach(kind=>{
+    const arr = arrOf(kind);
+    const box = $('chips-' + kind);
+    if(!box) return;
+    box.innerHTML = arr.length
+      ? arr.map((v, i)=> '<span class="chip"><span>' + esc(v) + '</span><button data-del="' + kind + '" data-i="' + i + '">×</button></span>').join('')
+      : '<span class="hint" style="margin:0">还没有</span>';
+    const d = box.closest('details');
+    if(d){
+      const s = d.querySelector('summary');
+      const base = DICTS[kind].label;
+      s.textContent = base + (arr.length ? '（' + arr.length + '）' : '');
+    }
+  });
+}
+function addChip(kind){
+  const input = $('add-' + kind);
+  const raw = input.value.trim();
+  if(!raw) return;
+  const arr = arrOf(kind);
+  let n = 0;
+  raw.split(/[,，、;；\n]/).map(s=>s.trim()).filter(Boolean).forEach(v=>{
+    if(!arr.includes(v)){ arr.push(v); n++; }
+  });
+  save(K.P, P);
+  input.value = '';
+  renderChips();
+  if(n) toast('已添加 ' + n + ' 条');
+}
+
+/* ---- 点框即选 ---- */
+const SEL_PH = {plate:'点这里选车号', supplier:'点这里选供应商', mill:'点这里选纸厂'};
+const TYPE_PH = {plate:'辽A12345', supplier:'木片厂名称', mill:'收货纸厂'};
+
+function openPicker(kind){
+  const arr = arrOf(kind);
+  const cur = (($(kind) || {}).value || '').trim();
+  const list = arr.length
+    ? arr.map(v=>{
+        const on = v === cur;
+        return '<div class="pi' + (on ? ' on' : '') + '" data-v="' + esc(v) + '" data-k="' + kind + '">'
+          + '<span class="n">' + esc(v) + '</span>'
+          + (on ? '<span class="ck">✓</span>' : '<span class="a">›</span>')
+          + '</div>';
+      }).join('')
+    : '<div class="pi empty">档案还是空的，可先手动输入，或去「设置 → 基础档案」添加</div>';
+  const manual = '<div class="pi" data-manual="' + kind + '"><span class="n">手动输入（不在上面）</span><span class="a">✎</span></div>';
+  openSheet('选择' + DICTS[kind].label, list + manual);
+}
+
+function lockSel(kinds){
+  (kinds ? [].concat(kinds) : ['plate','supplier']).forEach(k=>{
+    const el = $(k);
+    if(!el) return;
+    el.readOnly = true;
+    el.classList.remove('typing');
+    if(!el.value.trim()) el.placeholder = SEL_PH[k] || '';
+  });
+}
+
+function startManual(kind){
+  const el = $(kind);
+  if(!el) return;
+  closeSheet();
+  el.readOnly = false;
+  el.classList.add('typing');
+  el.placeholder = TYPE_PH[kind] || '';
+  el.focus();
+  el.addEventListener('blur', ()=> lockSel(kind), {once:true});
+}
+
+document.addEventListener('click', e=>{
+  const act = e.target.closest('[data-act]');
+  if(act){
+    const a = act.dataset.act;
+    if(a === 'imp-merge' || a === 'imp-replace'){ applyImport(a === 'imp-replace' ? 'replace' : 'merge'); return; }
+    if(a === 'fund-sync'){ fundSync(); return; }
+    if(a === 'real-from-ledger'){
+      const p = ledgerPace();
+      if(!(p.q > 0)){ toast('台账还不够，先记两车'); return; }
+      if($('fReal')) $('fReal').value = p.q.toFixed(2);
+      saveFund(); renderTurn();
+      toast('已按台账日均 ' + p.q.toFixed(2) + ' 车/天');
+      return;
+    }
+    if(a === 'copy' && _revCtx){ copyText(receiptText(_revCtx.inp, _revCtx.R)); return; }
+    if(a === 'edit' && _sheetId){
+      const r = REC.find(x=> x.id === _sheetId);
+      if(r) loadForEdit(r);
+      return;
+    }
+    if(a === 'del' && _sheetId){
+      if(!confirm('删除这条记录？不可恢复。')) return;
+      REC = REC.filter(x=> x.id !== _sheetId);
+      save(K.R, REC);
+      closeSheet(); renderRec(); renderSum(); dataInfo();
+      toast('已删除');
+      return;
+    }
+  }
+
+  if(e.target.closest('[data-close]')){ closeSheet(); return; }
+
+  const add = e.target.closest('[data-add]');
+  if(add){ addChip(add.dataset.add); return; }
+
+  const del = e.target.closest('[data-del]');
+  if(del){
+    arrOf(del.dataset.del).splice(+del.dataset.i, 1);
+    save(K.P, P); renderChips();
+    return;
+  }
+
+  const selBox = e.target.closest('.sel');
+  if(selBox){
+    const el = selBox.querySelector('input');
+    if(el && el.readOnly) openPicker(el.id);
+    return;
+  }
+
+  const man = e.target.closest('[data-manual]');
+  if(man){ startManual(man.dataset.manual); return; }
+
+  const item = e.target.closest('.pi[data-v]');
+  if(item){
+    $(item.dataset.k).value = item.dataset.v;
+    closeSheet();
+    render();
+  }
+});
+
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape') closeSheet();
+  if(e.key === 'Enter' && e.target.id && /^add-(supplier|mill|plate)$/.test(e.target.id)){
+    e.preventDefault();
+    addChip(e.target.id.slice(4));
+  }
+});
+
+/* ---- 设置 ---- */
+function fillSet(){
+  const set = (id, v)=> { const el = $(id); if(el) el.value = (v === 0 || v || v === '0') ? v : ''; };
+  set('sPw', P.pw); set('sPd', P.pd); set('sFreight', P.freight);
+  set('sPlow', P.plow); set('sR', P.r); set('sProcess', P.process);
+  set('sM0', P.m0); set('sMlog', P.mlog);
+  set('sSurtax', P.surtax); set('sItax', P.incomeTax); set('sStamp', P.stamp);
+  if($('sTicket')) $('sTicket').value = P.ticket || '13';
+  renderChips();
+  fillMillSelect();
+  fillCatSelect($('cat') ? $('cat').value : '');
+  renderPx();
+  renderPxUpd();
+  dataInfo();
+}
+
+function applyParams(){
+  const map = { pw:P.pw, pd:P.pd, freight:P.freight, plog:P.plow, mlog:P.mlog, r:P.r, process:P.process };
+  Object.keys(map).forEach(id=>{
+    const v = map[id];
+    if(v === '' || v === null || v === undefined) return;
+    $(id).value = v;
+  });
+  if(P.ticket) $('ticket').value = P.ticket;
+}
+
+$('btnSaveSet').onclick = ()=>{
+  const nb = id => { const v = $(id).value.trim(); return v === '' ? '' : num(v); };
+  P = {
+    m0: nb('sM0'),
+    surtax: num($('sSurtax').value) || 12,
+    incomeTax: num($('sItax').value) || 25,
+    stamp: $('sStamp').value.trim() === '' ? 0.03 : num($('sStamp').value),
+    pw: nb('sPw'), pd: nb('sPd'), freight: nb('sFreight'),
+    plow: nb('sPlow'), r: nb('sR'), process: nb('sProcess'), mlog: nb('sMlog'),
+    ticket: $('sTicket').value || P.ticket || '13',
+    supList: P.supList, millList: P.millList, plateList: P.plateList,
+    px: P.px || {}, pxAt: P.pxAt || '',
+    pxSrc: P.pxSrc || '', pxMeta: P.pxMeta || {}, catAdd: P.catAdd || {},
+    fund: fundP()
+  };
+  save(K.P, P);
+  applyParams();
+  fillSet();
+  render();
+  toast('设置已保存并同步');
+};
+
+/* ---- 汇总 ---- */
+function groupKey(r, by){
+  const i = r.inp || {};
+  if(by === 'month') return (i.date || '').slice(0,7) || '未填日期';
+  if(by === 'supplier') return i.supplier || '未填供应商';
+  if(by === 'mill') return i.mill || '未填纸厂';
+  return '模式' + (i.mode || '?');
+}
+function aggregate(by){
+  const m = new Map();
+  REC.forEach(r=>{
+    const o = r.out || {};
+    const k = groupKey(r, by);
+    if(!m.has(k)) m.set(k, {k, n:0, D:0, rev:0, vat:0, net:0, allTax:0});
+    const g = m.get(k);
+    g.n++;
+    g.D += o.D || 0;
+    g.rev += o.revNet || 0;
+    g.vat += o.vatPay || 0;
+    g.net += o.net || 0;
+    g.allTax += (o.vatPay || 0) + (o.surtax || 0) + (o.stamp || 0) + (o.itax || 0);
+  });
+  const arr = [...m.values()];
+  arr.forEach(g=>{
+    g.perDry = g.D > 0 ? g.net/g.D : 0;
+    g.margin = g.rev > 0 ? g.net/g.rev : 0;
+    g.allRate = g.rev > 0 ? g.allTax/g.rev : 0;
+  });
+  if(by === 'month') arr.sort((a,b)=> a.k.localeCompare(b.k));
+  else arr.sort((a,b)=> b.net - a.net);
+  return arr;
+}
+function renderSum(){
+  const arr = aggregate(grpBy);
+  const tot = arr.reduce((s,g)=> ({n:s.n+g.n, D:s.D+g.D, rev:s.rev+g.rev, net:s.net+g.net, tax:s.tax+g.allTax}),
+    {n:0, D:0, rev:0, net:0, tax:0});
+  $('smNet').textContent = '¥' + fmt(tot.net);
+  $('smCnt').textContent = tot.n;
+  $('smD').textContent = fmt(tot.D, 2);
+  $('smTax').textContent = tot.rev > 0 ? pct(tot.tax/tot.rev) : '—';
+  $('smDim').textContent = ({month:'按月', supplier:'按供应商', mill:'按纸厂', mode:'按模式'})[grpBy] || '';
+
+  if(!arr.length){
+    $('smBars').innerHTML = '<div class="hint" style="margin:0">还没有数据，先保存几车</div>';
+    $('smList').innerHTML = '';
+    return;
+  }
+  const max = Math.max(...arr.map(g=> Math.abs(g.net)), 1);
+  $('smBars').innerHTML = arr.map(g=>{
+    const w = Math.max(2, Math.abs(g.net)/max*100);
+    return '<div class="bar' + (g.net < 0 ? ' neg' : '') + '">'
+      + '<div class="n">' + esc(g.k) + '</div>'
+      + '<div class="t"><i class="' + (g.net < 0 ? 'neg' : '') + '" style="width:' + w.toFixed(1) + '%"></i></div>'
+      + '<div class="v">' + (g.net < 0 ? '−' : '') + fmt(Math.abs(g.net), 0) + '</div></div>';
+  }).join('');
+
+  $('smList').innerHTML = arr.map(g=>
+    '<div class="grp">'
+    + '<div class="grp-h"><b class="' + (g.net < 0 ? 'neg' : '') + '">' + esc(g.k) + '</b>'
+    + '<span>' + g.n + ' 车 · ' + (g.net < 0 ? '−' : '') + '¥' + fmt(Math.abs(g.net), 0) + '</span></div>'
+    + '<div class="grp-s">'
+    + '<div>绝干吨 <em>' + fmt(g.D, 2) + '</em></div>'
+    + '<div>吨均 <em>¥' + fmt(g.perDry, 0) + '</em></div>'
+    + '<div>净利率 <em>' + pct(g.margin) + '</em></div>'
+    + '<div>税负 <em>' + pct(g.allRate) + '</em></div>'
+    + '<div>增值税 <em>¥' + fmt(g.vat, 0) + '</em></div>'
+    + '</div></div>').join('');
+}
+
+/* ---- 导出 ---- */
+function toCSV(rows){
+  return '\ufeff' + rows.map(r=> r.map(c=> '"' + String(c === undefined || c === null ? '' : c).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+}
+function download(name, text, type){
+  const blob = new Blob([text], {type: type || 'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800);
+}
+function exportDetail(){
+  if(!REC.length){ toast('没有记录可导出'); return; }
+  const head = ['日期','车号','供应商','纸厂','品类','模式','上游票种','出厂湿重','到厂湿重','含水率%','扣杂吨','结算湿吨','绝干吨',
+    '采购含税','采购进项','运费含税','运费进项','加工费','其他','销项税','进项合计','应纳增值税','不含税收入','不含税毛利','含税毛利',
+    '附加','印花','所得税','净利','每绝干吨净利','增值税税负率','全口径税负率','净利率'];
+  const rows = REC.map(r=>{
+    const i = r.inp || {}, o = r.out || {}, ex = o.extra || {};
+    return [i.date, i.plate, i.supplier, i.mill, i.cat || '', '模式' + i.mode,
+      i.mode === '3' ? ('原木' + (i.logTicket === '9' ? '9%' : '免税')) : (i.ticket + '%'),
+      i.wOut, i.wIn, i.m, i.impurity, ex.settleWet || '', (o.D || 0).toFixed(3),
+      (ex.buyAmt ?? ex.logAmt ?? 0).toFixed(2), (ex.buyIn ?? ex.logIn ?? 0).toFixed(2),
+      (ex.frAmt || 0).toFixed(2), (ex.frIn || 0).toFixed(2), (ex.procAmt || 0).toFixed(2), (i.other || 0).toFixed(2),
+      (o.outVat || 0).toFixed(2), (o.costIn || 0).toFixed(2), (o.vatPay || 0).toFixed(2),
+      (o.revNet || 0).toFixed(2), (o.gross || 0).toFixed(2), (o.grossTax || 0).toFixed(2),
+      (o.surtax || 0).toFixed(2), (o.stamp || 0).toFixed(2), (o.itax || 0).toFixed(2),
+      (o.net || 0).toFixed(2), (o.perDry || 0).toFixed(2),
+      ((o.vatRate || 0)*100).toFixed(2) + '%', ((o.allRate || 0)*100).toFixed(2) + '%',
+      ((o.netMargin || 0)*100).toFixed(2) + '%'];
+  });
+  download('木片每车明细-' + today() + '.csv', toCSV([head, ...rows]));
+  toast('已导出 ' + REC.length + ' 车明细');
+}
+function exportSum(){
+  const arr = aggregate(grpBy);
+  if(!arr.length){ toast('没有数据'); return; }
+  const dim = ({month:'月份', supplier:'供应商', mill:'纸厂', mode:'模式'})[grpBy];
+  const head = [dim, '车数', '绝干吨', '不含税收入', '应纳增值税', '净利', '吨均净利', '净利率', '全口径税负率'];
+  const rows = arr.map(g=> [g.k, g.n, g.D.toFixed(2), g.rev.toFixed(2), g.vat.toFixed(2), g.net.toFixed(2),
+    g.perDry.toFixed(2), (g.margin*100).toFixed(2) + '%', (g.allRate*100).toFixed(2) + '%']);
+  download('木片汇总-' + today() + '.csv', toCSV([head, ...rows]));
+  toast('已导出汇总');
+}
+
+$('btnCsvRec').onclick = exportDetail;
+$('btnCsvAll').onclick = exportDetail;
+$('btnCsvSum').onclick = exportSum;
+
+/* ---- 周转：一笔钱循环运转能赚多少 ---------------------------------- */
+function fundP(){
+  const d = DEF.fund, v = (P.fund && typeof P.fund === 'object') ? P.fund : {};
+  const o = {};
+  Object.keys(d).forEach(k=>{ o[k] = (v[k] === undefined || v[k] === null) ? d[k] : v[k]; });
+  if(!(num(v.ver) >= 2)){
+    /* 旧版口径：账期默认 30 天、日发车上限手填。按现在的「预付 + 2~3 天尾款」节奏重算一次 */
+    o.ver = 2;
+    o.millDays = num(o.preDay) + num(o.labDays) + num(o.tailDays) + num(o.collectDays);
+    o.realCapDay = num(v.capDay) > 0 ? num(v.capDay) : 0;
+  }
+  return o;
+}
+function tMoney(n){
+  if(!isFinite(n)) return '—';
+  const neg = n < 0, a = Math.abs(n);
+  const s = a >= 10000 ? (fmt(a/10000, 1) + '万') : fmt(a, 0);
+  return (neg ? '-¥' : '¥') + s;
+}
+/* 纸厂结算节奏 → 账期天数（到厂 → 收齐尾款） */
+function fundSeq(f){
+  return Math.max(0, num(f.preDay)) + Math.max(0, num(f.labDays))
+       + Math.max(0, num(f.tailDays)) + Math.max(0, num(f.collectDays));
+}
+
+function fillTurn(){
+  const f = fundP();
+  const put = (id, v, blankZero)=>{
+    const el = $(id); if(!el) return;
+    if(v === '' || v === null || v === undefined) el.value = '';
+    else if(v === 0 && blankZero) el.value = '';
+    else el.value = String(v);
+  };
+  put('fCap', f.cap ? +(f.cap/10000).toFixed(4) : '', true);
+  put('fRate', f.rate, false);
+  put('fUp', f.upDays, false);
+  put('fTransit', f.transitDays, false);
+  put('fLab', f.labDays, false);
+  put('fTail', f.tailDays, false);
+  put('fMill', f.millDays, false);
+  put('fCollect', f.collectDays, false);
+  put('fReal', f.realCapDay, true);
+  put('fMoist', f.moistOv, false);
+  put('fNet', f.netOv, false);
+  put('fCost', f.costOv, false);
+}
+
+function readFundForm(){
+  const v = id => { const el = $(id); return el ? el.value.trim() : ''; };
+  const f = fundP();
+  f.ver = 2;
+  f.cap = num(v('fCap')) * 10000;
+  f.rate = num(v('fRate'));
+  f.upDays = num(v('fUp'));
+  f.transitDays = num(v('fTransit'));
+  f.labDays = num(v('fLab'));
+  f.tailDays = num(v('fTail'));
+  f.millDays = num(v('fMill'));
+  f.collectDays = num(v('fCollect'));
+  f.realCapDay = num(v('fReal'));
+  f.moistOv = v('fMoist') === '' ? '' : num(v('fMoist'));
+  f.netOv = v('fNet') === '' ? '' : num(v('fNet'));
+  f.costOv = v('fCost') === '' ? '' : num(v('fCost'));
+  return f;
+}
+function saveFund(){ P.fund = readFundForm(); save(K.P, P); }
+
+/* 单车净利 / 垫资 / 含水率：优先当前测算，其次台账最近 30 车均值 */
+function autoBase(){
+  try{
+    const inp = readInp();
+    const R = compute(inp, P);
+    const pdV = String(inp.mode) === '3' ? num(inp.pd3) : num(inp.pd);
+    if(num(inp.wIn) > 0 && pdV > 0 && R.D > 0 && isFinite(R.net)){
+      return {net:R.net, cost:R.costTax, moist:num(inp.m)/100, rev:num(R.revTax), from:'calc', n:1};
+    }
+  }catch(e){}
+  const rs = REC.filter(r=> r && r.out && isFinite(r.out.net))
+    .slice()
+    .sort((a,b)=> String((b.inp||{}).date||'').localeCompare(String((a.inp||{}).date||'')))
+    .slice(0, 30);
+  if(rs.length){
+    let sn = 0, sc = 0, cn = 0, sm = 0, mn = 0, sr = 0;
+    rs.forEach(r=>{
+      const o = r.out || {}, i = r.inp || {};
+      sn += num(o.net);
+      let c = num(o.costTax);
+      if(!(c > 0)) c = num(o.revTax) - num(o.grossTax);
+      if(c > 0){ sc += c; cn++; }
+      const m = num(i.m);
+      if(m > 0 && m < 100){ sm += m; mn++; }
+      if(num(o.revTax) > 0) sr += num(o.revTax);
+    });
+    return {
+      net: sn / rs.length, cost: cn ? sc / cn : 0,
+      moist: mn ? (sm / mn) / 100 : 0, rev: sr / rs.length,
+      from:'ledger', n: rs.length
+    };
+  }
+  return {net:0, cost:0, moist:0, rev:0, from:'none', n:0};
+}
+
+/* 台账实际发车速度：最近 90 天（或全部记录跨度）平均每天几车 */
+function ledgerPace(){
+  const ds = REC.map(r=> String((r.inp||{}).date || '')).filter(s=> /^\d{4}-\d{2}-\d{2}$/.test(s)).sort();
+  if(ds.length < 2) return {q:0, cars:ds.length, days:0};
+  const t0 = Date.parse(ds[0]), t1 = Date.parse(ds[ds.length-1]);
+  if(!isFinite(t0) || !isFinite(t1)) return {q:0, cars:ds.length, days:0};
+  const span = Math.max(1, Math.round((t1 - t0) / 86400000) + 1);
+  const days = Math.min(span, 90);
+  const from = t1 - (days - 1) * 86400000;
+  const cars = ds.filter(s=> Date.parse(s) >= from).length;
+  return {q: cars / days, cars, days};
+}
+
+/* 纯函数：按「预付款 + 尾款」两段回款，算资金占用与回报
+   回款节奏：
+     付上游货款 → 在途 → 车到厂（出磅单，14 点前当天 / 14 点后次日）→ 预付款到账
+     → 化验出绝干吨（2~3 天）→ 付尾款（2~3 天）→ 收齐
+   预付款 = 湿吨 × 50% × 当日厂价 = 含税销售额 × 0.5/(1−含水率) */
+function fundCalc(f, base){
+  const M = Math.max(0, num(f.cap));
+  const C = Math.max(0, num(base.cost));
+  const net = num(base.net);
+  const dUp = Math.max(0, num(f.upDays));
+  const dTr = Math.max(0, num(f.transitDays));
+  const preDay = num(f.preDay) >= 0.5 ? 1 : 0;
+  const dLab = Math.max(0, num(f.labDays));
+  const dTail = Math.max(0, num(f.tailDays));
+  const dCo = Math.max(0, num(f.collectDays));
+  const seq = preDay + dLab + dTail + dCo;
+  let dMl = num(f.millDays);
+  if(!(dMl > 0)) dMl = seq;
+  dMl = Math.max(0.5, dMl);
+  const t1 = Math.max(0.5, dUp + dTr + preDay);      // 付款 → 预付款到账
+  const T = Math.max(t1 + 0.5, dUp + dTr + dMl);     // 付款 → 收齐尾款
+  const tap = Math.max(0, T - t1);                   // 预付款后继续等尾款的天数
+  const realCap = Math.max(0, num(f.realCapDay));
+  const r = Math.max(0, num(f.rate)) / 100;
+
+  let m = num(base.moist);
+  if(f.moistOv !== '' && f.moistOv !== undefined && f.moistOv !== null) m = num(f.moistOv) / 100;
+  if(!(m > 0 && m < 0.95)) m = 0.45;
+
+  const cov = 0.5 / Math.max(0.05, 1 - m);           // 预付款 / 含税销售额
+  const rev = num(base.rev) > 0 ? num(base.rev) : (C > 0 ? C / 0.9 : 0);
+  const adv = Math.max(0, rev * cov);                // 预付款金额
+  const rest = Math.max(0, rev - adv);               // 尾款金额
+  const gap = Math.max(0, C - adv);                  // 预付款到账后仍压自己的钱
+  const I = C * t1 + gap * tap;                      // 资金占用积分（元·天）
+
+  const o = {M, C, net, T, t1, tap, dUp, dTr, dMl, dLab, dTail, dCo, preDay,
+             m, cov, rev, adv, rest, gap, I, realCap, r, seq};
+
+  if(M <= 0) return Object.assign(o, {state:'noMoney'});
+  if(C <= 0) return Object.assign(o, {state:'noCost'});
+
+  const qCap = M / Math.max(0.01, I);                // 资金允许的日发车
+  const q = realCap > 0 ? Math.min(qCap, realCap) : qCap;
+  const binding = (realCap > 0 && realCap < qCap - 1e-9) ? 'cap' : 'money';
+  const turnsYr = 365 / T;
+  const profitYr = q * 365 * net;
+  const rateYr = profitYr / M;
+  const nFull = q * t1;                              // 全额压着货款的车数
+  const nAll = q * T;                                // 在途总车数（含已收预付的）
+  const util = M > 0 ? Math.min(1, (q * I) / M) : 0;
+  const idle = Math.max(0, M - q * I);
+  const interest = M * r;
+  const netYr = profitYr - interest;
+  const realRate = netYr / M;
+
+  let state = 'ok';
+  if(M < C) state = 'short';
+  else if(net <= 0) state = 'loss';
+
+  return Object.assign(o, {
+    qCap, q, binding, turnsYr, profitYr, rateYr, rTurn: C > 0 ? net / C : 0,
+    profitCycle: q * T * net, nFull, nAll, advCover: rev > 0 ? adv / rev : 0,
+    util, idle, interest, netYr, realRate, beRate: rateYr,
+    profitMonth: profitYr / 12, state
+  });
+}
+
+function fundTips(r){
+  const out = [];
+  if(r.state === 'loss'){
+    out.push(['d', '这个价差做周转是 <b>亏的</b>，转得越多亏得越多。先去测算页把价差修好，再回来看能放大到多少。']);
+    return out;
+  }
+  /* 预付款结构：真正压钱的是到厂前那几天 */
+  if(r.advCover >= 1){
+    out.push(['g', '<b>预付款会超过结算额。</b>含水率 ' + fmt(r.m*100,1) + '%，按「湿吨 × 50%」粗算的预付款是货款的 <b>'
+      + pct(r.advCover) + '</b>，化验结论出来后你要把多收的 <b>' + tMoney(r.adv - r.rev)
+      + '</b> 退回去。资金上不吃亏，但要留出退款的头寸。']);
+  } else {
+    out.push(['g', '<b>预付款覆盖 ' + pct(r.advCover) + ' 的货款</b>，第 ' + fmt(r.t1,1) + ' 天到账。'
+      + (r.gap <= 0.5
+        ? '这笔钱一到，本金就全回来了，后面 <b>' + fmt(r.tap,1) + ' 天</b>只是等尾款结案——<b>尾款晚几天，不影响你发下一车</b>。'
+        : '预付款之后还要压 <b>' + tMoney(r.gap) + '</b> 等尾款，这 ' + fmt(r.tap,1) + ' 天是实打实占着钱的。')]);
+  }
+  /* 瓶颈 */
+  if(r.binding === 'cap'){
+    out.push(['g', '<b>车不够，不是钱不够。</b>这笔钱本可以撑 <b>' + fmt(r.qCap,2) + ' 车/天</b>，但日发车上限是 <b>'
+      + fmt(r.realCap,2) + ' 车/天</b>。一年只发 <b>' + fmt(r.q*365,0) + ' 车</b>、赚 <b>' + tMoney(r.profitYr)
+      + '</b>，有 <b>' + tMoney(r.idle) + '</b> 闲着。要么加车，要么把钱抽走一部分。']);
+  } else if(r.q >= 4){
+    out.push(['g', '<b>这是资金上限，不是你的实际产能。</b>按这笔钱算能撑 <b>' + fmt(r.q,1)
+      + ' 车/天</b>（一年 ' + fmt(r.q*365,0) + ' 车），前提是货源、车、纸厂日收量都跟得上。把「实际日发车」填成你真正能做到的速度，数字才落地。']);
+  } else {
+    out.push(['g', '<b>钱是瓶颈。</b>一年 <b>' + fmt(r.q*365,0) + ' 车</b> 已经是这笔钱的上限（全款压在路上 ' + fmt(r.nFull,1) + ' 车）。想放大只有两条路：加钱，或让钱回来得更快。']);
+  }
+  /* 账期到底有没有用 */
+  if(r.gap <= 0.5){
+    out.push(['t', '账期 6 天还是 30 天，一年赚的钱 <b>几乎一样</b>。因为发下一车用的是「预付款回笼的本金」，不是尾款——本金第 '
+      + fmt(r.t1,1) + ' 天就回来了。尾款那笔本来就是利润，晚到只是晚点落袋。真正要抠的是「付款 → 预付款到账」这 ' + fmt(r.t1,1) + ' 天。']);
+  } else {
+    out.push(['t', '账期每多 1 天，等于多压 <b>' + tMoney(r.gap) + '</b> 现金，一年少赚 <b>'
+      + tMoney(365 * r.net * r.gap / r.I) + '</b>。']);
+  }
+  /* 加钱的边际 */
+  if(r.binding === 'cap'){
+    out.push(['t', '再加钱没用，瓶颈在车。加一车运力，一年多赚 <b>' + tMoney(r.net * 365) + '</b>。']);
+  } else {
+    out.push(['t', '再加 <b>' + tMoney(r.C) + '</b>（正好一车）→ 一年多赚 <b>' + tMoney(365 * r.net * r.C / r.I)
+      + '</b>，回报率不变。']);
+  }
+  /* 年化为什么这么高 */
+  const effDays = r.C > 0 ? r.I / r.C : 0;
+  out.push(['t', '每车平均只占 <b>' + fmt(effDays,1) + ' 天</b> 本金（不是 ' + fmt(r.T,1) + ' 天账期），同一笔钱一年能滚 <b>'
+    + fmt(365 / Math.max(0.5, effDays),0) + ' 次</b>，每次赚 ' + pct(r.rTurn) + '，乘起来就是 <b>' + pct(r.rateYr)
+    + '</b> —— 不是算错了，是回款快。']);
+  if(r.r > 0){
+    if(r.beRate <= 1){
+      out.push(['t', '借钱的利息吃掉 <b>' + tMoney(r.interest) + '</b>，净得 <b>' + tMoney(r.netYr)
+        + '</b>。利率超过 ' + pct(r.beRate) + ' 就白干。']);
+    }else{
+      out.push(['t', '借钱的利息吃掉 <b>' + tMoney(r.interest) + '</b>，净得 <b>' + tMoney(r.netYr)
+        + '</b>。以这个回款速度，利息不是主要成本，真正的风险是货源断和纸厂停收。']);
+    }
+  }
+  out.push(['t', '第一车要压 <b>' + fmt(r.T,1) + ' 天</b> 才收齐，第一年实际约 <b>'
+    + tMoney(r.profitYr * Math.max(0, (365 - r.T) / 365)) + '</b>。']);
+  return out;
+}
+
+function gridHTML(f, base){
+  const C = num(base.cost), M0 = num(f.cap);
+  if(!(C > 0) || !(M0 > 0)) return '<div class="hint" style="margin:0">先填投入资金和单车垫资</div>';
+  const curWan = M0 / 10000;
+  const rows = [0.5, 1, 1.5, 2].map(k=> Math.max(1, Math.round(curWan * k)));
+  const curMill = Math.max(0, Math.round(num(f.millDays)));
+  const cols = [];
+  [curMill, 15, 30].forEach(d=>{ if(d > 0 && cols.indexOf(d) < 0) cols.push(d); });
+  cols.sort((a,b)=> a - b);
+  const cell = (mWan, days)=>{
+    const f2 = Object.assign({}, f, {cap: mWan * 10000, millDays: days});
+    const r2 = fundCalc(f2, base);
+    const p2 = isFinite(r2.profitYr) ? r2.profitYr : 0;
+    const rt2 = isFinite(r2.rateYr) ? r2.rateYr : 0;
+    const cur = Math.abs(mWan - curWan) < 0.5 && days === curMill;
+    const cls = (cur ? 'cur' : '') + (p2 < 0 ? (cur ? ' bad' : 'bad') : '');
+    return '<td' + (cls ? ' class="' + cls + '"' : '') + '>'
+      + '<b>' + (p2/10000).toFixed(1) + '万</b><i>' + (rt2*100).toFixed(1) + '%</i></td>';
+  };
+  let h = '<table class="sg"><thead><tr><th>资金</th>'
+        + cols.map(d=> '<th>账期 ' + d + ' 天</th>').join('') + '</tr></thead><tbody>';
+  rows.forEach(m=>{
+    const curRow = Math.abs(m - curWan) < 0.5;
+    h += '<tr><td' + (curRow ? ' class="cur"' : '') + '>' + m + '万</td>'
+       + cols.map(d=> cell(m, d)).join('') + '</tr>';
+  });
+  return h + '</tbody></table>';
+}
+
+function renderTurn(){
+  if(!$('tProfit')) return;
+  const f = readFundForm();
+  const ab = autoBase();
+  const base = {
+    net: f.netOv === '' ? ab.net : num(f.netOv),
+    cost: f.costOv === '' ? ab.cost : num(f.costOv),
+    moist: ab.moist,
+    rev: ab.rev
+  };
+  /* 日发车上限：手填优先，否则按台账实际速度自动带出 */
+  const pace = ledgerPace();
+  const autoReal = (pace.cars >= 5 && pace.days >= 7) ? pace.q : 0;
+  const realSrc = f.realCapDay > 0 ? 'manual' : (autoReal > 0 ? 'ledger' : 'none');
+  const fEff = Object.assign({}, f, {realCapDay: f.realCapDay > 0 ? f.realCapDay : autoReal});
+  const r = fundCalc(fEff, base);
+  const dn = n => fmt(n, 1).replace(/\.0$/, '');
+
+  if($('btnRealFromLedger')){
+    $('btnRealFromLedger').textContent = pace.q > 0 ? ('用 ' + fmt(pace.q,2) + ' 车/天') : '台账不够';
+    $('btnRealFromLedger').disabled = !(pace.q > 0);
+  }
+
+  if($('fBaseHint')){
+    let h;
+    const mTxt = '含水率 ' + fmt(r.m*100,1) + '%';
+    if(f.netOv !== '' || f.costOv !== '' || f.moistOv !== ''){
+      h = '手工指定：净利 ¥' + fmt(base.net,0) + ' / 垫资 ¥' + fmt(base.cost,0) + ' / ' + mTxt + '，不再跟随测算。';
+    }else if(ab.from === 'calc'){
+      h = '取自测算页当前这车：净利 ¥' + fmt(base.net,0) + '、垫资 ¥' + fmt(base.cost,0) + '、' + mTxt + '，改测算会跟着变。';
+    }else if(ab.from === 'ledger'){
+      h = '测算页还没算，按台账最近 ' + ab.n + ' 车均值：净利 ¥' + fmt(base.net,0) + '、垫资 ¥' + fmt(base.cost,0) + '、' + mTxt + '。';
+    }else{
+      h = '还没有测算或台账，请手工填单车净利与垫资。';
+    }
+    $('fBaseHint').innerHTML = h;
+  }
+  if($('fTHint')){
+    $('fTHint').innerHTML = '一轮 <b>' + dn(r.T) + ' 天</b> = 上游 ' + dn(r.dUp) + ' + 在途 ' + dn(r.dTr)
+      + ' + 账期 ' + dn(r.dMl) + '；预付款第 <b>' + dn(r.t1) + ' 天</b>到，占货款的 <b>' + pct(r.advCover) + '</b>。';
+  }
+  const rateNow = num(f.rate), millNow = num(f.millDays), seqNow = fundSeq(f);
+  document.querySelectorAll('#fRateChips button').forEach(b=>{
+    b.classList.toggle('on', Math.abs(num(b.dataset.fr) - rateNow) < 1e-9);
+  });
+  document.querySelectorAll('#fMillChips button').forEach(b=>{
+    const v = b.dataset.fmc;
+    b.classList.toggle('on', v === 'seq'
+      ? Math.abs(seqNow - millNow) < 1e-9
+      : Math.abs(num(v) - millNow) < 1e-9);
+  });
+  document.querySelectorAll('#fPreChips button').forEach(b=>{
+    b.classList.toggle('on', num(b.dataset.fp) === num(f.preDay));
+  });
+
+  const card = $('tSumCard');
+  if(r.state === 'noMoney' || r.state === 'noCost' || r.state === 'short'){
+    card.classList.remove('loss');
+    $('tHead').textContent = '一年净赚';
+    $('tProfit').textContent = r.state === 'short' ? '不够一车' : '—';
+    $('tRate').textContent = '—';
+    $('tT').textContent = r.state === 'noMoney' ? '—' : dn(r.T) + ' 天';
+    $('tMonth').textContent = '—';
+    $('tBadge').textContent = r.state === 'noMoney' ? '待填资金' : (r.state === 'noCost' ? '待填垫资' : '资金偏少');
+    $('tMode').textContent = '—';
+    const msg = r.state === 'noMoney'
+      ? '先填投入资金（万元）'
+      : r.state === 'noCost'
+        ? '先测算一车，或手工填单车垫资'
+        : '这笔钱还不够一车（垫资 ' + tMoney(r.C) + '），还差 ' + tMoney(r.C - r.M);
+    $('tLines').innerHTML = '<div class="hint" style="margin:0">' + msg + '</div>';
+    $('tTips').innerHTML = '<div class="tip">' + msg + '。</div>';
+    $('tGrid').innerHTML = '<div class="hint" style="margin:0">先填投入资金</div>';
+    return;
+  }
+
+  const neg = r.netYr < 0;
+  card.classList.toggle('loss', neg);
+  const ttl = neg ? '一年净亏' : (r.r > 0 ? '一年净赚（已扣资金成本）' : '一年净赚');
+  $('tHead').textContent = (!neg && r.binding === 'money' && r.q >= 6) ? '一年净赚 · 资金上限' : ttl;
+  $('tProfit').textContent = tMoney(r.netYr);
+  $('tRate').textContent = pct(r.realRate);
+  $('tT').textContent = dn(r.T) + ' 天';
+  $('tMonth').textContent = tMoney(r.netYr / 12);
+  $('tBadge').textContent = '一轮 ' + dn(r.T) + ' 天';
+  $('tMode').textContent = r.state === 'loss' ? '亏损' : (r.binding === 'cap' ? '运力瓶颈' : '资金上限');
+
+  let h = '';
+  h += '<div class="sheet-t">投入侧</div>';
+  h += lineHTML('单车垫资（含税现金）', '¥' + fmt(r.C, 0));
+  h += lineHTML('单车净利（已扣完税）', '¥' + fmt(r.net, 0));
+  h += lineHTML('单车利润率', pct(r.rTurn));
+  h += '<div class="sheet-t">回款侧</div>';
+  h += lineHTML('预付款（湿吨×50%×厂价）', '¥' + fmt(r.adv, 0));
+  h += '<div class="covbar' + (r.advCover >= 1 ? ' over' : '') + '"><i style="width:' + Math.min(100, Math.max(0, r.advCover*100)) + '%"></i></div>';
+  h += lineHTML('　占含税货款', pct(r.advCover) + (r.advCover >= 1 ? '（超付，结算要退）' : ''));
+  h += lineHTML('尾款（结算价 − 预付）', '¥' + fmt(r.rest, 0));
+  h += lineHTML('预付款到账', '第 ' + dn(r.t1) + ' 天');
+  h += lineHTML('尾款收齐', '第 ' + dn(r.T) + ' 天');
+  h += lineHTML('预付后仍压本金', r.gap > 0.5 ? tMoney(r.gap) + ' × ' + dn(r.tap) + ' 天' : '不压（本金已回笼）');
+  h += '<div class="sheet-t">周转侧</div>';
+  h += lineHTML('资金当量占用', dn(r.I / Math.max(1, r.C)) + ' 天/车');
+  h += lineHTML('平均每车占用本金', tMoney(r.I / Math.max(1, r.T)));
+  h += lineHTML('日发车上限' + (realSrc === 'ledger' ? '（台账实际）' : realSrc === 'manual' ? '（手填）' : '（资金能力）'), fmt(r.q, 2) + ' 车/天');
+  h += lineHTML('全年发车', fmt(r.q*365, 0) + ' 车');
+  h += lineHTML('全款压在路上', fmt(r.nFull, 1) + ' 车');
+  h += lineHTML('在途总车数（含已收预付）', fmt(r.nAll, 1) + ' 车');
+  h += '<div class="sheet-t">结果</div>';
+  h += lineHTML('年利润', tMoney(r.profitYr));
+  h += lineHTML('年化回报率', pct(r.rateYr));
+  h += lineHTML('每月利润', tMoney(r.profitMonth));
+  if(r.idle > 1) h += lineHTML('闲置资金', tMoney(r.idle));
+  if(r.r > 0){
+    h += '<div class="sheet-t">资金成本</div>';
+    h += lineHTML('年利息（' + fmt(r.r*100,1) + '%）', '-' + tMoney(r.interest));
+    if(r.beRate <= 1) h += lineHTML('保本利率', pct(r.beRate));
+  }
+  h += lineHTML(r.r > 0 ? '净得' : '到手（无资金成本）', tMoney(r.netYr), 'total' + (neg ? ' bad' : ''));
+  $('tLines').innerHTML = h;
+
+  const tips = fundTips(r);
+  if(pace.q > 0){
+    if(realSrc === 'ledger'){
+      tips.push(['t', '日发车上限按台账近 ' + pace.days + ' 天实际发的 <b>' + pace.cars + ' 车</b>自动带出（日均 '
+        + fmt(pace.q,2) + ' 车）。想试「如果我能多发」，在「实际日发车」里填更大的数就行。']);
+    }else if(realSrc === 'none'){
+      const pr = pace.q * 365 * r.net;
+      tips.push(['t', '台账近 ' + pace.days + ' 天只发了 <b>' + pace.cars + ' 车</b>，样本太少，先按资金能力算。'
+        + '按这个历史速度，一年约 <b>' + tMoney(pr) + '</b>、年化 ' + pct(r.M > 0 ? pr / r.M : 0) + '。']);
+    }
+  }
+  $('tTips').innerHTML = tips.map(t=>{
+    const cls = t[0] === 'g' ? 'alert g' : (t[0] === 'd' ? 'alert d' : 'tip');
+    const st = t[0] === 't' ? '' : ' style="margin-top:0"';
+    return '<div class="' + cls + '"' + st + '>' + t[1] + '</div>';
+  }).join('');
+
+  $('tGrid').innerHTML = gridHTML(fEff, base);
+}
+
+function fundSync(){
+  const ab = autoBase();
+  if(ab.from === 'none'){ toast('测算页还没算，也没有台账记录'); return; }
+  const f = fundP();
+  f.ver = 2;
+  f.netOv = ''; f.costOv = ''; f.moistOv = '';
+  P.fund = f; save(K.P, P);
+  if($('fNet')) $('fNet').value = '';
+  if($('fCost')) $('fCost').value = '';
+  if($('fMoist')) $('fMoist').value = '';
+  renderTurn();
+  toast(ab.from === 'calc' ? '已按当前测算联动' : '已按台账最近 ' + ab.n + ' 车均值联动');
+}
+
+/* ---- 备份 / 合并同步 / 快照 / 归档 ---- */
+let _pendingImport = null;
+
+function recTime(r){
+  const t = Date.parse((r && (r.updatedAt || r.savedAt)) || '');
+  return isNaN(t) ? 0 : t;
+}
+/* 同一车的判定：日期＋车号＋供应商＋到厂湿重（没有车号时退回用记录 id） */
+function recKey(r){
+  const i = (r && r.inp) || {};
+  const d = String(i.date || '').trim();
+  const p = String(i.plate || '').trim().toUpperCase();
+  const s = String(i.supplier || '').trim();
+  const w = Number(i.wIn) || 0;
+  if(!d && !p) return 'id:' + String(r.id || '');
+  return d + '|' + p + '|' + s + '|' + w.toFixed(2);
+}
+function unionList(a, b){
+  const out = Array.isArray(a) ? a.slice() : [];
+  (Array.isArray(b) ? b : []).forEach(v=>{
+    const s = String(v == null ? '' : v).trim();
+    if(s && !out.includes(s)) out.push(s);
+  });
+  return out;
+}
+function planImport(d){
+  const inc = (Array.isArray(d.REC) ? d.REC : []).filter(r=> r && r.inp);
+  const byId = new Map();
+  REC.forEach(r=> byId.set(String(r.id || ''), r));
+  const byKey = new Map();
+  REC.forEach(r=>{
+    const k = recKey(r);
+    if(!byKey.has(k)) byKey.set(k, []);
+    byKey.get(k).push(r);
+  });
+  const plan = {add:[], upd:[], same:0, bad:0, dictNew:0};
+  const seen = new Set();
+  inc.forEach(r=>{
+    if(!r.inp || (!r.inp.date && !r.inp.plate)){ plan.bad++; return; }
+    let cur = null;
+    if(r.id && byId.has(String(r.id))) cur = byId.get(String(r.id));
+    if(!cur){
+      const cands = byKey.get(recKey(r)) || [];
+      if(cands.length === 1) cur = cands[0];
+    }
+    if(!cur){
+      const k = recKey(r);
+      if(seen.has(k)){ plan.bad++; return; }
+      seen.add(k);
+      plan.add.push(r);
+      return;
+    }
+    if(recTime(r) > recTime(cur)) plan.upd.push({cur, nu:r});
+    else plan.same++;
+  });
+  const dp = d.P || {};
+  ['supList','millList','plateList'].forEach(k=>{
+    const merged = unionList(P[k], dp[k]);
+    const before = Array.isArray(P[k]) ? P[k].length : 0;
+    plan.dictNew += Math.max(0, merged.length - before);
+  });
+  return plan;
+}
+
+function showImport(d){
+  const plan = planImport(d);
+  const inc = Array.isArray(d.REC) ? d.REC.length : 0;
+  const src = d.app === 'desktop' ? '电脑版' : (d.app === 'mobile' ? '手机版' : '旧版/电脑版');
+  const rows = [
+    ['文件内记录', inc + ' 车', ''],
+    ['新增到本机', plan.add.length + ' 车', plan.add.length ? 'hi' : ''],
+    ['用较新的更新', plan.upd.length + ' 车', plan.upd.length ? 'hi' : ''],
+    ['已是最新', plan.same + ' 车', '']
+  ];
+  if(plan.bad) rows.push(['重复或无法识别', plan.bad + ' 条', 'warn']);
+  if(plan.dictNew) rows.push(['基础档案新增', plan.dictNew + ' 条', '']);
+  const html = '<div class="imp">' + rows.map(([k,v,c])=>
+      '<div class="r ' + c + '"><span>' + k + '</span><b>' + v + '</b></div>').join('') + '</div>'
+    + '<div class="hint" style="margin-top:10px">来源：' + src + '备份。合并不会删掉本机任何一车；同一车以修改时间较新的为准，档案取并集，已有参数保持不动。</div>'
+    + '<div class="btns" style="margin-top:14px"><button class="btn pri" data-act="imp-merge">合并导入</button></div>'
+    + '<div class="btns" style="margin-top:8px"><button class="btn" data-act="imp-replace" style="color:#b93b2f">覆盖导入（清空本机现有）</button></div>';
+  openSheet('导入预览', html);
+}
+
+function applyImport(kind){
+  const d = _pendingImport;
+  if(!d){ closeSheet(); return; }
+  const snapOk = snapshot('导入前');
+  if(!snapOk && kind === 'replace'){ toast('快照存不下，先导出备份再覆盖'); return; }
+  let added = 0, updated = 0;
+  if(kind === 'replace'){
+    REC = (Array.isArray(d.REC) ? d.REC : []).filter(r=> r && r.inp);
+    P = Object.assign({}, DEF, d.P || {});
+    P.fund = fundP();
+    added = REC.length;
+  }else{
+    const plan = planImport(d);
+    const used = new Set(REC.map(r=> String(r.id || '')));
+    plan.add.forEach(r=>{
+      const rec = Object.assign({}, r);
+      if(!rec.id || used.has(String(rec.id))) rec.id = 'r' + Date.now() + Math.random().toString(36).slice(2, 6);
+      used.add(String(rec.id));
+      REC.push(rec);
+      added++;
+    });
+    plan.upd.forEach(pair=>{
+      const idx = REC.indexOf(pair.cur);
+      const rec = Object.assign({}, pair.nu, {id: pair.cur.id});
+      if(idx >= 0) REC[idx] = rec; else REC.push(rec);
+      updated++;
+    });
+    ['supList','millList','plateList'].forEach(k=>{ P[k] = unionList(P[k], (d.P || {})[k]); });
+    const src = d.P || {};
+    ['m0','surtax','incomeTax','stamp','pw','pd','freight','plow','r','process','mlog'].forEach(k=>{
+      const empty = P[k] === '' || P[k] === undefined || P[k] === null;
+      if(empty && src[k] !== '' && src[k] !== undefined && src[k] !== null) P[k] = src[k];
+    });
+    if(!P.ticket && src.ticket) P.ticket = src.ticket;
+    const sf = src.fund;
+    if(sf && typeof sf === 'object'){
+      const cur = fundP();
+      Object.keys(DEF.fund).forEach(k=>{
+        const dv = DEF.fund[k];
+        const isDef = cur[k] === dv || cur[k] === undefined || cur[k] === null || cur[k] === '';
+        if(isDef && sf[k] !== undefined && sf[k] !== null && sf[k] !== '') cur[k] = sf[k];
+      });
+      P.fund = cur;
+    }
+  }
+  REC.sort((a, b)=> String((b.inp || {}).date || '').localeCompare(String((a.inp || {}).date || '')));
+  save(K.R, REC); save(K.P, P);
+  _pendingImport = null;
+  closeSheet();
+  fillSet(); applyParams(); renderChips(); renderRec(); renderSum(); render(); dataInfo();
+  toast(kind === 'replace' ? ('已覆盖导入 ' + REC.length + ' 车') : ('合并完成：新增 ' + added + ' 车，更新 ' + updated + ' 车'));
+}
+
+function snapshot(tag){
+  try{
+    return ST.set(K.S, JSON.stringify({at: new Date().toISOString(), tag: tag || '', P, REC}));
+  }catch(e){ return false; }
+}
+/* 备份时间以裸字符串存；老版本可能存成了带引号的 JSON 串，读时剥掉 */
+function lastBackup(){
+  return String(ST.get(K.B) || '').replace(/^"|"$/g, '');
+}
+function markBackup(){
+  ST.set(K.B, new Date().toISOString());
+}
+function snapInfo(){
+  const el = $('snapHint');
+  if(!el) return;
+  const raw = ST.get(K.S);
+  if(!raw){ el.textContent = '还没有快照。每次导入、归档、清空前会自动留一份。'; return; }
+  try{
+    const s = JSON.parse(raw);
+    const at = String(s.at || '').replace('T', ' ').slice(0, 16);
+    el.textContent = '上一份快照：' + at + '（' + ((s.REC || []).length) + ' 车' + (s.tag ? '，' + s.tag : '') + '）';
+  }catch(e){ el.textContent = '快照读取失败，可忽略'; }
+}
+
+function dataInfo(){
+  let bytes = 0;
+  try{
+    bytes = new Blob([JSON.stringify(P), JSON.stringify(REC), ST.get(K.S) || '']).size;
+  }catch(e){
+    bytes = JSON.stringify(P).length + JSON.stringify(REC).length + (ST.get(K.S) || '').length;
+  }
+  const dates = REC.map(r=> String((r.inp || {}).date || '')).filter(Boolean).sort();
+  const range = dates.length ? (dates[0] + ' ~ ' + dates[dates.length - 1]) : '暂无记录';
+  const last = lastBackup();
+  const days = last ? Math.floor((Date.now() - new Date(last).getTime()) / 86400000) : null;
+  const ratio = bytes / 5242880 * 100;
+  let h = '已存 ' + REC.length + ' 车 · ' + range + ' · 占用 ' + (bytes / 1024).toFixed(0) + ' KB（约 ' + ratio.toFixed(1) + '%）';
+  if(!last) h += ' · 还没备份过';
+  else if(days >= 7) h += ' · 上次备份 ' + last.slice(0, 10) + '，已 ' + days + ' 天';
+  else h += ' · 上次备份 ' + last.slice(0, 10);
+  if(ratio >= 60) h += ' · 接近上限，建议按年归档';
+  const el = $('dataHint');
+  if(el) el.textContent = h;
+  renderBkBar();
+  fillArc();
+  snapInfo();
+}
+
+function backState(){
+  const last = lastBackup();
+  const days = last ? Math.floor((Date.now() - new Date(last).getTime()) / 86400000) : null;
+  return {last, days, need: REC.length > 0 && (!last || days >= 7)};
+}
+function renderBkBar(){
+  const bar = $('bkBar');
+  if(!bar) return;
+  const st = backState();
+  const hide = ST.get(K.H) || '';
+  const show = st.need && hide !== today();
+  bar.classList.toggle('on', !!show);
+  if(!show) return;
+  $('bkTxt').textContent = st.days === null
+    ? ('本机已存 ' + REC.length + ' 车，还没导出过备份')
+    : ('已 ' + st.days + ' 天没备份，清缓存或换手机会丢');
+}
+
+function doBackup(){
+  const data = {v:4, app:'mobile', P, REC, at:new Date().toISOString()};
+  download('木片台账备份-' + today() + '.json', JSON.stringify(data, null, 2), 'application/json');
+  markBackup();
+  dataInfo();
+  toast('已导出 ' + REC.length + ' 车备份');
+}
+
+/* 按年归档 */
+function recYear(r){
+  const d = String((r.inp || {}).date || '');
+  return d.slice(0, 4) || '未填日期';
+}
+function fillArc(){
+  const sel = $('arcYear');
+  if(!sel) return;
+  const prev = sel.value;
+  const m = new Map();
+  REC.forEach(r=>{ const y = recYear(r); m.set(y, (m.get(y) || 0) + 1); });
+  const ys = [...m.entries()].sort((a, b)=> String(b[0]).localeCompare(String(a[0])));
+  sel.innerHTML = ys.length
+    ? ys.map(([y, n])=> '<option value="' + esc(y) + '">' + esc(y) + '（' + n + ' 车）</option>').join('')
+    : '<option value="">还没有记录</option>';
+  if(prev && ys.some(x=> x[0] === prev)) sel.value = prev;
+  const y = sel.value;
+  const hit = ys.find(x=> x[0] === y);
+  const hint = $('arcHint');
+  if(hint) hint.textContent = hit
+    ? ('该年 ' + hit[1] + ' 车，导出后再清理；清理前会自动留快照。')
+    : '归档会先导出一份当年备份，再从本机删除；删除前自动留一份快照，可回滚。';
+}
+function yearPayload(y){
+  return {
+    v:4, app:'mobile', scope:'year', year:y, P,
+    REC: REC.filter(r=> recYear(r) === y), at:new Date().toISOString()
+  };
+}
+function dropYear(y){
+  const before = REC.length;
+  REC = REC.filter(r=> recYear(r) !== y);
+  save(K.R, REC);
+  return before - REC.length;
+}
+
+$('btnBackup').onclick = doBackup;
+$('bkNow').onclick = doBackup;
+$('bkHide').onclick = ()=>{ ST.set(K.H, today()); renderBkBar(); };
+
+$('btnRestore').onclick = ()=> $('fileRestore').click();
+$('fileRestore').onchange = e=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  const rd = new FileReader();
+  rd.onload = ()=>{
+    try{
+      const d = JSON.parse(rd.result);
+      if(!d || (!Array.isArray(d.REC) && !d.P)){ toast('文件里没有可导入的数据'); return; }
+      _pendingImport = d;
+      showImport(d);
+    }catch(err){ toast('文件格式不对'); }
+  };
+  rd.readAsText(f);
+  e.target.value = '';
+};
+
+$('btnSnap').onclick = ()=>{
+  const raw = ST.get(K.S);
+  if(!raw){ toast('还没有快照'); return; }
+  let s = null;
+  try{ s = JSON.parse(raw); }catch(e){ toast('快照损坏'); return; }
+  if(!confirm('用 ' + String(s.at || '').replace('T', ' ').slice(0, 16) + ' 的快照替换当前数据？当前数据会先另存一份。')) return;
+  snapshot('恢复前');
+  P = Object.assign({}, DEF, s.P || {});
+  REC = Array.isArray(s.REC) ? s.REC : [];
+  save(K.P, P); save(K.R, REC);
+  fillSet(); applyParams(); renderChips(); renderRec(); renderSum(); render(); dataInfo();
+  toast('已回到快照');
+};
+
+$('btnWipe').onclick = ()=>{
+  if(!REC.length){ toast('台账已经是空的'); return; }
+  if(!confirm('清空全部 ' + REC.length + ' 车记录？会先留一份快照。')) return;
+  if(!confirm('再确认一次：清空后只能从快照恢复。')) return;
+  if(!snapshot('清空前')){ toast('快照存不下，先导出备份再清空'); return; }
+  REC = [];
+  save(K.R, REC);
+  renderRec(); renderSum(); dataInfo();
+  toast('已清空，可在设置里回滚');
+};
+
+$('arcYear').onchange = fillArc;
+$('btnArcExport').onclick = ()=>{
+  const y = $('arcYear').value;
+  if(!y){ toast('还没有可导出的记录'); return; }
+  const d = yearPayload(y);
+  if(!d.REC.length){ toast('该年没有记录'); return; }
+  download('木片台账-' + y + '.json', JSON.stringify(d, null, 2), 'application/json');
+  toast('已导出 ' + y + ' 年 ' + d.REC.length + ' 车');
+};
+$('btnArcClean').onclick = ()=>{
+  const y = $('arcYear').value;
+  if(!y){ toast('还没有可归档的记录'); return; }
+  const n = REC.filter(r=> recYear(r) === y).length;
+  if(!n){ toast('该年没有记录'); return; }
+  if(!confirm('先导出 ' + y + ' 年 ' + n + ' 车，再从本机删除？')) return;
+  download('木片台账-' + y + '.json', JSON.stringify(yearPayload(y), null, 2), 'application/json');
+  if(!snapshot(y + ' 归档前')){ toast('快照存不下，先导出备份再归档'); return; }
+  const n2 = dropYear(y);
+  renderRec(); renderSum(); dataInfo();
+  toast('已归档 ' + y + ' 年 ' + n2 + ' 车');
+};
+
+/* ---- 页面切换 ---- */
+function go(page){
+  document.querySelectorAll('[data-page]').forEach(sec=>{
+    sec.style.display = (sec.dataset.page === page) ? '' : 'none';
+  });
+  document.querySelectorAll('[data-nav]').forEach(b=> b.classList.toggle('on', b.dataset.nav === page));
+  $('dock').classList.toggle('on', page === 'calc');
+  window.scrollTo(0, 0);
+  if(page === 'ledger') renderRec();
+  if(page === 'sum') renderSum();
+  if(page === 'set') fillSet();
+  if(page === 'turn'){ fillTurn(); renderTurn(); }
+}
+document.querySelectorAll('[data-nav]').forEach(b=> b.onclick = ()=> go(b.dataset.nav));
+
+/* ---- 输入即算 ---- */
+document.querySelectorAll('[data-page="calc"] input, [data-page="calc"] select')
+  .forEach(el=>{ el.addEventListener('input', render); el.addEventListener('change', render); });
+
+/* 周转页：输入即算，失焦才落盘 */
+document.querySelectorAll('[data-page="turn"] input').forEach(el=>{
+  el.addEventListener('input', renderTurn);
+  el.addEventListener('change', ()=>{ saveFund(); renderTurn(); });
+});
+document.querySelectorAll('#fRateChips button, #fMillChips button').forEach(b=>{
+  b.onclick = ()=>{
+    if(b.dataset.fr !== undefined) $('fRate').value = b.dataset.fr;
+    if(b.dataset.fmc !== undefined){
+      $('fMill').value = b.dataset.fmc === 'seq' ? String(fundSeq(readFundForm())) : b.dataset.fmc;
+    }
+    saveFund(); renderTurn();
+  };
+});
+document.querySelectorAll('#fPreChips button').forEach(b=>{
+  b.onclick = ()=>{
+    const f = readFundForm();
+    f.preDay = num(b.dataset.fp);
+    /* 账期若还等于原来的节奏合计，就跟着一起走 */
+    if($('fMill') && Math.abs(num($('fMill').value) - fundSeq(fundP())) < 1e-9){
+      f.millDays = fundSeq(f);
+      $('fMill').value = String(f.millDays);
+    }
+    P.fund = f; save(K.P, P);
+    renderTurn();
+  };
+});
+
+document.querySelectorAll('#seg button').forEach(b=>{
+  b.onclick = ()=> setMode(b.dataset.mode);
+});
+
+$('fMode').addEventListener('click', e=>{
+  const b = e.target.closest('button[data-fm]');
+  if(!b) return;
+  filtMode = b.dataset.fm;
+  [...$('fMode').children].forEach(x=> x.classList.toggle('on', x === b));
+  renderRec();
+});
+$('qLed').addEventListener('input', renderRec);
+
+$('grp').addEventListener('click', e=>{
+  const b = e.target.closest('button[data-g]');
+  if(!b) return;
+  grpBy = b.dataset.g;
+  [...$('grp').children].forEach(x=> x.classList.toggle('on', x === b));
+  renderSum();
+});
+
+/* ---- 启动 ---- */
+(function init(){
+  $('date').value = today();
+  applyParams();
+  setMode('1');
+  fillSet();
+  renderChips();
+  renderRec();
+  renderSum();
+  go('calc');
+  render();
+})();
+</script>
+</body>
+</html>

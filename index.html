@@ -4,7 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#256b4e">
-<title>木片单车测算器</title>
+<meta name="application-name" content="木片台账">
+<title>木片台账</title>
+<script>
+/* 手机浏览器打开自动切到移动版。只在 http/https 下生效，本地双击打开不受影响；
+   带 ?pc=1 强制留在完整版；mobile.html 不存在时保持原样。 */
+(function(){
+  try{
+    if(!/^https?:$/.test(location.protocol)) return;
+    if(location.search.indexOf('pc=1')>-1) return;
+    if(/mobile\.html$/i.test(location.pathname)) return;
+    var w=Math.min(screen.width||999,screen.height||999);
+    var ua=navigator.userAgent;
+    var phone=w<720 || /iPhone|iPod|Android.*Mobile|Mobile.*Android|Windows Phone|HarmonyOS/i.test(ua);
+    if(!phone) return;
+    fetch('mobile.html',{method:'HEAD'}).then(function(r){
+      if(r && r.ok) location.replace('mobile.html');
+    }).catch(function(){});
+  }catch(e){}
+})();
+</script>
 <style>
 :root{
   --bg:#f4f6f2; --card:#ffffff; --ink:#1b201c; --muted:#6c746a;
@@ -227,8 +246,8 @@ select.pick{padding:8px 11px;border:1px solid var(--line);border-radius:8px;back
 <header class="app-header">
   <div class="hwrap">
     <div>
-      <h1>木片单车测算器</h1>
-      <p class="sub">湿吨采购 / 绝干吨销售 · 三种模式 · 每车利润与税负</p>
+      <h1>木片台账</h1>
+      <p class="sub">鹏淼国贸林业部专用 · 湿吨折绝干 · 票税同算</p>
     </div>
     <div class="ver">v1.0 · 数据仅存本机</div>
   </div>
@@ -236,7 +255,7 @@ select.pick{padding:8px 11px;border:1px solid var(--line);border-radius:8px;back
 
 <nav class="tabs">
   <div class="tabs-in">
-    <button class="tab on" data-view="calc">单车测算</button>
+    <button class="tab on" data-view="calc">每车测算</button>
     <button class="tab" data-view="records">记录</button>
     <button class="tab" data-view="summary">汇总</button>
     <button class="tab" data-view="settings">参数</button>
@@ -244,7 +263,7 @@ select.pick{padding:8px 11px;border:1px solid var(--line);border-radius:8px;back
 </nav>
 
 <main>
-  <!-- ============ 单车测算 ============ -->
+  <!-- ============ 每车测算 ============ -->
   <section class="view on" id="view-calc">
     <div class="mini">
       <div class="m"><span>本车净利</span><b id="miniNet">—</b></div>
@@ -551,7 +570,7 @@ select.pick{padding:8px 11px;border:1px solid var(--line);border-radius:8px;back
 function num(v){ const n = parseFloat(v); return isFinite(n) ? n : 0; }
 
 /**
- * 单车测算
+ * 每车测算
  * inp: 输入（mode 1/2/3）
  * P: 参数
  * mOv: 可选，覆盖含水率（0-1 小数），用于求临界值
@@ -995,7 +1014,7 @@ function renderRecords(){
   });
   const tb = $('tbRec');
   if(!rows.length){
-    tb.innerHTML = `<tr><td colspan="9"><div class="empty">还没有记录。在“单车测算”填入一车数据后点“保存本车”。</div></td></tr>`;
+    tb.innerHTML = `<tr><td colspan="9"><div class="empty">还没有记录。在“每车测算”填入一车数据后点“保存本车”。</div></td></tr>`;
     return;
   }
   tb.innerHTML = rows.map(r=>{
@@ -1104,7 +1123,7 @@ function exportDetail(){
       (o.revNet>0? o.gross/o.revNet*100:0).toFixed(2)+'%'
     ];
   });
-  download(`木片单车明细_${today()}.csv`, toCSV([head, ...rows]));
+  download(`木片每车明细_${today()}.csv`, toCSV([head, ...rows]));
 }
 function exportSummary(){
   const by = $('groupBy').value;
@@ -1154,7 +1173,7 @@ function printReceipt(){
   if(ms) rows.push(['临界含水率', `${ms.toFixed(2)}%（超过即亏）`]);
 
   $('receipt').innerHTML = `
-    <h2>木片单车结算测算单</h2>
+    <h2>木片每车结算测算单</h2>
     <div class="rc-sub">生成时间 ${new Date().toLocaleString('zh-CN')}</div>
     <table>${rows.map(([k,v])=>`<tr><td class="k">${k}</td><td class="v">${v}</td></tr>`).join('')}</table>
     <div class="rc-foot">
@@ -1210,6 +1229,10 @@ $('fileRestore').onchange = e=>{
   rd.onload = ()=>{
     try{
       const d = JSON.parse(rd.result);
+      if(REC.length && !confirm('导入会替换本机现有 ' + REC.length + ' 车，导入前会先自动导出一份当前备份。继续？')){
+        e.target.value = ''; return;
+      }
+      if(REC.length) exportBackup();
       if(Array.isArray(d.REC)) { REC = d.REC; saveJSON(K.R, REC); }
       if(d.P){ P = Object.assign({}, DEF, d.P); migrateDict(); saveJSON(K.P, P); }
       refreshDatalist();
