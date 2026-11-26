@@ -34,10 +34,11 @@ header{
 .hrow{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 .brand{font-size:15px;font-weight:700;letter-spacing:.2px;color:var(--p);white-space:nowrap}
 .brand em{font-style:normal;font-weight:400;font-size:11.5px;color:var(--muted);margin-left:6px}
-.tabs{display:flex;justify-content:space-between;gap:8px;margin-top:6px}
+.tabs{display:flex;gap:0;margin-top:6px}
 .tabs button{
-  border:0;background:none;padding:8px 0 9px;font-size:14.5px;color:var(--sub);
-  position:relative;font-weight:500;
+  flex:1 1 0;min-width:0;white-space:nowrap;
+  border:0;background:none;padding:8px 0 9px;font-size:13.5px;color:var(--sub);
+  position:relative;font-weight:500;letter-spacing:-.2px;
 }
 .tabs button.on{color:var(--p);font-weight:600}
 .tabs button.on::after{
@@ -379,6 +380,23 @@ details .body{padding-bottom:2px}
 .covbar i{display:block;height:100%;background:var(--p);border-radius:4px;transition:width .25s}
 .covbar.warn i{background:var(--dang)}
 .covbar.over i{background:var(--warn)}
+
+/* 资金池 */
+.pl-inv{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line2)}
+.pl-inv:last-child{border-bottom:0}
+.pl-inv .nm{font-size:14px;font-weight:600;color:var(--ink)}
+.pl-inv .mt{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.5}
+.pl-inv .rt{text-align:right;flex:0 1 44%;min-width:118px}
+.pl-inv .rt b{display:block;font-size:14px;font-variant-numeric:tabular-nums;color:var(--p)}
+.pl-inv .rt i{font-style:normal;font-size:11px;color:var(--muted)}
+.pl-tag{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:5px;background:var(--p-soft);color:var(--p);margin-left:5px;vertical-align:1px}
+.pl-tag.off{background:#f0f0ee;color:var(--muted)}
+.pl-tag.warn{background:#fdf3e3;color:var(--warn)}
+.pl-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;justify-content:flex-end}
+.pl-note{font-size:11.5px;line-height:1.65;color:var(--sub);background:#fafbf8;border:1px solid var(--line2);border-radius:10px;padding:10px 12px;margin-top:10px}
+.pl-note b{color:var(--ink)}
+.pl-note.d{background:#fdeeea;border-color:#f5d6d0;color:#8c2a22}
+.pl-note.d b{color:#8c2a22}
 </style>
 </head>
 <body>
@@ -392,6 +410,7 @@ details .body{padding-bottom:2px}
     <button data-nav="turn">周转</button>
     <button data-nav="ledger">台账</button>
     <button data-nav="sum">汇总</button>
+    <button data-nav="pool">资金池</button>
     <button data-nav="set">设置</button>
   </div>
 </header>
@@ -554,21 +573,31 @@ details .body{padding-bottom:2px}
         <button data-fr="8">借 8%</button>
       </div>
       <div class="hint">自有资金利率填 0；用流贷或托盘资金，填实际年化。</div>
+      <div class="flab" style="margin-top:13px">一年实际能跑多少天 <i>雨天 / 检修 / 节假日都停</i></div>
+      <label class="f"><span>年有效运营 <i>天/年 · 可手填</i></span>
+        <input type="text" id="fActiveDays" inputmode="numeric" placeholder="288"></label>
+      <div class="fs" id="fDayChips" style="margin-top:9px">
+        <button data-fd="365">满跑 365</button>
+        <button data-fd="320">320 天</button>
+        <button data-fd="288">288 天</button>
+        <button data-fd="250">250 天</button>
+      </div>
+      <div class="hint">实体经营不可能 365 天连轴转：雨季、道路管制、纸厂检修、春节都会停，木片与运输受影响尤其大。288 天约等于月均 24 个工作日；雨季长的年份可填 250 天。年度利润、年化、全年发车都按这个天数折算，填 365 才是连续满跑口径。</div>
     </div>
 
     <div class="card">
       <div class="card-h"><b>钱什么时候回来</b><span>按纸厂结算</span></div>
-      <div class="hint" style="margin:0 0 10px"><b>一轮周期</b> = 从货款付给上游，到这车的钱（预付款 + 尾款）全部收回来的天数。钱回来后能立刻再投下一车，所以一年能滚 365 ÷ 一轮天数 次。</div>
+      <div class="hint" style="margin:0 0 10px"><b>一轮周期</b> = 从货款付给上游，到这车的钱（预付款 + 尾款）全部收回来的天数。钱回来后能立刻再投下一车，所以一年能滚「有效运营天数 ÷ 一轮天数」次。</div>
       <div class="g2">
         <label class="f"><span>在途运输 <i>天</i></span>
           <input type="text" id="fTransit" inputmode="decimal" placeholder="2"></label>
         <label class="f"><span>上游付款占用 <i>天</i></span>
           <input type="text" id="fUp" inputmode="decimal" placeholder="0"></label>
       </div>
-      <div class="flab">出磅单时段 <i>决定预付款哪天到</i></div>
+      <div class="flab">出磅时段 <i>14 点是分界，决定预付款哪天到</i></div>
       <div class="fs" id="fPreChips">
-        <button data-fp="0">14 点前 · 当天结</button>
-        <button data-fp="1">14 点后 · 次日结</button>
+        <button data-fp="0">14 点前出磅 · 当天结</button>
+        <button data-fp="1">14 点后出磅 · 次日结</button>
       </div>
       <div class="g2">
         <label class="f"><span>化验出结果 <i>天</i></span>
@@ -577,19 +606,13 @@ details .body{padding-bottom:2px}
           <input type="text" id="fTail" inputmode="decimal" placeholder="3"></label>
       </div>
       <div class="g2">
-        <label class="f"><span>纸厂账期 <i>天 · 手填</i></span>
-          <input type="text" id="fMill" inputmode="decimal" placeholder="6"></label>
-        <label class="f"><span>回款在途 <i>承兑填这里</i></span>
+        <label class="f"><span>回款在途 <i>天 · 承兑填这里</i></span>
           <input type="text" id="fCollect" inputmode="decimal" placeholder="0"></label>
-      </div>
-      <div class="fs" id="fMillChips">
-        <button data-fmc="seq">按节奏重算</button>
-        <button data-fmc="15">15 天</button>
-        <button data-fmc="30">30 天</button>
-        <button data-fmc="45">45 天</button>
+        <label class="f"><span>纸厂账期 <i>天 · 自动</i></span>
+          <input type="text" id="fMill" inputmode="decimal" placeholder="6" readonly></label>
       </div>
       <div class="hint" id="fTHint">一轮 = 上游 + 在途 + 账期 + 回款</div>
-      <div class="hint">账期指「到厂 → 收齐尾款」的天数（化验 + 付尾款 + 回款在途）；一轮周期再往前加在途。预付款按 湿吨 × 50% × 当日厂价 估算，在出磅单当天或次日到账。</div>
+      <div class="hint">账期指「到厂 → 收齐尾款」的天数，<b>自动 = 化验 + 付尾款 + 回款在途</b>，不用手填。一轮周期再往前加在途。预付款按 湿吨 × 50% × 当日厂价 估算。同样 30 万元：14 点前出磅、当天到账约撑 13.9 车/天；14 点后出磅、次日到账只剩 7.2 车——14 点这道分界线，就是全流程最敏感的一环。</div>
     </div>
 
     <div class="card">
@@ -691,6 +714,125 @@ details .body{padding-bottom:2px}
     <div class="btns" style="margin-top:12px">
       <button class="btn" id="btnCsvSum">导出汇总 CSV</button>
     </div>
+  </section>
+
+  <!-- ================= 资金池 ================= -->
+  <section data-page="pool" style="display:none">
+
+    <div class="sum" id="plSumCard">
+      <div class="t" id="plNavT">每份净值</div>
+      <div class="v" id="plNav">—</div>
+      <div class="r">
+        <div>在册份数<b id="plShares">—</b></div>
+        <div>池子本金<b id="plCap">—</b></div>
+        <div>累计留存<b id="plKeep">—</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>出资人</b><span id="plInvN">0 人</span></div>
+      <div id="plInvList"><div class="hint" style="margin:0">还没有出资人。点下面「新增出资人」登记第一份。</div></div>
+      <div class="btns" style="margin-top:12px">
+        <button class="btn pri" id="btnPoolAdd">新增出资人</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>月度结算</b><span>按月分</span></div>
+      <div class="g2">
+        <label class="f"><span>结算月份</span>
+          <select id="plMonth"></select></label>
+        <div class="f"><span>操作</span>
+          <button class="mini" id="btnPoolPrev" style="height:46px">重算这个月</button></div>
+      </div>
+      <div id="plPrev"><div class="hint" style="margin:0">选月份后点「重算这个月」，看这个月能分多少。</div></div>
+      <div class="btns" style="margin-top:12px">
+        <button class="btn pri" id="btnPoolGen">生成分配表</button>
+      </div>
+      <div class="hint">生成时会把这一个月的净利、补亏、应分、代扣税款（含税目与税率）、每人到手金额全部存成快照。之后台账再改也不动这份已生成的月报。</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>分配记录</b><span id="plHistN">0 期</span></div>
+      <div id="plHist"><div class="hint" style="margin:0">还没有生成过分配表。</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>每人投入与分红</b><span id="plDetailN">—</span></div>
+      <div id="plDetail"><div class="hint" style="margin:0">还没有出资人。</div></div>
+      <div class="hint">每笔认购按到账日记日期和金额；每月分红列出已生成分配表的到手金额（未生成的不计）。点「明细」看这个人的完整对账单，退出的人也保留历史。</div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>退出窗口</b><span id="plWinT">—</span></div>
+      <div id="plWin"><div class="hint" style="margin:0">—</div></div>
+      <div id="plExitList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>池子参数</b><span>改完点保存</span></div>
+      <div class="g2">
+        <label class="f"><span>每份金额 <i>元</i></span>
+          <input type="text" id="pUnit" inputmode="decimal" placeholder="5000"></label>
+        <label class="f"><span>目标份数 <i>份</i></span>
+          <input type="text" id="pTarget" inputmode="numeric" placeholder="60"></label>
+      </div>
+      <div class="g2">
+        <label class="f"><span>出资人分成 <i>% 含税</i></span>
+          <input type="text" id="pInvPct" inputmode="decimal" placeholder="6"></label>
+        <label class="f"><span>代扣税率 <i>% · 可手填</i></span>
+          <input type="text" id="pTaxPct" inputmode="decimal" placeholder="20"></label>
+      </div>
+      <div class="flab">代扣税目 <i>选一种，税率跟着带出、也能手改</i></div>
+      <div class="fs" id="pTaxModeChips">
+        <button data-ptm="personal">个税 · 默认 20%</button>
+        <button data-ptm="business">经营所得 · 默认 5%</button>
+      </div>
+      <div class="g2">
+        <label class="f"><span>风险准备金 <i>% 净利 · 填 0</i></span>
+          <input type="text" id="pResPct" inputmode="decimal" placeholder="0"></label>
+        <label class="f"><span>人工 <i>元/月</i></span>
+          <input type="text" id="pLabor" inputmode="decimal" placeholder="18000"></label>
+      </div>
+      <div class="g2">
+        <label class="f"><span>办公 <i>元/月</i></span>
+          <input type="text" id="pOffice" inputmode="decimal" placeholder="3000"></label>
+        <label class="f"><span>差旅 <i>元/月</i></span>
+          <input type="text" id="pTravel" inputmode="decimal" placeholder="4000"></label>
+      </div>
+      <div class="g2">
+        <label class="f"><span>锁定期 <i>月</i></span>
+          <input type="text" id="pLock" inputmode="numeric" placeholder="6"></label>
+        <label class="f"><span>退出窗口月 <i>逗号分隔</i></span>
+          <input type="text" id="pExitMon" inputmode="numeric" placeholder="3,6,9,12"></label>
+      </div>
+      <div class="g2">
+        <label class="f"><span>提前申请 <i>天</i></span>
+          <input type="text" id="pNotice" inputmode="numeric" placeholder="30"></label>
+        <label class="f"><span>单次退出上限 <i>% 份数</i></span>
+          <input type="text" id="pExitCap" inputmode="decimal" placeholder="20"></label>
+      </div>
+      <label class="f" style="margin-top:10px"><span>经营方 <i>签约主体</i></span>
+        <input type="text" id="pOperator" placeholder="鹏淼国贸林业部"></label>
+      <div class="hint">6% 是含税口径：按「个税 20%」到手约 4.8%，按「经营所得 5%」约 5.7%，以实际认定税目为准，签约前到主管税务所确认。人工 / 办公 / 差旅按月自行填入，从经营方留存中支付，不进出资人的分红基数。本方案不设准备金，填 0。</div>
+      <div class="btns" style="margin-top:12px">
+        <button class="btn pri" id="btnPoolSaveP">保存参数</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-h"><b>导出与文书</b><span>发给出资人</span></div>
+      <div class="btns">
+        <button class="btn" id="btnPoolCsv">导出分配表 CSV</button>
+        <button class="btn" id="btnPoolLedger">导出出资台账 CSV</button>
+      </div>
+      <div class="btns" style="margin-top:10px">
+        <button class="btn" id="btnPoolPersonCsv">导出投入与分红明细 CSV</button>
+        <button class="btn" id="btnPoolSub">生成份额认购确认书</button>
+      </div>
+      <div class="hint">确认书里写明「共担风险、不保本、不是借贷」——这三句是这份文件最重要的话，别删。</div>
+    </div>
+
   </section>
 
   <!-- ================= 设置 ================= -->
@@ -966,7 +1108,7 @@ function logStar(inp, P){
 const $ = id => document.getElementById(id);
 const K = {
   P:'wp_m_params_v1', R:'wp_m_records_v1', B:'wp_m_lastbackup',
-  S:'wp_m_snapshot_v1', H:'wp_m_bkbar_hide'
+  S:'wp_m_snapshot_v1', H:'wp_m_bkbar_hide', POOL:'wp_m_pool_v1'
 };
 
 /* 存储层：现在落在 localStorage。将来要换 IndexedDB 时只改 ST 的 get/set/del，
@@ -994,17 +1136,42 @@ const DEF = {
     ver:2,
     cap:0,          // 投入资金（元），表单按万元输入
     rate:0,         // 资金年化利率 %
+    activeDays:288, // 年有效运营天数（扣雨天 / 检修 / 节假日，实体经营跑不满 365 天）
     upDays:0,       // 上游付款占用天数
-    transitDays:2,  // 在途运输天数
-    preDay:0,       // 出磅单时段：0 = 当天结预付，1 = 次日结预付
+    transitDays:1,  // 在途运输天数（当天装车当天到厂）
+    preDay:1,       // 出磅时段：0 = 14 点前出磅·当天结；1 = 14 点后出磅·次日结（默认）
     labDays:3,      // 化验出结果（2~3 天）
     tailDays:3,     // 付尾款（2~3 天）
-    millDays:6,     // 纸厂账期 = 到厂到收齐尾款（手填，seq = 按节奏重算）
+    millDays:7,     // 纸厂账期 = 到厂到收齐尾款（自动 = 化验 + 付尾款 + 回款在途，仅作展示/迁移）
     collectDays:0,  // 回款在途 / 承兑
     realCapDay:0,   // 实际日发车，0 = 按资金自动
     moistOv:'',     // 含水率手工覆盖（%），'' = 自动
     netOv:'',       // 单车净利手工覆盖，'' = 自动
     costOv:''       // 单车垫资手工覆盖，'' = 自动
+  },
+  /* 外部资金池（合同型合作经营，不是借贷、不是股权） */
+  pool: {
+    ver:1,
+    unit:5000,          // 每份金额（元）
+    target:60,          // 目标份数
+    invPct:6,           // 投资人分成比例（可分配利润的 %，含税）
+    taxMode:'personal', // 代扣税目：personal 个税 / business 经营所得
+    taxPct:20,          // 当前生效代扣税率（%，可手填）
+    personalTaxPct:20,  // 个税默认税率（%）
+    businessTaxPct:5,   // 经营所得默认税率（% 核定口径，可手填）
+    reservePct:0,       // 风险准备金计提比例（本方案不设准备金）
+    reserveCapPct:20,   // 准备金累计上限（池子本金的 %）
+    laborMonth:18000,   // 人工（元/月，从经营方留存中支付）
+    officeMonth:3000,   // 办公（元/月）
+    travelMonth:4000,   // 差旅（元/月）
+    lockMonths:6,       // 锁定期（月）
+    exitMonths:'3,6,9,12', // 退出窗口月
+    noticeDays:30,      // 提前申请天数
+    exitCapPct:20,      // 单次退出上限（在册份数的 %）
+    reportDay:5,        // 月报日
+    payDay:10,          // 打款日
+    operator:'鹏淼国贸林业部',
+    startMonth:''       // 起算月，'' = 取最早认购日
   }
 };
 
@@ -1022,6 +1189,33 @@ function save(key, v){
 
 let P = load(K.P, DEF);
 let REC = load(K.R, []);
+
+/* ================= 资金池：数据层 ================= */
+const POOL_DEF = {ver:1, inv:[], dist:[], exits:[], seq:1};
+
+function poolP(){
+  const d = DEF.pool, v = (P.pool && typeof P.pool === 'object') ? P.pool : {};
+  const o = {};
+  Object.keys(d).forEach(k=>{ o[k] = (v[k] === undefined || v[k] === null) ? d[k] : v[k]; });
+  return o;
+}
+function poolSetP(o){ P.pool = o; save(K.P, P); }
+function poolLoad(){
+  try{
+    const raw = ST.get(K.POOL);
+    if(!raw) return JSON.parse(JSON.stringify(POOL_DEF));
+    const v = JSON.parse(raw) || {};
+    return {
+      ver: v.ver || 1,
+      inv: Array.isArray(v.inv) ? v.inv : [],
+      dist: Array.isArray(v.dist) ? v.dist : [],
+      exits: Array.isArray(v.exits) ? v.exits : [],
+      seq: Math.max(1, num(v.seq) || 1)
+    };
+  }catch(e){ return JSON.parse(JSON.stringify(POOL_DEF)); }
+}
+function poolSave(){ return ST.set(K.POOL, JSON.stringify(POOL)); }
+let POOL = poolLoad();
 let mode = '1';
 let editingId = null;
 let filtMode = '';
@@ -2333,7 +2527,9 @@ $('btnSaveSet').onclick = ()=>{
     supList: P.supList, millList: P.millList, plateList: P.plateList,
     px: P.px || {}, pxAt: P.pxAt || '',
     pxSrc: P.pxSrc || '', pxMeta: P.pxMeta || {}, catAdd: P.catAdd || {},
-    fund: fundP()
+    fund: fundP(),
+    pool: poolP(),
+    autoPx: P.autoPx !== false
   };
   save(K.P, P);
   applyParams();
@@ -2466,9 +2662,9 @@ function fundP(){
   const o = {};
   Object.keys(d).forEach(k=>{ o[k] = (v[k] === undefined || v[k] === null) ? d[k] : v[k]; });
   if(!(num(v.ver) >= 2)){
-    /* 旧版口径：账期默认 30 天、日发车上限手填。按现在的「预付 + 2~3 天尾款」节奏重算一次 */
+    /* 旧版口径：账期默认 30 天、日发车上限手填。按现在的「预付 + 化验 + 付尾款」节奏重算一次 */
     o.ver = 2;
-    o.millDays = num(o.preDay) + num(o.labDays) + num(o.tailDays) + num(o.collectDays);
+    o.millDays = num(o.labDays) + num(o.tailDays) + num(o.collectDays);
     o.realCapDay = num(v.capDay) > 0 ? num(v.capDay) : 0;
   }
   return o;
@@ -2479,9 +2675,9 @@ function tMoney(n){
   const s = a >= 10000 ? (fmt(a/10000, 1) + '万') : fmt(a, 0);
   return (neg ? '-¥' : '¥') + s;
 }
-/* 纸厂结算节奏 → 账期天数（到厂 → 收齐尾款） */
+/* 纸厂账期天数（到厂 → 收齐尾款）= 化验 + 付尾款 + 回款在途，不含出磅预付款那一档 */
 function fundSeq(f){
-  return Math.max(0, num(f.preDay)) + Math.max(0, num(f.labDays))
+  return Math.max(0, num(f.labDays))
        + Math.max(0, num(f.tailDays)) + Math.max(0, num(f.collectDays));
 }
 
@@ -2495,12 +2691,14 @@ function fillTurn(){
   };
   put('fCap', f.cap ? +(f.cap/10000).toFixed(4) : '', true);
   put('fRate', f.rate, false);
+  put('fActiveDays', f.activeDays, false);
   put('fUp', f.upDays, false);
   put('fTransit', f.transitDays, false);
   put('fLab', f.labDays, false);
   put('fTail', f.tailDays, false);
-  put('fMill', f.millDays, false);
   put('fCollect', f.collectDays, false);
+  /* 账期只读，自动 = 化验 + 付尾款 + 回款在途（不含出磅预付款那一档） */
+  put('fMill', num(f.labDays) + num(f.tailDays) + num(f.collectDays), false);
   put('fReal', f.realCapDay, true);
   put('fMoist', f.moistOv, false);
   put('fNet', f.netOv, false);
@@ -2513,12 +2711,14 @@ function readFundForm(){
   f.ver = 2;
   f.cap = num(v('fCap')) * 10000;
   f.rate = num(v('fRate'));
+  f.activeDays = num(v('fActiveDays'));
   f.upDays = num(v('fUp'));
   f.transitDays = num(v('fTransit'));
   f.labDays = num(v('fLab'));
   f.tailDays = num(v('fTail'));
-  f.millDays = num(v('fMill'));
   f.collectDays = num(v('fCollect'));
+  /* 账期自动 = 化验 + 付尾款 + 回款在途，不读只读框 */
+  f.millDays = f.labDays + f.tailDays + f.collectDays;
   f.realCapDay = num(v('fReal'));
   f.moistOv = v('fMoist') === '' ? '' : num(v('fMoist'));
   f.netOv = v('fNet') === '' ? '' : num(v('fNet'));
@@ -2586,19 +2786,21 @@ function fundCalc(f, base){
   const net = num(base.net);
   const dUp = Math.max(0, num(f.upDays));
   const dTr = Math.max(0, num(f.transitDays));
-  const preDay = num(f.preDay) >= 0.5 ? 1 : 0;
+  const preDay = Math.max(0, Math.min(3, Math.round(num(f.preDay))));
   const dLab = Math.max(0, num(f.labDays));
   const dTail = Math.max(0, num(f.tailDays));
   const dCo = Math.max(0, num(f.collectDays));
-  const seq = preDay + dLab + dTail + dCo;
-  let dMl = num(f.millDays);
-  if(!(dMl > 0)) dMl = seq;
-  dMl = Math.max(0.5, dMl);
+  /* 纸厂账期自动 = 化验 + 付尾款 + 回款在途（到厂 → 收齐尾款，不含出磅预付款那一档） */
+  const seq = dLab + dTail + dCo;
+  const dMl = Math.max(0.5, seq);
   const t1 = Math.max(0.5, dUp + dTr + preDay);      // 付款 → 预付款到账
   const T = Math.max(t1 + 0.5, dUp + dTr + dMl);     // 付款 → 收齐尾款
   const tap = Math.max(0, T - t1);                   // 预付款后继续等尾款的天数
   const realCap = Math.max(0, num(f.realCapDay));
   const r = Math.max(0, num(f.rate)) / 100;
+  /* 年有效运营天数：实体经营跑不满 365 天（雨季、道路管制、纸厂检修、春节） */
+  const adRaw = num(f.activeDays);
+  const D = Math.max(1, Math.min(365, adRaw > 0 ? adRaw : 288));
 
   let m = num(base.moist);
   if(f.moistOv !== '' && f.moistOv !== undefined && f.moistOv !== null) m = num(f.moistOv) / 100;
@@ -2611,7 +2813,7 @@ function fundCalc(f, base){
   const gap = Math.max(0, C - adv);                  // 预付款到账后仍压自己的钱
   const I = C * t1 + gap * tap;                      // 资金占用积分（元·天）
 
-  const o = {M, C, net, T, t1, tap, dUp, dTr, dMl, dLab, dTail, dCo, preDay,
+  const o = {M, C, net, T, t1, tap, dUp, dTr, dMl, dLab, dTail, dCo, preDay, D,
              m, cov, rev, adv, rest, gap, I, realCap, r, seq};
 
   if(M <= 0) return Object.assign(o, {state:'noMoney'});
@@ -2620,8 +2822,8 @@ function fundCalc(f, base){
   const qCap = M / Math.max(0.01, I);                // 资金允许的日发车
   const q = realCap > 0 ? Math.min(qCap, realCap) : qCap;
   const binding = (realCap > 0 && realCap < qCap - 1e-9) ? 'cap' : 'money';
-  const turnsYr = 365 / T;
-  const profitYr = q * 365 * net;
+  const turnsYr = D / T;
+  const profitYr = q * D * net;
   const rateYr = profitYr / M;
   const nFull = q * t1;                              // 全额压着货款的车数
   const nAll = q * T;                                // 在途总车数（含已收预付的）
@@ -2631,6 +2833,12 @@ function fundCalc(f, base){
   const netYr = profitYr - interest;
   const realRate = netYr / M;
 
+  /* 容错：一辆车晚一天到账，就多压一天的货款 */
+  const peak = q * I;                                // 峰值占用（元）
+  const headroom = Math.max(0, M - peak);            // 余量
+  const lateTol = C > 0 ? headroom / C : 0;          // 能容忍几车晚一天出磅
+  const peakPct = M > 0 ? peak / M : 0;
+
   let state = 'ok';
   if(M < C) state = 'short';
   else if(net <= 0) state = 'loss';
@@ -2639,7 +2847,8 @@ function fundCalc(f, base){
     qCap, q, binding, turnsYr, profitYr, rateYr, rTurn: C > 0 ? net / C : 0,
     profitCycle: q * T * net, nFull, nAll, advCover: rev > 0 ? adv / rev : 0,
     util, idle, interest, netYr, realRate, beRate: rateYr,
-    profitMonth: profitYr / 12, state
+    profitMonth: profitYr / 12, state,
+    peak, headroom, lateTol, peakPct
   });
 }
 
@@ -2663,13 +2872,22 @@ function fundTips(r){
   /* 瓶颈 */
   if(r.binding === 'cap'){
     out.push(['g', '<b>车不够，不是钱不够。</b>这笔钱本可以撑 <b>' + fmt(r.qCap,2) + ' 车/天</b>，但日发车上限是 <b>'
-      + fmt(r.realCap,2) + ' 车/天</b>。一年只发 <b>' + fmt(r.q*365,0) + ' 车</b>、赚 <b>' + tMoney(r.profitYr)
+      + fmt(r.realCap,2) + ' 车/天</b>。一年只发 <b>' + fmt(r.q*r.D,0) + ' 车</b>、赚 <b>' + tMoney(r.profitYr)
       + '</b>，有 <b>' + tMoney(r.idle) + '</b> 闲着。要么加车，要么把钱抽走一部分。']);
   } else if(r.q >= 4){
     out.push(['g', '<b>这是资金上限，不是你的实际产能。</b>按这笔钱算能撑 <b>' + fmt(r.q,1)
-      + ' 车/天</b>（一年 ' + fmt(r.q*365,0) + ' 车），前提是货源、车、纸厂日收量都跟得上。把「实际日发车」填成你真正能做到的速度，数字才落地。']);
+      + ' 车/天</b>（一年 ' + fmt(r.q*r.D,0) + ' 车），前提是货源、车、纸厂日收量都跟得上。把「实际日发车」填成你真正能做到的速度，数字才落地。']);
   } else {
-    out.push(['g', '<b>钱是瓶颈。</b>一年 <b>' + fmt(r.q*365,0) + ' 车</b> 已经是这笔钱的上限（全款压在路上 ' + fmt(r.nFull,1) + ' 车）。想放大只有两条路：加钱，或让钱回来得更快。']);
+    out.push(['g', '<b>钱是瓶颈。</b>一年 <b>' + fmt(r.q*r.D,0) + ' 车</b> 已经是这笔钱的上限（全款压在路上 ' + fmt(r.nFull,1) + ' 车）。想放大只有两条路：加钱，或让钱回来得更快。']);
+  }
+  /* 容错：满负荷时一车晚点就断链 */
+  if(r.lateTol < 1){
+    out.push(['d', '<b>零余量，一车晚点就断。</b>峰值已占本金 <b>' + pct(r.peakPct) + '</b>，只要 1 车晚一天出磅，就多压 <b>'
+      + tMoney(r.C) + '</b>。把日发车压到 <b>' + fmt(Math.max(1, Math.floor(r.M / Math.max(1, r.I) * 0.58)), 0)
+      + ' 车</b> 左右（约六成负荷），余量才扛得住延误、抢收和临时加单——这是「能跑」和「能一直跑」的差别。']);
+  } else {
+    out.push(['t', '余量 <b>' + tMoney(r.headroom) + '</b>，能扛 <b>' + fmt(Math.floor(r.lateTol), 0)
+      + ' 车</b> 晚一天出磅。这就是「留一成至四成余量」的实际含义。']);
   }
   /* 账期到底有没有用 */
   if(r.gap <= 0.5){
@@ -2677,19 +2895,20 @@ function fundTips(r){
       + fmt(r.t1,1) + ' 天就回来了。尾款那笔本来就是利润，晚到只是晚点落袋。真正要抠的是「付款 → 预付款到账」这 ' + fmt(r.t1,1) + ' 天。']);
   } else {
     out.push(['t', '账期每多 1 天，等于多压 <b>' + tMoney(r.gap) + '</b> 现金，一年少赚 <b>'
-      + tMoney(365 * r.net * r.gap / r.I) + '</b>。']);
+      + tMoney(r.D * r.net * r.gap / r.I) + '</b>。']);
   }
   /* 加钱的边际 */
   if(r.binding === 'cap'){
-    out.push(['t', '再加钱没用，瓶颈在车。加一车运力，一年多赚 <b>' + tMoney(r.net * 365) + '</b>。']);
+    out.push(['t', '再加钱没用，瓶颈在车。加一车运力，一年多赚 <b>' + tMoney(r.net * r.D) + '</b>。']);
   } else {
-    out.push(['t', '再加 <b>' + tMoney(r.C) + '</b>（正好一车）→ 一年多赚 <b>' + tMoney(365 * r.net * r.C / r.I)
+    out.push(['t', '再加 <b>' + tMoney(r.C) + '</b>（正好一车）→ 一年多赚 <b>' + tMoney(r.D * r.net * r.C / r.I)
       + '</b>，回报率不变。']);
   }
   /* 年化为什么这么高 */
   const effDays = r.C > 0 ? r.I / r.C : 0;
-  out.push(['t', '每车平均只占 <b>' + fmt(effDays,1) + ' 天</b> 本金（不是 ' + fmt(r.T,1) + ' 天账期），同一笔钱一年能滚 <b>'
-    + fmt(365 / Math.max(0.5, effDays),0) + ' 次</b>，每次赚 ' + pct(r.rTurn) + '，乘起来就是 <b>' + pct(r.rateYr)
+  out.push(['t', '每车平均只占 <b>' + fmt(effDays,1) + ' 天</b> 本金（不是 ' + fmt(r.T,1) + ' 天账期），在 <b>'
+    + fmt(r.D,0) + ' 天</b>运营期里同一笔钱能滚 <b>'
+    + fmt(r.D / Math.max(0.5, effDays),0) + ' 次</b>，每次赚 ' + pct(r.rTurn) + '，乘起来就是 <b>' + pct(r.rateYr)
     + '</b> —— 不是算错了，是回款快。']);
   if(r.r > 0){
     if(r.beRate <= 1){
@@ -2700,8 +2919,12 @@ function fundTips(r){
         + '</b>。以这个回款速度，利息不是主要成本，真正的风险是货源断和纸厂停收。']);
     }
   }
+  out.push(['t', '上面按你填的 <b>' + fmt(r.D,0) + ' 天/年</b> 有效运营天数算（约占全年 '
+    + pct(r.D / 365) + '）。木业和运输看天吃饭：雨季、道路管制、纸厂检修、春节都会停，别拿 365 天满跑的数对外说。'
+    + '若真按 365 天连轴转，一年约 <b>' + tMoney(r.q * 365 * r.net)
+    + '</b>，比当前口径多 ' + tMoney(r.q * Math.max(0, 365 - r.D) * r.net) + '。']);
   out.push(['t', '第一车要压 <b>' + fmt(r.T,1) + ' 天</b> 才收齐，第一年实际约 <b>'
-    + tMoney(r.profitYr * Math.max(0, (365 - r.T) / 365)) + '</b>。']);
+    + tMoney(r.profitYr * Math.max(0, (r.D - r.T) / r.D)) + '</b>。']);
   return out;
 }
 
@@ -2710,12 +2933,14 @@ function gridHTML(f, base){
   if(!(C > 0) || !(M0 > 0)) return '<div class="hint" style="margin:0">先填投入资金和单车垫资</div>';
   const curWan = M0 / 10000;
   const rows = [0.5, 1, 1.5, 2].map(k=> Math.max(1, Math.round(curWan * k)));
-  const curMill = Math.max(0, Math.round(num(f.millDays)));
+  const curMill = Math.max(0, Math.round(num(f.labDays) + num(f.tailDays) + num(f.collectDays)));
   const cols = [];
   [curMill, 15, 30].forEach(d=>{ if(d > 0 && cols.indexOf(d) < 0) cols.push(d); });
   cols.sort((a,b)=> a - b);
   const cell = (mWan, days)=>{
-    const f2 = Object.assign({}, f, {cap: mWan * 10000, millDays: days});
+    /* 账期是「化验 + 付尾款 + 回款在途」的派生值；模拟更长账期时，把差额摊到「付尾款」上 */
+    const tail = Math.max(0, days - num(f.labDays) - num(f.collectDays));
+    const f2 = Object.assign({}, f, {cap: mWan * 10000, tailDays: tail});
     const r2 = fundCalc(f2, base);
     const p2 = isFinite(r2.profitYr) ? r2.profitYr : 0;
     const rt2 = isFinite(r2.rateYr) ? r2.rateYr : 0;
@@ -2737,6 +2962,8 @@ function gridHTML(f, base){
 function renderTurn(){
   if(!$('tProfit')) return;
   const f = readFundForm();
+  /* 账期只读框跟随化验/付尾款/回款在途实时刷新 */
+  if($('fMill')) $('fMill').value = String(f.millDays);
   const ab = autoBase();
   const base = {
     net: f.netOv === '' ? ab.net : num(f.netOv),
@@ -2775,15 +3002,12 @@ function renderTurn(){
     $('fTHint').innerHTML = '一轮 <b>' + dn(r.T) + ' 天</b> = 上游 ' + dn(r.dUp) + ' + 在途 ' + dn(r.dTr)
       + ' + 账期 ' + dn(r.dMl) + '；预付款第 <b>' + dn(r.t1) + ' 天</b>到，占货款的 <b>' + pct(r.advCover) + '</b>。';
   }
-  const rateNow = num(f.rate), millNow = num(f.millDays), seqNow = fundSeq(f);
+  const rateNow = num(f.rate);
   document.querySelectorAll('#fRateChips button').forEach(b=>{
     b.classList.toggle('on', Math.abs(num(b.dataset.fr) - rateNow) < 1e-9);
   });
-  document.querySelectorAll('#fMillChips button').forEach(b=>{
-    const v = b.dataset.fmc;
-    b.classList.toggle('on', v === 'seq'
-      ? Math.abs(seqNow - millNow) < 1e-9
-      : Math.abs(num(v) - millNow) < 1e-9);
+  document.querySelectorAll('#fDayChips button').forEach(b=>{
+    b.classList.toggle('on', Math.abs(num(b.dataset.fd) - r.D) < 1e-9);
   });
   document.querySelectorAll('#fPreChips button').forEach(b=>{
     b.classList.toggle('on', num(b.dataset.fp) === num(f.preDay));
@@ -2838,10 +3062,15 @@ function renderTurn(){
   h += lineHTML('资金当量占用', dn(r.I / Math.max(1, r.C)) + ' 天/车');
   h += lineHTML('平均每车占用本金', tMoney(r.I / Math.max(1, r.T)));
   h += lineHTML('日发车上限' + (realSrc === 'ledger' ? '（台账实际）' : realSrc === 'manual' ? '（手填）' : '（资金能力）'), fmt(r.q, 2) + ' 车/天');
-  h += lineHTML('全年发车', fmt(r.q*365, 0) + ' 车');
+  h += lineHTML('全年发车', fmt(r.q*r.D, 0) + ' 车');
   h += lineHTML('全款压在路上', fmt(r.nFull, 1) + ' 车');
   h += lineHTML('在途总车数（含已收预付）', fmt(r.nAll, 1) + ' 车');
+  h += lineHTML('峰值占用', tMoney(r.peak) + ' · 本金的 ' + pct(r.peakPct));
+  h += lineHTML('余量能扛', r.lateTol >= 1
+    ? fmt(Math.floor(r.lateTol), 0) + ' 车晚一天出磅'
+    : '不足一车 · 零容错', r.lateTol >= 2 ? '' : 'bad');
   h += '<div class="sheet-t">结果</div>';
+  h += lineHTML('年有效运营', fmt(r.D, 0) + ' 天 · 全年发 ' + fmt(r.q*r.D, 0) + ' 车');
   h += lineHTML('年利润', tMoney(r.profitYr));
   h += lineHTML('年化回报率', pct(r.rateYr));
   h += lineHTML('每月利润', tMoney(r.profitMonth));
@@ -2860,7 +3089,7 @@ function renderTurn(){
       tips.push(['t', '日发车上限按台账近 ' + pace.days + ' 天实际发的 <b>' + pace.cars + ' 车</b>自动带出（日均 '
         + fmt(pace.q,2) + ' 车）。想试「如果我能多发」，在「实际日发车」里填更大的数就行。']);
     }else if(realSrc === 'none'){
-      const pr = pace.q * 365 * r.net;
+      const pr = pace.q * r.D * r.net;
       tips.push(['t', '台账近 ' + pace.days + ' 天只发了 <b>' + pace.cars + ' 车</b>，样本太少，先按资金能力算。'
         + '按这个历史速度，一年约 <b>' + tMoney(pr) + '</b>、年化 ' + pct(r.M > 0 ? pr / r.M : 0) + '。']);
     }
@@ -2886,6 +3115,812 @@ function fundSync(){
   if($('fMoist')) $('fMoist').value = '';
   renderTurn();
   toast(ab.from === 'calc' ? '已按当前测算联动' : '已按台账最近 ' + ab.n + ' 车均值联动');
+}
+
+/* ================= 资金池：计算层 =================
+   口径：合同型合作经营。投资人按「可分配利润 × 分成比例」按份分，
+   盈亏共担、不保本、不保底。所有金额在「分」上取整，Σ每人 = 投资人合计。 */
+const poolR2 = n => Math.round((isFinite(n) ? n : 0) * 100) / 100;
+const monthOK = s => /^\d{4}-(0[1-9]|1[0-2])$/.test(String(s || ''));
+function monthDays(m){
+  if(!monthOK(m)) return 0;
+  return new Date(+m.slice(0, 4), +m.slice(5, 7), 0).getDate();
+}
+function todayMonth(){ return today().slice(0, 7); }
+function prevMonth(m){
+  if(!monthOK(m)) return '';
+  const y = +m.slice(0, 4), mo = +m.slice(5, 7);
+  return mo === 1 ? (y - 1) + '-12' : y + '-' + (mo - 1 < 10 ? '0' : '') + (mo - 1);
+}
+function addMonthsYMD(ymd, n){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(ymd || ''))) return '';
+  const t = new Date(+ymd.slice(0, 4), +ymd.slice(5, 7) - 1 + n, +ymd.slice(8, 10));
+  const p = x => (x < 10 ? '0' : '') + x;
+  return t.getFullYear() + '-' + p(t.getMonth() + 1) + '-' + p(t.getDate());
+}
+function daysBetween(a, b){
+  const A = new Date(a + 'T00:00:00'), B = new Date(b + 'T00:00:00');
+  return Math.round((B - A) / 86400000);
+}
+
+function invById(id){ return POOL.inv.find(x => String(x.id) === String(id)) || null; }
+function invLots(inv){ return (inv && Array.isArray(inv.lots)) ? inv.lots : []; }
+/* 代扣税目名称：个税 / 经营所得，按实际情况认定 */
+function taxLabel(mode){ return String(mode) === 'business' ? '经营所得税' : '个人所得税'; }
+/* 认购批次的单价与金额：新数据记当时单价，旧数据按当前每份金额折算 */
+function lotUnit(l, unit){ return num(l && l.u) > 0 ? num(l.u) : unit; }
+function lotAmt(l, unit){ return poolR2(Math.max(0, num(l && l.n)) * lotUnit(l, unit)); }
+function invInvest(inv, unit){
+  return poolR2(invLots(inv).reduce((t, l) => t + lotAmt(l, unit), 0));
+}
+/* 某人的每月分红明细（按已生成的分配表快照） */
+function invPaidRows(id){
+  return distSorted().map(d => {
+    const it = (d.items || []).find(x => String(x.invId) === String(id));
+    if(!it) return null;
+    return {m:d.m, amt:num(it.amt), tax:num(it.tax),
+      net: it.net === undefined ? num(it.amt) : num(it.net),
+      paid:!!d.paid, taxName: taxLabel(d.taxMode || poolP().taxMode)};
+  }).filter(Boolean);
+}
+function invShares(inv){
+  if(!inv || inv.status === 'out') return 0;
+  return invLots(inv).reduce((s, l) => s + Math.max(0, num(l.n)), 0);
+}
+function poolShares(){ return POOL.inv.reduce((s, x) => s + invShares(x), 0); }
+function poolCapital(){ return poolShares() * (num(poolP().unit) || 0); }
+function poolActive(){ return POOL.inv.filter(x => invShares(x) > 0); }
+function invFirstDate(inv){
+  const ds = invLots(inv).map(l => String(l.d || '')).filter(s => /^\d{4}-\d{2}-\d{2}$/.test(s)).sort();
+  return ds[0] || '';
+}
+function invCanExit(inv){
+  const f = invFirstDate(inv);
+  return f ? addMonthsYMD(f, Math.max(0, num(poolP().lockMonths))) : '';
+}
+/* 该批次在给定月份内被占用的天数：月中新进只算到手那天起 */
+function lotDaysInMonth(lot, m){
+  const dim = monthDays(m);
+  if(!dim) return 0;
+  const d = String(lot.d || '').slice(0, 10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) return dim;
+  const lm = d.slice(0, 7);
+  if(lm < m) return dim;
+  if(lm > m) return 0;
+  return Math.max(0, dim - (+d.slice(8, 10)) + 1);
+}
+function monthRecs(m){
+  return REC.filter(r => String((r.inp || {}).date || '').slice(0, 7) === m);
+}
+function monthNet(m){ return monthRecs(m).reduce((s, r) => s + num((r.out || {}).net), 0); }
+function distSorted(){ return POOL.dist.slice().sort((a, b) => String(a.m).localeCompare(String(b.m))); }
+
+/* 未弥补亏损：只由已生成的分配表推算，保证「净利润 − 准备金」能吃掉历史亏损 */
+function poolCarryBefore(m){
+  let carry = 0;
+  distSorted().forEach(d => {
+    if(String(d.m) >= m) return;
+    const av = num(d.net) - num(d.reserve);
+    if(av >= 0) carry = Math.max(0, carry - av);
+    else carry += -av;
+  });
+  return poolR2(carry);
+}
+/* 累计留存 = 截至某月的全部净利 − 已分配总额（= 累计风险准备金 − 未弥补亏损）
+   退出净值只用它的「负值」部分：赚的钱已经按月分掉了，留存是池子抵御亏损的缓冲，
+   不归出资人；只有累计亏损吃掉全部准备金之后，净值才低于面值——这才是共担风险的落点。 */
+function poolKeep(upto){
+  let net = 0, dis = 0;
+  REC.forEach(r => {
+    const m = String((r.inp || {}).date || '').slice(0, 7);
+    if(monthOK(m) && m <= upto) net += num((r.out || {}).net);
+  });
+  POOL.dist.forEach(d => { if(String(d.m) <= upto) dis += num(d.dist); });
+  return poolR2(net - dis);
+}
+function navOf(unit, sh, keep){
+  if(sh <= 0) return Math.max(0, unit);
+  return Math.max(0, poolR2(unit + Math.min(0, keep) / sh));
+}
+function poolNav(m){
+  const unit = num(poolP().unit) || 5000;
+  const sh = poolShares();
+  const keep = poolKeep(m);
+  return {unit, sh, keep, nav: navOf(unit, sh, keep)};
+}
+
+/* 月度结算：净利 → 准备金 → 补亏 → 可分配 → 按份分 */
+function poolCalc(m){
+  const p = poolP();
+  const unit = num(p.unit) || 5000;
+  const sh = poolShares();
+  const cap = sh * unit;
+  const recs = monthRecs(m);
+  const N = poolR2(monthNet(m));
+  const carryIn = poolCarryBefore(m);
+  const reserveCap = poolR2(cap * Math.max(0, num(p.reserveCapPct)) / 100);
+  const reserveAcc = distSorted().filter(d => String(d.m) < m)
+    .reduce((s, d) => s + num(d.reserve), 0);
+  let reserve = 0;
+  if(N > 0 && num(p.reservePct) > 0){
+    reserve = Math.min(N * num(p.reservePct) / 100, Math.max(0, reserveCap - reserveAcc));
+  }
+  reserve = poolR2(reserve);
+  const avail = poolR2(N - reserve);
+  const carryUsed = poolR2(Math.min(carryIn, Math.max(0, avail)));
+  const dist = poolR2(Math.max(0, avail - carryIn));
+  const invPct = Math.max(0, Math.min(100, num(p.invPct)));
+  const invTotal = poolR2(dist * invPct / 100);
+  /* 税目二选一：个税 / 经营所得，税率可手填 */
+  const taxMode = String(p.taxMode) === 'business' ? 'business' : 'personal';
+  const taxName = taxLabel(taxMode);
+  const taxPct = Math.max(0, Math.min(100, num(p.taxPct)));
+  const taxTotal = poolR2(invTotal * taxPct / 100);
+  const netTotal = poolR2(invTotal - taxTotal);
+  const opAmt = poolR2(dist - invTotal);
+  /* 人工 / 办公 / 差旅三项自行填入，从经营方留存中支付 */
+  const costLabor = poolR2(Math.max(0, num(p.laborMonth)));
+  const costOffice = poolR2(Math.max(0, num(p.officeMonth)));
+  const costTravel = poolR2(Math.max(0, num(p.travelMonth)));
+  const labor = poolR2(costLabor + costOffice + costTravel);
+  const opNet = poolR2(opAmt - labor);
+
+  const rows = [];
+  let tw = 0;
+  POOL.inv.forEach(v => {
+    const s = invShares(v);
+    if(s <= 0) return;
+    let w = 0;
+    invLots(v).forEach(l => { w += Math.max(0, num(l.n)) * lotDaysInMonth(l, m); });
+    if(w <= 0) return;
+    rows.push({invId:v.id, name:v.name, shares:s, w});
+    tw += w;
+  });
+
+  const items = [];
+  if(invTotal > 0 && rows.length && tw > 0){
+    const cents = Math.round(invTotal * 100);
+    const parts = rows.map(r => Math.round(cents * r.w / tw));
+    parts[0] = cents - parts.slice(1).reduce((a, b) => a + b, 0);
+    rows.forEach((r, i) => items.push({
+      invId:r.invId, name:r.name, shares:r.shares, amt: parts[i] / 100,
+      tax: poolR2(parts[i] / 100 * taxPct / 100),
+      net: poolR2(parts[i] / 100 * (1 - taxPct / 100))
+    }));
+  }
+
+  const nv = poolNav(m);
+  const hasRec = POOL.dist.some(d => String(d.m) === m);
+  const keep = hasRec ? nv.keep : poolR2(nv.keep - dist);
+  const nav = navOf(unit, sh, keep);
+
+  return {
+    m, unit, shares:sh, capital:cap, cars:recs.length, N,
+    carryIn, carryUsed, reserve, reserveAcc, reserveCap,
+    reserveLeft: poolR2(Math.max(0, reserveCap - reserveAcc - reserve)),
+    avail, dist, invPct, invTotal, taxMode, taxName, taxPct, taxTotal, netTotal, opAmt,
+    labor, costLabor, costOffice, costTravel, opNet,
+    perShare: sh > 0 ? poolR2(invTotal / sh) : 0,
+    perShareNet: sh > 0 ? poolR2(netTotal / sh) : 0,
+    items, keep, nav, target: num(p.target)
+  };
+}
+
+/* 退出结算价：申请日上一月末的每份净值 × 份数 */
+function exitQuote(id, n){
+  const inv = invById(id);
+  const have = invShares(inv);
+  const sh = Math.max(0, Math.min(Math.floor(num(n)), have));
+  const m = prevMonth(todayMonth()) || todayMonth();
+  const nv = poolNav(m);
+  return {shares:sh, month:m, nav:nv.nav, amt:poolR2(sh * nv.nav), unit:nv.unit, have};
+}
+/* 下次可申请的退出窗口：取第一个「申请截止日 ≥ 今天」的窗口月 */
+function exitWin(){
+  const p = poolP();
+  const ms = String(p.exitMonths || '').split(',').map(s => parseInt(s, 10))
+    .filter(n => n >= 1 && n <= 12);
+  const list = ms.length ? ms : [3, 6, 9, 12];
+  const nd = Math.max(0, num(p.noticeDays));
+  const t = today();
+  const ty = +t.slice(0, 4), tm = +t.slice(5, 7);
+  const p2 = x => (x < 10 ? '0' : '') + x;
+  for(let k = 0; k < 30; k++){
+    const yy = ty + Math.floor((tm - 1 + k) / 12);
+    const mm = ((tm - 1 + k) % 12) + 1;
+    if(list.indexOf(mm) < 0) continue;
+    const wd = yy + '-' + p2(mm) + '-01';
+    const dl = new Date(yy, mm - 1, 1);
+    dl.setDate(dl.getDate() - nd);
+    const dls = dl.getFullYear() + '-' + p2(dl.getMonth() + 1) + '-' + p2(dl.getDate());
+    if(dls < t) continue;
+    return {ym: wd.slice(0, 7), date: wd, days: daysBetween(t, wd), deadline: dls,
+            notice: daysBetween(t, dls), open: t >= dls};
+  }
+  return null;
+}
+/* 从最新批次往前扣份 */
+function takeShares(id, n){
+  const inv = invById(id);
+  if(!inv) return 0;
+  let left = Math.max(0, Math.floor(num(n)));
+  invLots(inv).slice().sort((a, b) => String(b.d || '').localeCompare(String(a.d || '')))
+    .forEach(l => {
+      if(left <= 0) return;
+      const have = Math.max(0, num(l.n));
+      const cut = Math.min(have, left);
+      l.n = have - cut;
+      left -= cut;
+    });
+  inv.lots = invLots(inv).filter(l => Math.max(0, num(l.n)) > 0);
+  if(invShares(inv) <= 0) inv.status = 'out';
+  return Math.max(0, Math.floor(num(n))) - left;
+}
+
+/* ================= 资金池：渲染 ================= */
+function fillPool(){
+  const p = poolP();
+  const put = (id, v) => { const el = $(id); if(el) el.value = v; };
+  put('pUnit', p.unit); put('pTarget', p.target); put('pInvPct', p.invPct);
+  put('pTaxPct', p.taxPct);
+  put('pResPct', p.reservePct); put('pResCap', p.reserveCapPct);
+  put('pLabor', p.laborMonth); put('pOffice', p.officeMonth); put('pTravel', p.travelMonth);
+  put('pLock', p.lockMonths); put('pExitMon', p.exitMonths);
+  put('pNotice', p.noticeDays); put('pExitCap', p.exitCapPct);
+  put('pOperator', p.operator);
+}
+function readPoolP(){
+  const v = id => ($(id) ? $(id).value.trim() : '');
+  const p = poolP();
+  p.unit = num(v('pUnit')) || 5000;
+  p.target = Math.max(0, Math.floor(num(v('pTarget'))));
+  p.invPct = Math.max(0, Math.min(100, num(v('pInvPct'))));
+  p.taxPct = Math.max(0, Math.min(100, num(v('pTaxPct'))));
+  if(p.taxMode === 'business') p.businessTaxPct = p.taxPct; else p.personalTaxPct = p.taxPct;
+  p.reservePct = Math.max(0, Math.min(100, num(v('pResPct'))));
+  p.reserveCapPct = $('pResCap') ? Math.max(0, num(v('pResCap'))) : 20;
+  p.laborMonth = Math.max(0, num(v('pLabor')));
+  p.officeMonth = Math.max(0, num(v('pOffice')));
+  p.travelMonth = Math.max(0, num(v('pTravel')));
+  p.lockMonths = Math.max(0, Math.floor(num(v('pLock'))));
+  p.exitMonths = v('pExitMon').replace(/[^\d,]/g, '') || '3,6,9,12';
+  p.noticeDays = Math.max(0, Math.floor(num(v('pNotice'))));
+  p.exitCapPct = Math.max(0, Math.min(100, num(v('pExitCap'))));
+  p.operator = v('pOperator') || '鹏淼国贸林业部';
+  return p;
+}
+
+function fillPoolMonth(){
+  const sel = $('plMonth');
+  if(!sel) return;
+  const keep = sel.value;
+  const set = new Set();
+  REC.forEach(r => { const m = String((r.inp || {}).date || '').slice(0, 7); if(monthOK(m)) set.add(m); });
+  POOL.dist.forEach(d => { if(monthOK(d.m)) set.add(d.m); });
+  const tm = todayMonth();
+  set.add(tm); set.add(prevMonth(tm));
+  const arr = [...set].filter(monthOK).sort().reverse();
+  sel.innerHTML = arr.map(m => '<option value="' + m + '">' + m
+    + (POOL.dist.some(d => String(d.m) === m) ? '（已生成）' : '') + '</option>').join('');
+  if(keep && arr.indexOf(keep) >= 0) sel.value = keep;
+}
+
+function renderPoolPrev(){
+  const box = $('plPrev');
+  const sel = $('plMonth');
+  if(!box || !sel) return null;
+  const m = sel.value;
+  if(!monthOK(m)){ box.innerHTML = '<div class="hint" style="margin:0">先选月份</div>'; return null; }
+  const r = poolCalc(m);
+  const p = poolP();
+  const rec = POOL.dist.find(d => String(d.m) === m);
+
+  let h = '';
+  h += '<div class="sheet-t">这个月赚了多少</div>';
+  h += lineHTML('车数', fmt(r.cars, 0) + ' 车');
+  h += lineHTML('净利（已扣流转税与企业所得税）', '¥' + fmt(r.N, 0));
+  if(r.reserve > 0) h += lineHTML('计提风险准备金 ' + fmt(num(p.reservePct), 0) + '%', '-¥' + fmt(r.reserve, 0));
+  h += lineHTML('弥补以前亏损', '-¥' + fmt(r.carryUsed, 0));
+  h += lineHTML('可分配利润', '¥' + fmt(r.dist, 0), 'total');
+
+  h += '<div class="sheet-t">怎么分（在册 ' + fmt(r.shares, 0) + ' 份）</div>';
+  h += lineHTML('出资人合计 ' + fmt(r.invPct, 0) + '%（含税）', '¥' + fmt(r.invTotal, 0));
+  h += lineHTML('代扣' + r.taxName + ' ' + fmt(r.taxPct, 0) + '%', '-¥' + fmt(r.taxTotal, 0));
+  h += lineHTML('出资人实付合计', '¥' + fmt(r.netTotal, 0), 'total');
+  h += lineHTML('每份', '¥' + fmt(r.perShare, 2) + ' → 到手 ¥' + fmt(r.perShareNet, 2));
+  h += lineHTML('分配后每份净值', '¥' + fmt(r.nav, 2));
+
+  h += '<div class="sheet-t">经营方</div>';
+  h += lineHTML('留存（可分配 − 出资人应分）', '¥' + fmt(r.opAmt, 0));
+  h += lineHTML('减：人工 / 办公 / 差旅', '-¥' + fmt(r.labor, 0));
+  h += '<div class="pl-note" style="margin-top:4px;padding:7px 10px">人工 ¥' + fmt(r.costLabor, 0)
+    + ' · 办公 ¥' + fmt(r.costOffice, 0) + ' · 差旅 ¥' + fmt(r.costTravel, 0)
+    + '（元/月，在「池子参数」里自行填入）</div>';
+  h += lineHTML('经营方所得', '¥' + fmt(r.opNet, 0), 'total' + (r.opNet < 0 ? ' bad' : ''));
+  if(r.opNet < 0){
+    h += '<div class="pl-note d">这个月净利<b>不够付人工 / 办公 / 差旅</b>，要从以前月份的留存里补。这也是「你一年真正赚多少」和「净利」不是同一个数的原因。</div>';
+  }else{
+    h += '<div class="pl-note">每份每月到手 ' + fmt(r.perShareNet, 2) + ' 元，是从「净利 × ' + fmt(r.invPct, 0)
+      + '% ÷ 在册份数」算出来的；份数多、车没跟上，每份就被摊薄。经营方这 ' + fmt(r.opNet, 0)
+      + ' 元里还含你自己的工资与全部经营风险。</div>';
+  }
+
+  if(r.dist <= 0){
+    h += '<div class="pl-note">这个月不分配。' + (r.N <= 0
+      ? '该月净利为 <b>¥' + fmt(r.N, 0) + '</b>，亏损会记成「待弥补」，从后面月份的利润里优先补回来，<b>不要求出资人追加钱</b>。'
+      : '利润全部用于补以前亏损，出资人这个月拿 0。') + '</div>';
+  }
+
+  if(r.items.length){
+    h += '<div class="sheet-t">每人应分 / 代扣 / 到手</div>';
+    r.items.forEach(x => {
+      h += lineHTML(esc(x.name) + '　' + fmt(x.shares, 0) + ' 份',
+        fmt(x.amt, 2) + ' − ' + fmt(x.tax, 2) + ' = <b>' + fmt(x.net, 2) + '</b>');
+    });
+  }else if(r.dist > 0){
+    h += '<div class="pl-note d">有可分配利润，但<b>没有在册份数</b>，钱分不出去。先登记出资人。</div>';
+  }
+
+  if(rec){
+    h += '<div class="pl-note">' + (rec.paid
+      ? '<b>该月已生成并标记发放</b>（' + esc(rec.paidAt) + '），数字锁定，台账再改也不动。'
+      : '<b>该月已生成分配表，还没标记发放。</b>上面是按当前台账重算的结果，若与已生成的不同，以已生成的为准。') + '</div>';
+  }
+  box.innerHTML = h;
+  return r;
+}
+
+function renderPoolHist(){
+  const box = $('plHist'), n = $('plHistN');
+  if(!box) return;
+  const arr = distSorted().slice().reverse();
+  if(n) n.textContent = arr.length + ' 期';
+  if(!arr.length){
+    box.innerHTML = '<div class="hint" style="margin:0">还没有生成过分配表。</div>';
+    return;
+  }
+  box.innerHTML = arr.map(d => {
+    const st = d.paid ? '<span class="pl-tag">已发放</span>' : '<span class="pl-tag warn">待发放</span>';
+    return '<div class="pl-inv"><div><div class="nm">' + esc(d.m) + st + '</div>'
+      + '<div class="mt">' + fmt(num(d.cars), 0) + ' 车 · 净利 ¥' + fmt(num(d.net), 0)
+      + ' · 可分配 ¥' + fmt(num(d.dist), 0)
+      + '<br>投资人 ' + tMoney(num(d.invTotal)) + ' · 每份 ¥' + fmt(num(d.perShare), 2) + '</div></div>'
+      + '<div class="rt"><b>' + tMoney(num(d.invTotal)) + '</b><i>投资人合计</i>'
+      + '<div class="pl-acts">'
+      + (d.paid ? '' : '<button class="mini" data-pact="pay" data-id="' + esc(d.id) + '">标记已发</button>')
+      + '<button class="mini" data-pact="distcsv" data-id="' + esc(d.id) + '">明细</button>'
+      + '</div></div></div>';
+  }).join('');
+}
+
+/* 每人投入与分红：什么时候投、投多少、每月分多少 */
+function poolDetailText(inv){
+  const p = poolP();
+  const unit = num(p.unit) || 5000;
+  const lots = invLots(inv).slice().sort((a,b)=> String(a.d||'').localeCompare(String(b.d||'')));
+  const rows = invPaidRows(inv.id);
+  const invest = invInvest(inv, unit);
+  const totalNet = rows.reduce((t,x)=> t + x.net, 0);
+  const L = [];
+  L.push('投入与分红对账单 · ' + inv.name);
+  L.push('（每份面值 ¥' + fmt(unit,0) + '；当前代扣税目：' + taxLabel(p.taxMode) + ' ' + fmt(num(p.taxPct),0) + '%）');
+  L.push('');
+  L.push('一、投入明细（按到账日）');
+  if(lots.length){
+    lots.forEach(l => L.push('  ' + (l.d || '—') + '　' + fmt(num(l.n),0) + ' 份 × ¥'
+      + fmt(lotUnit(l,unit),0) + ' = ' + tMoney(lotAmt(l,unit))));
+  }else L.push('  无');
+  L.push('  合计：' + lots.length + ' 笔，' + tMoney(invest));
+  L.push('  首投日期：' + (invFirstDate(inv) || '—') + '　当前在册：' + fmt(invShares(inv),0) + ' 份');
+  L.push('');
+  L.push('二、每月分红（已生成的分配表）');
+  if(rows.length){
+    rows.forEach(x => L.push('  ' + x.m + '　应分 ¥' + fmt(x.amt,2) + ' − 代扣' + x.taxName
+      + ' ¥' + fmt(x.tax,2) + ' = 到手 ¥' + fmt(x.net,2) + (x.paid ? '　已发放' : '　待发放')));
+  }else L.push('  还没有生成分配表');
+  L.push('  累计到手：' + tMoney(totalNet));
+  L.push('');
+  L.push('说明：分红 = 当月净利 × ' + fmt(num(p.invPct),0) + '% ÷ 在册份数，按份·天折算，不保本、不保底。');
+  return L.join('\n');
+}
+
+function renderPoolDetail(){
+  const box = $('plDetail');
+  if(!box) return;
+  const unit = num(poolP().unit) || 5000;
+  if($('plDetailN')) $('plDetailN').textContent = POOL.inv.length + ' 人 · ' + POOL.dist.length + ' 期';
+  if(!POOL.inv.length){
+    box.innerHTML = '<div class="hint" style="margin:0">还没有出资人。</div>';
+    return;
+  }
+  box.innerHTML = POOL.inv.map(v => {
+    const lots = invLots(v).slice().sort((a,b)=> String(a.d||'').localeCompare(String(b.d||'')));
+    const invest = invInvest(v, unit);
+    const rows = invPaidRows(v.id);
+    const totalNet = rows.reduce((t,x)=> t + x.net, 0);
+    const show = rows.slice(-6), older = rows.slice(0, -6);
+    let h = '<div class="pl-inv"><div><div class="nm">' + esc(v.name)
+      + (v.status === 'out' ? '<span class="pl-tag off">已退出</span>' : '') + '</div>'
+      + '<div class="mt"><b>投入</b>：' + lots.length + ' 笔 · 合计 ' + tMoney(invest) + '<br>';
+    h += lots.length ? lots.map(l => '　' + esc(l.d || '—') + '　' + fmt(num(l.n),0) + ' 份 = '
+      + tMoney(lotAmt(l, unit))).join('<br>') : '　—';
+    h += '<br><b>每月分红（到手）</b>：累计 ' + tMoney(totalNet) + '<br>';
+    if(older.length) h += '　更早 ' + older.length + ' 期合计 '
+      + tMoney(older.reduce((t,x)=>t+x.net,0)) + '<br>';
+    h += show.length ? show.map(x => '　' + esc(x.m) + '　¥' + fmt(x.net,2)
+      + (x.paid ? '' : '（待发放）')).join('<br>') : '　还没有生成分配表';
+    h += '</div></div><div class="rt"><b>' + tMoney(totalNet) + '</b><i>累计到手</i>'
+      + '<div class="pl-acts"><button class="mini" data-pact="detail" data-id="' + esc(v.id) + '">明细</button></div>'
+      + '</div></div>';
+    return h;
+  }).join('');
+}
+
+function poolInvDetailSheet(id){
+  const inv = invById(id);
+  if(!inv) return;
+  const txt = poolDetailText(inv);
+  openSheet('对账单 · ' + inv.name,
+    '<div class="hint" style="margin:0 0 10px">投入按到账日逐笔记，分红按已生成的月报逐月列。可直接复制发微信。</div>'
+    + '<textarea readonly style="width:100%;height:46vh;border:1px solid #dde2da;border-radius:11px;'
+    + 'padding:10px;font-size:12px;line-height:1.6;font-family:inherit;background:#fbfcf9;'
+    + 'resize:none;color:var(--ink)">' + esc(txt) + '</textarea>'
+    + '<div class="btns" style="margin-top:12px"><button class="btn pri" id="plCopyDetail">复制全文</button></div>');
+  const b = $('plCopyDetail');
+  if(b) b.onclick = ()=> copyText(txt);
+}
+
+/* 投入 + 分红长表：一行一条记录，Excel 里按姓名 / 类型筛选即可 */
+function exportPoolPerson(){
+  const unit = num(poolP().unit) || 5000;
+  const rows = [['姓名','类型','日期/月份','份数','每份金额','投入金额','分红(含税)','代扣税款','代扣税目','到手金额','状态']];
+  POOL.inv.forEach(v => {
+    const lots = invLots(v).slice().sort((a,b)=> String(a.d||'').localeCompare(String(b.d||'')));
+    lots.forEach(l => rows.push([
+      v.name, '投入', l.d || '', fmt(num(l.n),0).replace(/,/g,''),
+      fmt(lotUnit(l,unit),0).replace(/,/g,''), fmt(lotAmt(l,unit),2).replace(/,/g,''),
+      '', '', '', '', v.status === 'out' ? '已退出' : '在册'
+    ]));
+    const prs = invPaidRows(v.id);
+    prs.forEach(x => rows.push([
+      v.name, '分红', x.m, '', '', '',
+      fmt(x.amt,2).replace(/,/g,''), fmt(x.tax,2).replace(/,/g,''), x.taxName,
+      fmt(x.net,2).replace(/,/g,''), x.paid ? '已发放' : '待发放'
+    ]));
+    rows.push([v.name, '小计', '', '', '',
+      fmt(invInvest(v,unit),2).replace(/,/g,''), '',
+      fmt(prs.reduce((t,x)=>t+x.tax,0),2).replace(/,/g,''), '',
+      fmt(prs.reduce((t,x)=>t+x.net,0),2).replace(/,/g,''), '']);
+  });
+  download('投入与分红明细-' + today() + '.csv', toCSV(rows));
+}
+
+function renderPoolExits(){
+  const box = $('plExitList');
+  if(!box) return;
+  if(!POOL.exits.length){ box.innerHTML = ''; return; }
+  box.innerHTML = '<div class="sheet-t">退出记录</div>'
+    + POOL.exits.slice().reverse().map(x =>
+      '<div class="pl-inv"><div><div class="nm">' + esc(x.name)
+      + (x.status === 'done' ? '<span class="pl-tag off">已结算</span>' : '<span class="pl-tag warn">待付款</span>')
+      + '</div><div class="mt">' + fmt(num(x.shares), 0) + ' 份 · 净值 ¥' + fmt(num(x.nav), 2)
+      + ' · ' + esc(x.month) + ' 月末 · 申请 ' + esc(x.at) + '</div></div>'
+      + '<div class="rt"><b>' + tMoney(num(x.amt)) + '</b><i>应结</i>'
+      + (x.status === 'done' ? '' : '<div class="pl-acts"><button class="mini" data-pact="exitdone" data-id="'
+        + esc(x.id) + '">已付</button></div>')
+      + '</div></div>').join('');
+}
+
+function renderPool(){
+  if(!$('plNav')) return;
+  const p = poolP();
+  document.querySelectorAll('#pTaxModeChips button').forEach(b=>{
+    b.classList.toggle('on', b.dataset.ptm === String(p.taxMode || 'personal'));
+  });
+  const nv = poolNav(todayMonth());
+  const sh = nv.sh, unit = nv.unit, cap = sh * unit;
+
+  $('plNav').textContent = '¥' + fmt(nv.nav, 2);
+  $('plNavT').textContent = '每份净值 · ' + (nv.nav < unit
+    ? '低于面值（亏损已超准备金）' : '面值（亏损由准备金吸收）');
+  $('plShares').textContent = fmt(sh, 0);
+  $('plCap').textContent = tMoney(cap);
+  $('plKeep').textContent = tMoney(nv.keep);
+  $('plSumCard').classList.toggle('loss', nv.nav < unit);
+
+  /* 出资人 */
+  const active = poolActive();
+  if($('plInvN')) $('plInvN').textContent = active.length + ' 人 · ' + fmt(sh, 0) + ' 份'
+    + (num(p.target) > 0 ? ' / 目标 ' + fmt(num(p.target), 0) + ' 份' : '');
+  if($('plInvList')){
+    if(!POOL.inv.length){
+      $('plInvList').innerHTML = '<div class="hint" style="margin:0">还没有出资人。点下面「新增出资人」登记第一份。</div>';
+    }else{
+      $('plInvList').innerHTML = POOL.inv.map(v => {
+        const s = invShares(v);
+        const rows = invPaidRows(v.id);
+        const paidNet = rows.reduce((t, x) => t + x.net, 0);
+        const invest = invInvest(v, unit);
+        const lots = invLots(v);
+        const can = invCanExit(v);
+        const tag = v.status === 'out' ? '<span class="pl-tag off">已退出</span>'
+          : (can && can > today() ? '<span class="pl-tag warn">锁定至 ' + can.slice(5) + '</span>' : '');
+        return '<div class="pl-inv"><div><div class="nm">' + esc(v.name) + tag + '</div>'
+          + '<div class="mt">' + fmt(s, 0) + ' 份 · 累计投入 ' + tMoney(invest)
+          + (v.phone ? ' · ' + esc(v.phone) : '')
+          + '<br>首投 ' + (invFirstDate(v) || '—') + ' · ' + lots.length + ' 笔 · 累计到手 ' + tMoney(paidNet)
+          + '</div></div>'
+          + '<div class="rt"><b>' + fmt(s, 0) + '</b><i>份</i>'
+          + '<div class="pl-acts"><button class="mini" data-pact="detail" data-id="' + esc(v.id) + '">明细</button>'
+          + '<button class="mini" data-pact="addlot" data-id="' + esc(v.id) + '">加份</button>'
+          + (s > 0 ? '<button class="mini" data-pact="exit" data-id="' + esc(v.id) + '">退出</button>' : '')
+          + '</div></div></div>';
+      }).join('');
+    }
+  }
+
+  /* 退出窗口 */
+  const w = exitWin();
+  if($('plWin')){
+    if(!w){
+      if($('plWinT')) $('plWinT').textContent = '—';
+      $('plWin').innerHTML = '<div class="hint" style="margin:0">退出窗口月没设对，去下面参数里改成 3,6,9,12 这种格式。</div>';
+    }else{
+      if($('plWinT')) $('plWinT').textContent = w.ym + ' 窗口';
+      const capSh = Math.max(1, Math.floor(sh * Math.max(0, num(p.exitCapPct)) / 100));
+      let h = '';
+      h += lineHTML('下次窗口日', w.date + '（' + fmt(w.days, 0) + ' 天后）');
+      h += lineHTML('申请截止', w.deadline + (w.open ? ' · 窗口已开' : '（还有 ' + fmt(w.notice, 0) + ' 天）'));
+      h += lineHTML('单次上限 ' + fmt(num(p.exitCapPct), 0) + '%', fmt(capSh, 0) + ' 份 · ' + tMoney(capSh * unit));
+      h += lineHTML('锁定期', fmt(num(p.lockMonths), 0) + ' 个月');
+      h += lineHTML('窗口月', String(p.exitMonths).split(',').join(' / ') + ' 月');
+      $('plWin').innerHTML = h;
+    }
+  }
+  renderPoolExits();
+  fillPoolMonth();
+  renderPoolPrev();
+  renderPoolHist();
+  renderPoolDetail();
+}
+
+/* ================= 资金池：表单与动作 ================= */
+function poolForm(title, html, onOk){
+  openSheet(title, html + '<div class="btns" style="margin-top:14px">'
+    + '<button class="btn pri" id="plOk">确定</button></div>');
+  $('plOk').onclick = ()=>{ if(onOk() !== false) closeSheet(); };
+}
+
+function poolAddSheet(){
+  const unit = num(poolP().unit) || 5000;
+  poolForm('新增出资人',
+    '<div class="g2">'
+    + '<label class="f"><span>姓名</span><input type="text" id="npName" placeholder="张三"></label>'
+    + '<label class="f"><span>手机号 <i>可不填</i></span><input type="text" id="npPhone" inputmode="tel"></label>'
+    + '</div>'
+    + '<div class="g2">'
+    + '<label class="f"><span>认购份数 <i>每份 ' + fmt(unit, 0) + ' 元</i></span>'
+    + '<input type="text" id="npLots" inputmode="numeric" placeholder="10"></label>'
+    + '<label class="f"><span>认购日期 <i>到账日</i></span>'
+    + '<input type="text" id="npDate" value="' + today() + '"></label>'
+    + '</div>'
+    + '<div class="hint">1 份起。日期用于「月中新进的按持有天数折算」，请填实际到账那天。</div>',
+    ()=>{
+      const name = $('npName').value.trim();
+      const n = Math.floor(num($('npLots').value));
+      if(!name){ toast('先填姓名'); return false; }
+      if(n <= 0){ toast('份数要大于 0'); return false; }
+      const d = $('npDate').value.trim() || today();
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){ toast('日期写成 2026-11-26'); return false; }
+      POOL.inv.push({
+        id:'i' + (POOL.seq++), name, phone:$('npPhone').value.trim(),
+        lots:[{id:'l' + (POOL.seq++), d, n, u:unit}],
+        status:'in', at:new Date().toISOString()
+      });
+      poolSave(); renderPool();
+      toast('已登记 ' + name + ' ' + n + ' 份 · ' + tMoney(n * unit));
+    });
+}
+
+function poolLotSheet(id){
+  const inv = invById(id);
+  if(!inv) return;
+  const unit = num(poolP().unit) || 5000;
+  poolForm('加份 · ' + inv.name,
+    '<div class="g2">'
+    + '<label class="f"><span>增加份数 <i>每份 ' + fmt(unit, 0) + ' 元</i></span>'
+    + '<input type="text" id="nlN" inputmode="numeric" placeholder="5"></label>'
+    + '<label class="f"><span>到账日期</span>'
+    + '<input type="text" id="nlD" value="' + today() + '"></label>'
+    + '</div>'
+    + '<div class="hint">当前 ' + fmt(invShares(inv), 0) + ' 份。每一批单独记日期，这样新加的钱只从到账那天开始算分配。</div>',
+    ()=>{
+      const n = Math.floor(num($('nlN').value));
+      if(n <= 0){ toast('份数要大于 0'); return false; }
+      const d = $('nlD').value.trim() || today();
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){ toast('日期写成 2026-11-26'); return false; }
+      if(!Array.isArray(inv.lots)) inv.lots = [];
+      inv.lots.push({id:'l' + (POOL.seq++), d, n, u:unit});
+      if(inv.status === 'out') inv.status = 'in';
+      poolSave(); renderPool();
+      toast('已加 ' + n + ' 份');
+    });
+}
+
+function poolExitSheet(id){
+  const inv = invById(id);
+  if(!inv) return;
+  const have = invShares(inv);
+  const can = invCanExit(inv);
+  const q = exitQuote(id, have);
+  poolForm('退出 · ' + inv.name,
+    '<div class="pl-note">按 <b>' + q.month + ' 月末</b> 净值 <b>¥' + fmt(q.nav, 2) + '</b> / 份 结算。'
+    + (can && can > today() ? '<br><b style="color:#a2650e">该出资人锁定到 ' + can + '，正常应在窗口期申请；这里仍可登记，但建议先谈好。</b>' : '')
+    + '</div>'
+    + '<div class="g2">'
+    + '<label class="f"><span>退出份数 <i>最多 ' + fmt(have, 0) + ' 份</i></span>'
+    + '<input type="text" id="nxN" inputmode="numeric" value="' + fmt(have, 0).replace(/,/g, '') + '"></label>'
+    + '<label class="f"><span>应结金额 <i>元 · 自动</i></span>'
+    + '<input type="text" id="nxAmt" value="' + fmt(q.amt, 2).replace(/,/g, '') + '" readonly></label>'
+    + '</div>'
+    + '<div class="hint">应结 = 份数 × 每份净值。本方案不设准备金，净值平时等于面值；亏损当月即按份数下调净值，盈利先补回面值再分红——亏的钱由出资人一起担，这就是「共担风险」的落点。</div>',
+    ()=>{
+      const n = Math.floor(num($('nxN').value));
+      if(n <= 0 || n > have){ toast('份数要在 1 ~ ' + have + ' 之间'); return false; }
+      const qq = exitQuote(id, n);
+      POOL.exits.push({
+        id:'x' + (POOL.seq++), invId:id, name:inv.name, shares:n,
+        month:qq.month, nav:qq.nav, amt:qq.amt, at:today(), status:'doing'
+      });
+      takeShares(id, n);
+      poolSave(); renderPool();
+      toast(inv.name + ' 退出 ' + n + ' 份，应结 ¥' + fmt(qq.amt, 2));
+    });
+}
+
+function genDist(){
+  const m = $('plMonth').value;
+  if(!monthOK(m)){ toast('先选月份'); return; }
+  const r = poolCalc(m);
+  const exist = POOL.dist.find(d => String(d.m) === m);
+  if(exist && exist.paid){ toast('该月已标记发放，不能再重算'); return; }
+  if(!r.shares){ toast('还没有在册份数，先登记出资人'); return; }
+  const rec = {
+    id: exist ? exist.id : ('d' + (POOL.seq++)),
+    m, at:new Date().toISOString(),
+    net:r.N, cars:r.cars, reserve:r.reserve, carryIn:r.carryIn, carryUsed:r.carryUsed,
+    dist:r.dist, invPct:r.invPct, invTotal:r.invTotal, perShare:r.perShare,
+    taxMode:r.taxMode, taxName:r.taxName, taxPct:r.taxPct, taxTotal:r.taxTotal,
+    netTotal:r.netTotal, perShareNet:r.perShareNet,
+    shares:r.shares, nav:r.nav, items:r.items, opAmt:r.opAmt,
+    labor:r.labor, costLabor:r.costLabor, costOffice:r.costOffice, costTravel:r.costTravel, opNet:r.opNet,
+    paid:false, paidAt:''
+  };
+  if(exist) POOL.dist[POOL.dist.indexOf(exist)] = rec;
+  else POOL.dist.push(rec);
+  POOL.dist.sort((a, b) => String(a.m).localeCompare(String(b.m)));
+  poolSave(); renderPool();
+  toast(m + ' 分配表已生成：可分配 ¥' + fmt(r.dist, 0) + '，应分 ¥' + fmt(r.invTotal, 0)
+    + '，代扣后实付 ¥' + fmt(r.netTotal, 0));
+}
+
+function markDistPaid(id){
+  const d = POOL.dist.find(x => String(x.id) === String(id));
+  if(!d) return;
+  if(!confirm('确认 ' + d.m + ' 的钱已全部打给出资人？\n标记后这份月报锁定，不再随台账重算。')) return;
+  d.paid = true; d.paidAt = today();
+  poolSave(); renderPool(); toast('已标记发放');
+}
+
+function exportPoolDist(id){
+  const d = POOL.dist.find(x => String(x.id) === String(id));
+  if(!d) return;
+  const rows = [['月份', '姓名', '份数', '应分（含税）',
+    '代扣' + taxLabel(d.taxMode || poolP().taxMode) + '(' + fmt(num(d.taxPct),0) + '%)',
+    '实付到手', '发放状态']];
+  (d.items || []).forEach(x => rows.push([
+    d.m, x.name, x.shares,
+    fmt(num(x.amt), 2).replace(/,/g, ''),
+    fmt(num(x.tax), 2).replace(/,/g, ''),
+    fmt(x.net === undefined ? num(x.amt) : num(x.net), 2).replace(/,/g, ''),
+    d.paid ? '已发放' : '待发放'
+  ]));
+  rows.push(['合计', '', d.shares,
+    fmt(num(d.invTotal), 2).replace(/,/g, ''),
+    fmt(num(d.taxTotal), 2).replace(/,/g, ''),
+    fmt(d.netTotal === undefined ? num(d.invTotal) : num(d.netTotal), 2).replace(/,/g, ''), '']);
+  download('月度分配表-' + d.m + '.csv', toCSV(rows));
+}
+
+function exportPoolLedger(){
+  const unit = num(poolP().unit) || 5000;
+  const rows = [['姓名', '手机', '在册份数', '累计投入', '首投日期',
+    '投入明细(日期 份数×单价=金额)', '累计应分(含税)', '累计代扣', '累计到手',
+    '每月分红(月:到手)', '状态', '锁定期至']];
+  POOL.inv.forEach(v => {
+    const lots = invLots(v).slice().sort((a,b)=> String(a.d||'').localeCompare(String(b.d||'')));
+    const prs = invPaidRows(v.id);
+    const paid = prs.reduce((t,x)=> t + x.amt, 0);
+    const tax = prs.reduce((t,x)=> t + x.tax, 0);
+    const paidNet = prs.reduce((t,x)=> t + x.net, 0);
+    rows.push([
+      v.name, v.phone || '', fmt(invShares(v),0), fmt(invInvest(v,unit),2).replace(/,/g,''), invFirstDate(v),
+      lots.map(l => (l.d || '') + ' ' + fmt(num(l.n),0) + '×' + fmt(lotUnit(l,unit),0)
+        + '=' + fmt(lotAmt(l,unit),0)).join(' | '),
+      fmt(paid,2).replace(/,/g,''), fmt(tax,2).replace(/,/g,''), fmt(paidNet,2).replace(/,/g,''),
+      prs.map(x => x.m + ':' + fmt(x.net,2)).join(' | '),
+      v.status === 'out' ? '已退出' : '在册', invCanExit(v)
+    ]);
+  });
+  download('出资台账-' + today() + '.csv', toCSV(rows));
+}
+
+function subText(id){
+  const inv = invById(id);
+  if(!inv) return '';
+  const p = poolP();
+  const s = invShares(inv);
+  const unit = num(p.unit) || 5000;
+  return [
+    '份额认购确认书',
+    '',
+    '甲方（经营方）：' + (p.operator || '鹏淼国贸林业部'),
+    '乙方（出资方）：' + inv.name + (inv.phone ? '　电话：' + inv.phone : ''),
+    '',
+    '一、合作性质',
+    '双方系木片购销项目的合作经营关系，依《合作经营协议》共同投资、共担风险、共享收益。',
+    '本确认书不是借款、不是股权投资，乙方不成为甲方股东、不办理工商登记。',
+    '',
+    '二、认购份额',
+    '认购 ' + fmt(s, 0) + ' 份，每份 ' + fmt(unit, 0) + ' 元，合计 ' + fmt(s * unit, 0) + ' 元。',
+    '认购日期：' + (invFirstDate(inv) || '—') + '。',
+    '',
+    '三、收益与风险',
+    '甲方按月度可分配利润的 ' + fmt(num(p.invPct), 0) + '% 向全体出资人分配（含税），按「份·天」折算，同份同权。',
+    '分配额由甲方按 ' + fmt(num(p.taxPct), 0) + '% 代扣' + taxLabel(p.taxMode)
+      + '后支付（税目以主管税务机关实际认定为准），乙方实得为分配额的 '
+      + fmt(100 - num(p.taxPct), 0) + '%，税款由甲方申报缴纳，乙方不再另行承担。',
+    '盈亏共担：当月无利润或亏损时不分配，且不补发、不保底。',
+    '本金不保本：退出时按届时每份净值结算，净值可能低于 ' + fmt(unit, 0) + ' 元。',
+    '',
+    '四、分配与退出',
+    '每月 ' + fmt(num(p.reportDay), 0) + ' 日出上月经营月报，' + fmt(num(p.payDay), 0) + ' 日前打款。',
+    '锁定期 ' + fmt(num(p.lockMonths), 0) + ' 个月；期满后每年 ' + String(p.exitMonths)
+      + ' 月开放退出窗口，须提前 ' + fmt(num(p.noticeDays), 0) + ' 天书面申请。',
+    '单次退出不超过在册份数的 ' + fmt(num(p.exitCapPct), 0) + '%，超出部分排队。',
+    '',
+    '五、乙方的权利',
+    '1. 每月收到经营月报；2. 查阅本项目收支凭证；3. 对停止经营、清算、变更分成比例等重大事项有知情权与表决权。',
+    '',
+    '六、资金用途',
+    '仅限木片采购付款、运费、加工费及本项目直接相关的经营支出，不得挪用。',
+    '',
+    '七、其他',
+    '本确认书与《合作经营协议》《风险揭示书》共同构成完整约定。一式两份，双方各持一份。',
+    '',
+    '甲方（盖章）：____________________',
+    '乙方（签字）：____________________',
+    '日期：' + today()
+  ].join('\n');
+}
+
+function poolSubSheet(id){
+  let inv = id ? invById(id) : null;
+  if(!inv){
+    const act = poolActive()[0] || POOL.inv[0];
+    if(!act){ toast('先登记出资人'); return; }
+    inv = act;
+  }
+  const txt = subText(inv.id);
+  openSheet('份额认购确认书',
+    '<div class="hint" style="margin:0 0 10px">' + esc(inv.name) + ' · ' + fmt(invShares(inv), 0)
+    + ' 份。可直接复制发微信，打印后双方签字。</div>'
+    + '<textarea readonly style="width:100%;height:46vh;border:1px solid #dde2da;border-radius:11px;'
+    + 'padding:10px;font-size:12px;line-height:1.6;font-family:inherit;background:#fbfcf9;'
+    + 'resize:none;color:var(--ink)">' + esc(txt) + '</textarea>'
+    + '<div class="btns" style="margin-top:12px"><button class="btn pri" id="plCopySub">复制全文</button></div>');
+  const b = $('plCopySub');
+  if(b) b.onclick = ()=> copyText(txt);
 }
 
 /* ---- 备份 / 合并同步 / 快照 / 归档 ---- */
@@ -2982,6 +4017,13 @@ function applyImport(kind){
     REC = (Array.isArray(d.REC) ? d.REC : []).filter(r=> r && r.inp);
     P = Object.assign({}, DEF, d.P || {});
     P.fund = fundP();
+    P.pool = poolP();
+    if(d.POOL && typeof d.POOL === 'object' && Array.isArray(d.POOL.inv)){
+      POOL = Object.assign({}, POOL_DEF, d.POOL, {
+        inv: d.POOL.inv || [], dist: d.POOL.dist || [], exits: d.POOL.exits || []
+      });
+      poolSave();
+    }
     added = REC.length;
   }else{
     const plan = planImport(d);
@@ -3016,6 +4058,41 @@ function applyImport(kind){
       });
       P.fund = cur;
     }
+    /* 资金池参数：只补还是默认值的那些，别把本机调过的覆盖掉 */
+    const sp = src.pool;
+    if(sp && typeof sp === 'object'){
+      const cur = poolP();
+      Object.keys(DEF.pool).forEach(k=>{
+        const dv = DEF.pool[k];
+        const isDef = cur[k] === dv || cur[k] === undefined || cur[k] === null || cur[k] === '';
+        if(isDef && sp[k] !== undefined && sp[k] !== null && sp[k] !== '') cur[k] = sp[k];
+      });
+      P.pool = cur;
+    }
+    /* 出资人按姓名并集，分配记录按月份并集，已有的不动 */
+    const dp2 = (d.POOL && typeof d.POOL === 'object') ? d.POOL : null;
+    if(dp2){
+      const names = new Set(POOL.inv.map(v=> String(v.name || '')));
+      (Array.isArray(dp2.inv) ? dp2.inv : []).forEach(v=>{
+        if(!v || !v.name || names.has(String(v.name))) return;
+        names.add(String(v.name));
+        POOL.inv.push(Object.assign({}, v, {id:'i' + (POOL.seq++)}));
+      });
+      const ms = new Set(POOL.dist.map(x=> String(x.m)));
+      (Array.isArray(dp2.dist) ? dp2.dist : []).forEach(x=>{
+        if(!x || !x.m || ms.has(String(x.m))) return;
+        ms.add(String(x.m));
+        POOL.dist.push(Object.assign({}, x, {id:'d' + (POOL.seq++)}));
+      });
+      POOL.dist.sort((a, b)=> String(a.m).localeCompare(String(b.m)));
+      const xs = new Set(POOL.exits.map(x=> String(x.id)));
+      (Array.isArray(dp2.exits) ? dp2.exits : []).forEach(x=>{
+        if(!x || xs.has(String(x.id))) return;
+        xs.add(String(x.id));
+        POOL.exits.push(x);
+      });
+      poolSave();
+    }
   }
   REC.sort((a, b)=> String((b.inp || {}).date || '').localeCompare(String((a.inp || {}).date || '')));
   save(K.R, REC); save(K.P, P);
@@ -3027,7 +4104,7 @@ function applyImport(kind){
 
 function snapshot(tag){
   try{
-    return ST.set(K.S, JSON.stringify({at: new Date().toISOString(), tag: tag || '', P, REC}));
+    return ST.set(K.S, JSON.stringify({at: new Date().toISOString(), tag: tag || '', P, REC, POOL}));
   }catch(e){ return false; }
 }
 /* 备份时间以裸字符串存；老版本可能存成了带引号的 JSON 串，读时剥掉 */
@@ -3052,9 +4129,9 @@ function snapInfo(){
 function dataInfo(){
   let bytes = 0;
   try{
-    bytes = new Blob([JSON.stringify(P), JSON.stringify(REC), ST.get(K.S) || '']).size;
+    bytes = new Blob([JSON.stringify(P), JSON.stringify(REC), JSON.stringify(POOL), ST.get(K.S) || '']).size;
   }catch(e){
-    bytes = JSON.stringify(P).length + JSON.stringify(REC).length + (ST.get(K.S) || '').length;
+    bytes = JSON.stringify(P).length + JSON.stringify(REC).length + JSON.stringify(POOL).length + (ST.get(K.S) || '').length;
   }
   const dates = REC.map(r=> String((r.inp || {}).date || '')).filter(Boolean).sort();
   const range = dates.length ? (dates[0] + ' ~ ' + dates[dates.length - 1]) : '暂无记录';
@@ -3092,11 +4169,11 @@ function renderBkBar(){
 }
 
 function doBackup(){
-  const data = {v:4, app:'mobile', P, REC, at:new Date().toISOString()};
+  const data = {v:5, app:'mobile', P, REC, POOL, at:new Date().toISOString()};
   download('木片台账备份-' + today() + '.json', JSON.stringify(data, null, 2), 'application/json');
   markBackup();
   dataInfo();
-  toast('已导出 ' + REC.length + ' 车备份');
+  toast('已导出 ' + REC.length + ' 车' + (POOL.inv.length ? ' + ' + POOL.inv.length + ' 位出资人' : '') + ' 备份');
 }
 
 /* 按年归档 */
@@ -3164,9 +4241,18 @@ $('btnSnap').onclick = ()=>{
   if(!confirm('用 ' + String(s.at || '').replace('T', ' ').slice(0, 16) + ' 的快照替换当前数据？当前数据会先另存一份。')) return;
   snapshot('恢复前');
   P = Object.assign({}, DEF, s.P || {});
+  P.fund = fundP();
+  P.pool = poolP();
   REC = Array.isArray(s.REC) ? s.REC : [];
+  if(s.POOL && typeof s.POOL === 'object'){
+    POOL = Object.assign({}, POOL_DEF, s.POOL, {
+      inv: s.POOL.inv || [], dist: s.POOL.dist || [], exits: s.POOL.exits || []
+    });
+    poolSave();
+  }
   save(K.P, P); save(K.R, REC);
   fillSet(); applyParams(); renderChips(); renderRec(); renderSum(); render(); dataInfo();
+  if($('plNav')) renderPool();
   toast('已回到快照');
 };
 
@@ -3215,6 +4301,7 @@ function go(page){
   if(page === 'sum') renderSum();
   if(page === 'set') fillSet();
   if(page === 'turn'){ fillTurn(); renderTurn(); }
+  if(page === 'pool'){ fillPool(); renderPool(); }
 }
 document.querySelectorAll('[data-nav]').forEach(b=> b.onclick = ()=> go(b.dataset.nav));
 
@@ -3227,12 +4314,10 @@ document.querySelectorAll('[data-page="turn"] input').forEach(el=>{
   el.addEventListener('input', renderTurn);
   el.addEventListener('change', ()=>{ saveFund(); renderTurn(); });
 });
-document.querySelectorAll('#fRateChips button, #fMillChips button').forEach(b=>{
+document.querySelectorAll('#fRateChips button, #fDayChips button').forEach(b=>{
   b.onclick = ()=>{
     if(b.dataset.fr !== undefined) $('fRate').value = b.dataset.fr;
-    if(b.dataset.fmc !== undefined){
-      $('fMill').value = b.dataset.fmc === 'seq' ? String(fundSeq(readFundForm())) : b.dataset.fmc;
-    }
+    if(b.dataset.fd !== undefined) $('fActiveDays').value = b.dataset.fd;
     saveFund(); renderTurn();
   };
 });
@@ -3240,11 +4325,6 @@ document.querySelectorAll('#fPreChips button').forEach(b=>{
   b.onclick = ()=>{
     const f = readFundForm();
     f.preDay = num(b.dataset.fp);
-    /* 账期若还等于原来的节奏合计，就跟着一起走 */
-    if($('fMill') && Math.abs(num($('fMill').value) - fundSeq(fundP())) < 1e-9){
-      f.millDays = fundSeq(f);
-      $('fMill').value = String(f.millDays);
-    }
     P.fund = f; save(K.P, P);
     renderTurn();
   };
@@ -3271,6 +4351,62 @@ $('grp').addEventListener('click', e=>{
   renderSum();
 });
 
+/* ---- 资金池：交互 ---- */
+if($('btnPoolAdd')) $('btnPoolAdd').onclick = ()=> poolAddSheet();
+if($('btnPoolPrev')) $('btnPoolPrev').onclick = ()=>{ renderPoolPrev(); toast('已按当前台账重算'); };
+if($('plMonth')) $('plMonth').onchange = ()=> renderPoolPrev();
+if($('btnPoolGen')) $('btnPoolGen').onclick = genDist;
+if($('btnPoolSaveP')) $('btnPoolSaveP').onclick = ()=>{
+  const p = readPoolP();
+  poolSetP(p);
+  fillPool(); renderPool();
+  toast('池子参数已保存');
+};
+if($('btnPoolCsv')) $('btnPoolCsv').onclick = ()=>{
+  const m = $('plMonth') ? $('plMonth').value : '';
+  let rec = POOL.dist.find(d=> String(d.m) === m);
+  if(!rec){
+    rec = distSorted().slice(-1)[0];
+    if(!rec){ toast('还没有生成过分配表'); return; }
+  }
+  exportPoolDist(rec.id);
+};
+if($('btnPoolLedger')) $('btnPoolLedger').onclick = exportPoolLedger;
+if($('btnPoolPersonCsv')) $('btnPoolPersonCsv').onclick = exportPoolPerson;
+if($('btnPoolSub')) $('btnPoolSub').onclick = ()=> poolSubSheet('');
+
+/* 代扣税目切换：带出各自默认税率，仍允许在输入框手改 */
+document.querySelectorAll('#pTaxModeChips button').forEach(b=>{
+  b.onclick = ()=>{
+    const p = poolP();
+    p.taxMode = b.dataset.ptm;
+    p.taxPct = p.taxMode === 'business' ? num(p.businessTaxPct) : num(p.personalTaxPct);
+    if(!(p.taxPct > 0)) p.taxPct = p.taxMode === 'business' ? 5 : 20;
+    poolSetP(p);
+    fillPool(); renderPool();
+    toast('已切换为' + taxLabel(p.taxMode) + '，代扣 ' + fmt(num(p.taxPct),0) + '%');
+  };
+});
+
+const _poolSec = document.querySelector('[data-page="pool"]');
+if(_poolSec) _poolSec.addEventListener('click', e=>{
+  const b = e.target.closest('[data-pact]');
+  if(!b) return;
+  const a = b.dataset.pact, id = b.dataset.id;
+  if(a === 'detail'){ poolInvDetailSheet(id); return; }
+  if(a === 'addlot'){ poolLotSheet(id); return; }
+  if(a === 'exit'){ poolExitSheet(id); return; }
+  if(a === 'pay'){ markDistPaid(id); return; }
+  if(a === 'distcsv'){ exportPoolDist(id); return; }
+  if(a === 'exitdone'){
+    const x = POOL.exits.find(y=> String(y.id) === String(id));
+    if(!x) return;
+    x.status = 'done'; x.doneAt = today();
+    poolSave(); renderPool(); toast('已标记结算完成');
+    return;
+  }
+});
+
 /* ---- 启动 ---- */
 (function init(){
   $('date').value = today();
@@ -3280,6 +4416,7 @@ $('grp').addEventListener('click', e=>{
   renderChips();
   renderRec();
   renderSum();
+  fillPool();
   go('calc');
   render();
   /* 打开就静默拉一次最新报价；900ms 让首屏先画完，别抢资源 */
