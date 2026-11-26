@@ -769,6 +769,11 @@ details .body{padding-bottom:2px}
         </div>
       </details>
       <div class="hint">改完立即生效，不用点下面的「保存设置」。留空表示该品类停收。</div>
+      <div class="hint" style="margin-top:8px">打开页面会自动拉一次最新报价（<b>你手工改过的价不会被覆盖</b>）。</div>
+      <div class="fs" id="autoPxChips">
+        <button data-ap="1">打开时自动刷新</button>
+        <button data-ap="0">不自动刷新</button>
+      </div>
     </div>
 
     <div class="btns">
@@ -984,6 +989,7 @@ const DEF = {
   pw:'', pd:'', freight:'', plow:'', r:'', process:'', mlog:'',
   ticket:'13', supList:[], millList:[], plateList:[],
   px:{}, pxAt:'', pxSrc:'', pxMeta:{}, catAdd:{},
+  autoPx:true,   // 每次打开自动拉一次 prices.json
   fund: {
     ver:2,
     cap:0,          // 投入资金（元），表单按万元输入
@@ -1879,7 +1885,7 @@ function applyPxItems(items, meta){
     catAdd: JSON.parse(JSON.stringify(P.catAdd || {})),
     pxAt: P.pxAt || '', pxMeta: JSON.parse(JSON.stringify(P.pxMeta || {}))
   };
-  const changed = [], added = [], same = [], dated = [];
+  const changed = [], added = [], same = [], dated = [], skipped = [];
   const seen = new Set();
 
   items.forEach(it=>{
@@ -1896,6 +1902,11 @@ function applyPxItems(items, meta){
     const before = pxEntry(mill.id, name);
     const isNewCat = !mill.cats.some(x=> x.n === name);
 
+    /* 自动刷新时不动手工改过的价：那是用户从业务员/地磅拿到的，比日报新 */
+    if(meta.skipManual && before.manual){
+      skipped.push({mill:mill.name, cat:name, p:before.p, at:dFull(before.at), to:p});
+      return;
+    }
     if(isNewCat){
       P.catAdd = P.catAdd || {};
       const add = (P.catAdd[mill.name] = P.catAdd[mill.name] || []);
@@ -1914,11 +1925,17 @@ function applyPxItems(items, meta){
     P.px[key] = {p, at, src:'net'};
   });
 
-  const stamps = items.map(it=> String(it.at || meta.at || '')).filter(s=> s.length >= 10).sort();
-  const at = stamps.length ? stamps[stamps.length - 1].slice(0, 10) : (meta.at || '');
-  if(at) P.pxAt = at;
+  const written = changed.length + dated.length + added.length + same.length;
+  const allSkipped = written === 0 && skipped.length > 0;
+  /* 整表采集日优先用日报日（meta.at）；没有才退回各行报价日的最大值。
+     两者语义不同：meta.at = 哪天抓的，各行 at = 该档厂方哪天执行。 */
+  const stamps = items.map(it=> String(it.at || '')).filter(s=> s.length >= 10).sort();
+  const metaAt = String(meta.at || '').slice(0, 10);
+  const at = metaAt.length === 10 ? metaAt
+    : (stamps.length ? stamps[stamps.length - 1].slice(0, 10) : '');
+  if(at && !allSkipped) P.pxAt = at;
   P.pxMeta = {
-    at: at || (P.pxMeta && P.pxMeta.at) || '',
+    at: allSkipped ? ((P.pxMeta && P.pxMeta.at) || '') : (at || (P.pxMeta && P.pxMeta.at) || ''),
     srcAt: meta.at || '',
     src: meta.src || '',
     by: meta.by || '',
@@ -1927,20 +1944,22 @@ function applyPxItems(items, meta){
   };
   save(K.P, P);
   _pxUndo = snap;
-  return {at, srcAt: meta.at || '', src: meta.src || '', changed, dated, added, same};
+  return {at, srcAt: meta.at || '', src: meta.src || '', changed, dated, added, same, skipped, allSkipped};
 }
 
 /* 摘要面板 */
 function pxResultHTML(res){
   const n = res.changed.length, a = res.added.length, s = res.same.length;
   const dt = (res.dated || []).length;
+  const sk = (res.skipped || []).length;
   let h = '<div class="pxr-h">更新到 ' + esc(dFull(res.at) || '未标日期')
     + (res.srcAt && dFull(res.srcAt) !== dFull(res.at) ? '<span class="pxr-hop">· ' + esc(dShort(res.srcAt)) + ' 日报</span>' : '')
     + '</div>';
   h += '<div class="pxr-s">' + (res.src ? esc(res.src) + '<br>' : '')
     + '价格变动 <b>' + n + '</b> 项'
     + (dt ? ' · 仅刷新报价日 <b>' + dt + '</b> 项' : '')
-    + ' · 新增品类 <b>' + a + '</b> 项 · 未变 <b>' + s + '</b> 项</div>';
+    + ' · 新增品类 <b>' + a + '</b> 项 · 未变 <b>' + s + '</b> 项'
+    + (sk ? ' · 保留手工价 <b>' + sk + '</b> 项' : '') + '</div>';
   if(n){
     h += '<div class="sheet-t">价格变动</div>';
     h += res.changed.map(c=>{
@@ -1963,7 +1982,13 @@ function pxResultHTML(res){
       + '<span class="v"><b>' + fmt(c.p,0) + '</b><i class="dt">'
       + esc(dShort(c.fromAt) || '—') + ' → ' + esc(dShort(c.at) || '—') + '</i></span></div>').join('');
   }
-  if(!n && !a && !dt) h += '<div class="hint" style="margin-top:10px">价格和本机一致，没有需要改的。</div>';
+  if(sk){
+    h += '<div class="sheet-t">保留你手工改的价（未覆盖）</div>';
+    h += res.skipped.map(c=> '<div class="pxr-row"><span class="m">' + esc(c.mill) + '<em>' + esc(c.cat) + '</em></span>'
+      + '<span class="v"><b>' + fmt(c.p,0) + '</b><i class="dt">你的 · '
+      + (c.to > 0 ? '日报 ' + fmt(c.to,0) : '日报停收') + '</i></span></div>').join('');
+  }
+  if(!n && !a && !dt && !sk) h += '<div class="hint" style="margin-top:10px">价格和本机一致，没有需要改的。</div>';
   h += '<div class="btns" style="margin-top:14px">'
     + '<button class="btn" data-act="pxundo">撤销这次更新</button>'
     + '<button class="btn pri" data-act="pxclose">知道了</button></div>';
@@ -1974,7 +1999,9 @@ function pxShowResult(res){
   openSheet('报价已更新', pxResultHTML(res));
   renderPx(); updatePxNote(); renderPxUpd();
   const n2 = res.changed.length + (res.dated || []).length + res.added.length;
-  toast(n2 ? '已更新 ' + n2 + ' 项 · 报价日 ' + (dFull(res.at) || '未标') : '已是最新，没有变化');
+  const sk = (res.skipped || []).length;
+  toast(n2 ? '已更新 ' + n2 + ' 项 · 报价日 ' + (dFull(res.at) || '未标')
+    : (sk ? '你的手工价没动 · 日报有 ' + sk + ' 项差异' : '已是最新，没有变化'));
 }
 
 function renderPxUpd(){
@@ -1983,10 +2010,11 @@ function renderPxUpd(){
   const m = P.pxMeta || {};
   if(!m.checked){
     el.className = 'pxu';
-    el.textContent = '还没查过。内置价截至 ' + PX_AT + '，点上面按钮可联网取最新一版。';
+    el.textContent = '还没成功刷新过。内置价截至 ' + PX_AT + '。打开页面会自动试一次；如果一直停在这句，说明没网或被拦截，可手动点上面按钮，或改用粘贴日报。';
     return;
   }
-  const when = String(m.checked).slice(0, 16).replace('T', ' ');
+  const cIso = String(m.checked).slice(0, 10), cTime = String(m.checked).slice(11, 16);
+  const when = (cIso === today() ? '今天 ' : (dShort(cIso) || cIso) + ' ') + cTime;
   const days = m.at ? Math.floor((Date.now() - new Date(m.at + 'T00:00:00').getTime()) / 86400000) : null;
   /* 木讯网日报只在工作日发，周末与节假日不出；阈值定 6 天，
      这样周五查过、周一早上打开不会误报「过期」。 */
@@ -1995,7 +2023,16 @@ function renderPxUpd(){
   el.innerHTML = '上次更新：<b>' + esc(dFull(m.at) || '—') + '</b> 的报价'
     + (m.srcAt && dFull(m.srcAt) !== dFull(m.at) ? ' · ' + esc(dShort(m.srcAt)) + ' 日报' : '')
     + ' · ' + esc(when) + ' 获取' + (m.src ? '，来源 ' + esc(m.src) : '')
-    + (stale ? '<br>已经是 ' + days + ' 天前的价，建议用「粘贴日报更新」贴一份最新日报。' : '');
+    + (m.by === 'auto' ? '（打开页面时自动刷新）' : '')
+    + (stale ? '<br>已经是 ' + days + ' 天前的价：可能纸厂确实没调，也可能日报还没更新。要更准就点「粘贴日报更新」。' : '');
+}
+
+/* 自动刷新开关 */
+function renderAutoPxChips(){
+  const on = P.autoPx !== false;
+  document.querySelectorAll('#autoPxChips button').forEach(b=>{
+    b.classList.toggle('on', (b.dataset.ap === '1') === on);
+  });
 }
 
 /* 粘贴面板 */
@@ -2021,7 +2058,7 @@ async function pxDoFetch(btn){
       });
     });
     if(!items.length) throw new Error('报价文件里没有可用的品类');
-    const res = applyPxItems(items, {at:d.at, src:d.src || '联网报价', by:'net'});
+    const res = applyPxItems(items, {at:d.at, src:d.src || '联网报价', by:'net', skipManual:true});
     pxShowResult(res);
   }catch(e){
     openSheet('没查成', '<div class="hint" style="margin:0">' + esc(e.message || '未知错误')
@@ -2032,10 +2069,54 @@ async function pxDoFetch(btn){
     btn.disabled = false; btn.textContent = old;
   }
 }
+/* 打开页面自动刷一次报价。三条铁律：
+   1) 全程静默，失败不弹窗（本机价照旧可用）；
+   2) 绝不覆盖用户手工改过的价 —— 那是业务员/地磅给的一手价，比日报新；
+   3) 只在真有调价时才轻提示一句。 */
+let _pxAutoing = false;
+async function autoPx(){
+  if(_pxAutoing) return;
+  if(P.autoPx === false) return;
+  try{ if(location.protocol === 'file:') return; }catch(e){ return; }
+  if(typeof fetch !== 'function') return;
+  if(typeof navigator !== 'undefined' && navigator.onLine === false) return;
+  _pxAutoing = true;
+  try{
+    const d = await pxFetchLatest();
+    const items = [];
+    (d.mills || []).forEach(m=>{
+      const mill = millByName(m.name) || millById(m.id);
+      if(!mill) return;
+      (m.cats || []).forEach(c=> items.push({mill, cat:c.n, p:c.p, at:c.at || d.at}));
+    });
+    if(!items.length) return;
+    const res = applyPxItems(items, {
+      at: d.at,
+      src: d.src || '联网报价',
+      by: 'auto',
+      skipManual: true
+    });
+    renderPx(); updatePxNote(); renderPxUpd();
+    if(res.changed.length) toast('报价已自动更新 · ' + res.changed.length + ' 项调价');
+  }catch(e){
+    if(typeof console !== 'undefined' && console.info) console.info('[autoPx]', e && e.message);
+  }finally{
+    _pxAutoing = false;
+  }
+}
 if($('btnPxFetch')) $('btnPxFetch').onclick = ()=> pxDoFetch($('btnPxFetch'));
 if($('btnPxFetch2')) $('btnPxFetch2').onclick = ()=> pxDoFetch($('btnPxFetch2'));
 
 $('btnPxPaste').onclick = ()=> pxOpenPaste();
+
+document.querySelectorAll('#autoPxChips button').forEach(b=>{
+  b.onclick = ()=>{
+    P.autoPx = b.dataset.ap === '1';
+    save(K.P, P);
+    renderAutoPxChips();
+    toast(P.autoPx ? '以后每次打开都会自动刷新报价' : '已关闭自动刷新，只能手动点按钮');
+  };
+});
 
 document.addEventListener('click', e=>{
   const el = e.target.closest('[data-act]');
@@ -2225,6 +2306,7 @@ function fillSet(){
   fillCatSelect($('cat') ? $('cat').value : '');
   renderPx();
   renderPxUpd();
+  renderAutoPxChips();
   dataInfo();
 }
 
@@ -3200,6 +3282,8 @@ $('grp').addEventListener('click', e=>{
   renderSum();
   go('calc');
   render();
+  /* 打开就静默拉一次最新报价；900ms 让首屏先画完，别抢资源 */
+  setTimeout(()=>{ try{ autoPx(); }catch(e){} }, 900);
 })();
 </script>
 </body>
