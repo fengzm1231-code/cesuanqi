@@ -58,6 +58,8 @@ main{padding:12px 14px calc(96px + env(safe-area-inset-bottom))}
 .card-h b{font-size:13.5px;color:var(--ink);font-weight:600;letter-spacing:0}
 .g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .g2+.g2{margin-top:10px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.g3 .f select{font-size:13.5px;padding:0 20px 0 7px;background-position:right 6px center;background-size:10px 7px}
 .f{display:flex;flex-direction:column;gap:5px;min-width:0}
 .f>span{font-size:12.5px;color:var(--sub);display:flex;align-items:center;gap:4px}
 .f>span i{font-style:normal;font-size:11px;color:var(--muted)}
@@ -258,11 +260,37 @@ details .body{padding-bottom:2px}
 /* 纸厂参考价 */
 .pxn{font-size:11.5px;color:var(--muted);line-height:1.55;margin:9px 0 0}
 .pxn.off{color:#9a5a12}
-.pxg{margin:12px 0 2px;font-size:12.5px;font-weight:600;color:var(--ink)}
-.pxr{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0}
-.pxr span{font-size:12.5px;color:var(--sub);min-width:0}
-.pxr span em{font-style:normal;font-size:11px;color:#9aa39a;margin-left:6px;white-space:nowrap}
-.pxr span em.man{color:#b0742a}
+.pxn b.up{color:#a42a16;font-weight:700}
+.pxn b.dn{color:#11563a;font-weight:700}
+.pxn b.flat{color:#4f5c54;font-weight:600}
+.pxg{margin:12px 0 2px;font-size:12.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pxg .pxs{font-style:normal;font-size:10.5px;font-weight:400;color:#6f7d72;background:#f1f4ef;border:1px solid #e0e6dc;border-radius:4px;padding:1px 5px;white-space:nowrap}
+.pxr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 8px;margin:1px -7px;border-radius:8px;border:1px solid transparent}
+.pxr.up{background:#f9d9d1;border-color:#e3a08e;box-shadow:inset 3px 0 0 #b32d1b}
+.pxr.dn{background:#d3e9dc;border-color:#9cc7ae;box-shadow:inset 3px 0 0 #17603c}
+.pxr.stop{background:#f8e0b8;border-color:#d9b273;box-shadow:inset 3px 0 0 #8a5407}
+.pxr.up,.pxr.dn,.pxr.stop{padding-left:10px}
+.pxr .lb{display:flex;flex-direction:column;gap:3px;min-width:0}
+.pxr .nm{display:block;font-size:12.5px;font-weight:400;color:var(--sub);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pxr .nm em{font-style:normal;font-size:11px;color:#8b948c;margin-left:6px}
+.pxr .nm em.man{color:#9a5f14;font-weight:600}
+.pxr .cm{font-style:normal;font-size:11px;line-height:1.4;color:#46524a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pxr .cm u{text-decoration:none;font-weight:700;margin-left:6px}
+.pxr .cm u.up{color:#a42a16}
+.pxr .cm u.dn{color:#11563a}
+.pxr .cm u.flat{color:#5f6c64;font-weight:500}
+.pxr .cm s{text-decoration:none;color:#4f5c54;font-weight:500;margin-left:5px}
+.pxr.up input,.pxr.dn input,.pxr.stop input{background:#fff;border-color:rgba(0,0,0,.18)}
+/* 参考价变动汇总条 */
+.pxc{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:11.5px;color:#3f4c44;background:#e9efe7;border:1px solid #c9d5c3;border-radius:8px;padding:7px 9px;margin:0 0 9px;line-height:1.5}
+.pxc b{font-weight:700}
+.pxc b.up{color:#a42a16}
+.pxc b.dn{color:#11563a}
+.pxc b.flat{color:#3f4c44}
+.pxc .lg{display:inline-flex;align-items:center;gap:4px;margin-left:auto;font-size:10.5px;color:#5f6c64}
+.pxc .lg i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.pxc .lg i.u{background:#f0bdaa;border:1px solid #d1846d}
+.pxc .lg i.d{background:#a9d3ba;border:1px solid #6fae8c}
 .pxr input{
   width:104px;height:38px;border:1px solid #dde2da;border-radius:9px;padding:0 10px;
   font-size:15px;text-align:right;background:#fbfcf9;color:var(--ink);
@@ -397,6 +425,28 @@ details .body{padding-bottom:2px}
 .pl-note b{color:var(--ink)}
 .pl-note.d{background:#fdeeea;border-color:#f5d6d0;color:#8c2a22}
 .pl-note.d b{color:#8c2a22}
+/* 运距 · 路线对比 */
+.rt-plan{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+  text-align:left;background:#fafbf8;border:1px solid var(--line);border-radius:9px;padding:9px 11px;
+  margin:0 0 7px;cursor:pointer;font:inherit;color:var(--ink);-webkit-tap-highlight-color:transparent}
+.rt-plan.on{border-color:var(--p);background:var(--p-soft)}
+.rt-plan>span:first-child{min-width:0;flex:1}
+.rt-plan b{font-size:13.5px;font-weight:600}
+.rt-plan small{display:block;color:var(--sub);font-size:11.5px;margin-top:2px;font-weight:400;line-height:1.35}
+.rt-plan .rt-p{font-variant-numeric:tabular-nums;font-size:12.5px;font-weight:600;color:var(--p);white-space:nowrap}
+.rt-plan.pend b{color:var(--sub);font-weight:500}
+.rt-plan.pend .rt-p{color:var(--muted);font-weight:500}
+#cardRoute .fs button{white-space:nowrap}
+#cardRoute .fs{gap:8px}
+/* 运距 · 路线图 */
+.rt-mapbox{margin-top:12px;border:1px solid var(--line2);border-radius:13px;overflow:hidden;background:#edf0e9}
+#rtMapCanvas{height:252px;width:100%;position:relative;z-index:0}
+.rt-mapempty{height:252px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12.5px;padding:0 22px;text-align:center;line-height:1.7}
+.rt-mapfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 11px;font-size:11px;color:var(--sub);background:#fff;border-top:1px solid var(--line2)}
+#rtMapTag{font-weight:600;color:var(--ink)}
+.rt-pin b{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;color:#fff;font-size:12px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff;box-sizing:border-box}
+.leaflet-container{font:inherit;background:#edf0e9}
+.leaflet-control-zoom a{width:30px;height:30px;line-height:28px;font-size:17px;color:#2c3a33}
 </style>
 </head>
 <body>
@@ -613,6 +663,74 @@ details .body{padding-bottom:2px}
       </div>
       <div class="hint" id="fTHint">一轮 = 上游 + 在途 + 账期 + 回款</div>
       <div class="hint">账期指「到厂 → 收齐尾款」的天数，<b>自动 = 化验 + 付尾款 + 回款在途</b>，不用手填。一轮周期再往前加在途。预付款按 湿吨 × 50% × 当日厂价 估算。同样 30 万元：14 点前出磅、当天到账约撑 13.9 车/天；14 点后出磅、次日到账只剩 7.2 车——14 点这道分界线，就是全流程最敏感的一环。</div>
+    </div>
+
+    <div class="card" id="cardRoute">
+      <div class="card-h"><b>跑多远 · 路怎么走</b><span id="rtBadge">未测算</span></div>
+      <div class="hint" style="margin:0 0 10px">装货地到纸厂的实际里程，过路费按 6 轴货车的高速费率算，路线在地图上逐段看。</div>
+
+      <div class="flab">起点 <i>市 / 县 选，镇 选或手填</i></div>
+      <div class="g3">
+        <label class="f"><select id="rtCity"><option value="">市</option></select></label>
+        <label class="f"><select id="rtCounty"><option value="">县</option></select></label>
+        <label class="f"><input type="text" id="rtTown" list="rtTownDL" placeholder="镇 / 乡" autocomplete="off"><datalist id="rtTownDL"></datalist></label>
+      </div>
+      <label class="f" style="margin-top:9px"><span>详细地点 <i>厂名 / 村名，越具体越准</i></span>
+        <input type="text" id="rtFromDetail" placeholder="如 六景镇 XX木业" autocomplete="off"></label>
+      <div class="hint" id="rtFromHint" style="margin:6px 0 0">—</div>
+
+      <div class="flab" style="margin-top:13px">终点 <i>预设纸厂，可改地址</i></div>
+      <label class="f"><select id="rtToSel"></select></label>
+      <label class="f" style="margin-top:9px"><span>纸厂地址 <i>改了就按你填的算</i></span>
+        <input type="text" id="rtTo" placeholder="市 + 县 + 镇 + 园区"></label>
+
+      <div class="flab" style="margin-top:13px">怎么走 <i>只给大车能走的两条</i></div>
+      <div class="fs" id="rtPlans" style="margin-bottom:0">
+        <button type="button" data-rt="fast" class="on">高速优先 · 推荐</button>
+        <button type="button" data-rt="cheap">省过路费</button>
+      </div>
+
+      <div class="hint" style="margin:7px 0 0">广西高速货车按轴收费：6 轴 2.36 元/车公里、桥隧段另加 0.59，ETC 还有优惠，这里按基本费率算，属于偏保守。</div>
+      <div class="g2" style="margin-top:10px">
+        <label class="f"><span>计费车型 <i>按轴收费</i></span>
+          <select id="rtAxle">
+            <option value="6">6 轴 · 13 米半挂</option>
+            <option value="5">5 轴货车</option>
+            <option value="4">4 轴货车</option>
+            <option value="3">3 轴货车</option>
+            <option value="2">2 轴 · 4.5 吨以上</option>
+          </select></label>
+        <label class="f"><span>过路费 <i>元 · 单程 · 自动</i></span>
+          <input type="text" inputmode="decimal" id="rtTolls" placeholder="0"></label>
+      </div>
+      <div class="g2">
+        <label class="f"><span>单程里程 <i>km · 可手填</i></span>
+          <input type="text" inputmode="decimal" id="rtKm" placeholder="0"></label>
+        <label class="f"><span>单程耗时 <i>小时 · 自动</i></span>
+          <input type="text" inputmode="decimal" id="rtHours" placeholder="0" readonly></label>
+      </div>
+      <button class="mini" id="btnRouteGo" type="button" style="height:46px;width:100%;margin-top:10px;font-size:14px;font-weight:600">联网测算这条路线</button>
+
+      <div class="rt-mapbox">
+        <div id="rtMapCanvas"><div class="rt-mapempty">填好起终点，按上面按钮出路线图</div></div>
+        <div class="rt-mapfoot"><span id="rtMapTag">路线图</span><span>可拖动 · 双指缩放</span></div>
+      </div>
+
+      <div id="rtOut"></div>
+
+      <details id="detRouteRoad" style="margin-top:12px">
+        <summary>分段路书（每段路名、里程、耗时）</summary>
+        <div class="body"><div id="rtRoad"></div></div>
+      </details>
+
+      <details id="detRouteK" style="margin-top:9px">
+        <summary>高德 Key（联网测算用，填一次存本机）</summary>
+        <div class="body">
+          <label class="f"><span>Web 服务 Key</span>
+            <input type="text" id="rtKey" placeholder="粘贴高德 Web服务 类型 Key"></label>
+          <div class="hint">在高德开放平台注册个人开发者，创建 Key 时服务平台选 <b>Web服务</b>（不是 Web端 JS API），免费配额 5000 次/日。<br>三种给法，任选其一：① 直接粘在这里（只存本机，不上传）；② 用 <b>地址?k=你的Key</b> 打开一次，页面存好后会自动抹掉地址；③ 写在源码顶部 <b>RT_CFG.amapKey</b>——这样发布出去别人打开即用，但公开仓库等于公开 Key，只建议放私有仓库。<br>填了 Key，镇一级有下拉、里程耗时过路费在途全自动；不填也能用，只是都得手填。</div>
+        </div>
+      </details>
     </div>
 
     <div class="card">
@@ -899,10 +1017,10 @@ details .body{padding-bottom:2px}
         <button class="btn pri" id="btnPxFetch">一键查最新报价</button>
         <button class="btn" id="btnPxPaste">粘贴日报更新</button>
       </div>
-      <div class="pxu" id="pxUpd">还没查过。内置价截至 2026-11-25，点上面按钮可联网取最新一版。</div>
-      <div class="hint" style="margin:0">含税绝干到厂挂牌价，留空＝停收。品类名后面是这条价的<b>报价日期</b>；带 <b style="color:#b0742a">*</b> 的表示你手工改过，日期为改价那天。来源：美伊重工《木片价格日报》2026-11-25（覆盖四家纸厂），冠豪档位经茂源林业 11-17 官方调价函交叉验证。</div>
+      <div class="pxu" id="pxUpd">还没查过。内置价截至 2026-11-27，点上面按钮可联网取最新一版。</div>
+      <div class="hint" style="margin:0">含税绝干到厂挂牌价，留空＝停收。品类名后面是这条价的<b>报价日期</b>；带 <b style="color:#b0742a">*</b> 的表示你手工改过，日期为改价那天。<br><b>每档下面一行是上一期</b>：价有变动的整行带底色（<b style="color:#a42a16">红＝上调</b>、<b style="color:#11563a">绿＝下调</b>、<b style="color:#8a5407">黄＝停收</b>）。上期由软件自动记录，第一次改价后会一直留着比。<br><b>取证渠道按厂分工</b>：太阳南宁、太阳北海 → <b>公众号「广西太阳纸业国内木片部」</b>官方价目表（厂方直发，第一手）；广西仙鹤、广西建晖 → <b>美伊重工《木片价格日报》</b>最新一期（行业汇总，二手）。厂名后面的小标就是该厂当前用的渠道和日报日期。</div>
       <details style="margin-top:8px">
-        <summary>展开修改（4 家纸厂）</summary>
+        <summary id="pxSummary">展开修改（4 家纸厂）</summary>
         <div class="body" id="pxBox"></div>
         <label class="f" style="margin-top:10px"><span>整表采集日</span>
           <input type="date" id="pxAt"></label>
@@ -1108,7 +1226,8 @@ function logStar(inp, P){
 const $ = id => document.getElementById(id);
 const K = {
   P:'wp_m_params_v1', R:'wp_m_records_v1', B:'wp_m_lastbackup',
-  S:'wp_m_snapshot_v1', H:'wp_m_bkbar_hide', POOL:'wp_m_pool_v1'
+  S:'wp_m_snapshot_v1', H:'wp_m_bkbar_hide', POOL:'wp_m_pool_v1',
+  AK:'wp_m_amap_key'
 };
 
 /* 存储层：现在落在 localStorage。将来要换 IndexedDB 时只改 ST 的 get/set/del，
@@ -1130,7 +1249,7 @@ const DEF = {
   m0:'', surtax:12, incomeTax:25, stamp:0.03,
   pw:'', pd:'', freight:'', plow:'', r:'', process:'', mlog:'',
   ticket:'13', supList:[], millList:[], plateList:[],
-  px:{}, pxAt:'', pxSrc:'', pxMeta:{}, catAdd:{},
+  px:{}, pxAt:'', pxSrc:'', pxMeta:{}, catAdd:{}, pxHis:{},
   autoPx:true,   // 每次打开自动拉一次 prices.json
   fund: {
     ver:2,
@@ -1147,7 +1266,14 @@ const DEF = {
     realCapDay:0,   // 实际日发车，0 = 按资金自动
     moistOv:'',     // 含水率手工覆盖（%），'' = 自动
     netOv:'',       // 单车净利手工覆盖，'' = 自动
-    costOv:''       // 单车垫资手工覆盖，'' = 自动
+    costOv:'',      // 单车垫资手工覆盖，'' = 自动
+    /* 运距（13 米半挂口径，只留路线与车型，不再算车效成本） */
+    route: {
+      from:'', fromCity:'', fromCounty:'', fromTown:'', fromDetail:'',
+      to:'', toMill:'', addrMap:{},
+      km:0, hours:0, tolls:0,
+      axle:'6'        // 计费车型：高速按车（轴）型收费，6 轴 2.36 元/km
+    }
   },
   /* 外部资金池（合同型合作经营，不是借贷、不是股权） */
   pool: {
@@ -1687,41 +1813,50 @@ const DICTS = {
 
 /* ---- 固定纸厂与品类报价 ----------------------------------------------
    口径：含税、绝干吨、到厂现汇（元/吨）。留空/0 表示该品类停收。
-   来源：① 美伊重工《木片价格日报》2026-11-25（公众号「造纸厂木材剥皮切片
-          生产线设备」）—— 主源，广西广东片区覆盖太阳南宁/太阳北海/
-          广西仙鹤/广西建晖，是唯一能同时覆盖四家的公开日报；
-        ② 茂源林业《木片供应链中心》2026-11-16 发的冠豪高新厂区调价函
-          （11-17 00:00 执行）—— 用于交叉验证①的冠豪一档，二者数字
-          完全吻合，故判定①的转述口径可信；
-        ③ 太阳纸业国内木片部公众号、木讯网《木片市场调研日报》作为旁证。
-   报价日 at 的语义 = 该厂当前价目表的执行日（整表刷新日），不等于调价日：
-   例如南宁太阳 2026-11-23 整表重发（同时恢复桉木片收购），未变价的档位
-   也一并记为 11-23。仙鹤 6 档自 11-11 起未再变动，11-17 与 11-25 两次
-   复核均持平，故报价日统一为 11-11。
-   注意：以上均为二手转述的厂方挂牌，实际结算以厂方当日挂牌、化验扣重
-        与合同为准。 */
-const PX_AT = '2026-11-25';
+   来源渠道（2026-11-27 用户指定，按厂分工，不再混用）：
+        ① 太阳纸业（南宁）、太阳纸业（北海）→ 公众号「广西太阳纸业国内木片
+          部」官方价目表。这是厂方自己发的，属第一手；价目表执行时点在
+          傍晚（南宁 11-25 18:00 那版即 11-25 执行）。
+        ② 广西仙鹤新材料、广西建晖纸业 → 美伊重工《木片价格日报》
+          （公众号「造纸厂木材剥皮切片生产线设备」）最新一期。该日报是
+          全行业二手汇总，覆盖这两家的档位有限；报「新」的档位是首次
+          收录，之后不再变动就沿用原执行日，所以仙鹤 6 档停在 11-11、
+          建晖两档停在 10-27，属「日报最近一次报价」而非过期漏更。
+   口径：含税、绝干吨、到厂现汇（元/吨）。留空/0 表示该品类停收。
+   报价日 at 的语义 = 该档价目表的执行日，不等于采集日。
+   注意：以上为厂方公开挂牌（太阳系为方直发、其余为二手转述），实际结算
+        以厂方当日挂牌、化验扣重与合同为准。
+   更新方式：公众号无公开 API，网页无法自动抓取（跨域+反爬）。实际走
+        「粘贴日报更新」——微信里打开文章复制全文，粘进软件即自动解析；
+        或由助手核到新价后改 prices.json，打开页面自动拉取。 */
+const PX_AT = '2026-11-27';
 const MILLS = [
-  {id:'tynn', name:'太阳纸业（南宁）', cats:[
-    {n:'桉木片', p:1130, at:'2026-11-23'},
-    {n:'桉木轴木片', p:1060, at:'2026-11-23'},
-    {n:'松木一级', p:1170, at:'2026-11-23'},
-    {n:'松木二级', p:1020, at:'2026-11-23'},
-    {n:'杂木片', p:990, at:'2026-11-23'},
-    {n:'广西相思木片', p:1150, at:'2026-11-23'},
-    {n:'苦楝木木片', p:1050, at:'2026-11-23'},
-    {n:'构木木片', p:1000, at:'2026-11-23'},
-    {n:'竹片A', p:990, at:'2026-11-23'},
-    {n:'竹片B', p:860, at:'2026-11-23'}
+  {id:'tynn', name:'太阳纸业（南宁）', addr:'广西南宁市横州市六景镇六景工业园区', loc:'',
+   src:{k:'公众号', ch:'公众号「广西太阳纸业国内木片部」', doc:'《南宁太阳原料收购价格》官方价目表', at:'2026-11-25', first:true},
+   cats:[
+    {n:'桉木片', p:1130, at:'2026-11-25'},
+    {n:'桉木轴木片', p:1030, at:'2026-11-25'},
+    {n:'松木一级', p:1200, at:'2026-11-25'},
+    {n:'松木二级', p:1050, at:'2026-11-25'},
+    {n:'杂木片', p:990, at:'2026-11-25'},
+    {n:'广西相思木片', p:1150, at:'2026-11-25'},
+    {n:'苦楝木木片', p:1000, at:'2026-11-25'},
+    {n:'构木木片', p:1000, at:'2026-11-25'},
+    {n:'竹片A', p:990, at:'2026-11-25'},
+    {n:'竹片B', p:860, at:'2026-11-25'}
   ]},
-  {id:'tybh', name:'太阳纸业（北海）', cats:[
-    {n:'桉木片A级', p:1180, at:'2026-11-11'},
+  {id:'tybh', name:'太阳纸业（北海）', addr:'广西北海市铁山港区兴港镇铁山港工业区', loc:'',
+   src:{k:'公众号', ch:'公众号「广西太阳纸业国内木片部」', doc:'官方价目表（北海）', at:'2026-11-26', first:true},
+   cats:[
+    {n:'桉木片A级', p:1200, at:'2026-11-26'},
     {n:'桉木片B级', p:1200, at:'2026-11-11'},
     {n:'桉木轴木片', p:1060, at:'2026-10-28'},
-    {n:'松木一级', p:1180, at:'2026-10-28'},
-    {n:'广西相思木片', p:1180, at:'2026-11-11'}
+    {n:'松木一级', p:1200, at:'2026-11-26'},
+    {n:'广西相思木片', p:1200, at:'2026-11-26'}
   ]},
-  {id:'xh', name:'广西仙鹤新材料有限公司', cats:[
+  {id:'xh', name:'广西仙鹤新材料有限公司', addr:'广西来宾市兴宾区南泗乡三江口新区高性能纸基新材料产业园', loc:'109.560682,23.675578',
+   src:{k:'美伊日报', ch:'美伊重工《木片价格日报》', doc:'公众号「造纸厂木材剥皮切片生产线设备」2026-11-26 期', at:'2026-11-26', first:false},
+   cats:[
     {n:'桉木片', p:1130, at:'2026-11-11'},
     {n:'桉木片（3级）', p:1000, at:'2026-11-11'},
     {n:'松木片', p:1130, at:'2026-11-11'},
@@ -1729,15 +1864,40 @@ const MILLS = [
     {n:'杂木片', p:980, at:'2026-11-11'},
     {n:'桉木白皮', p:770, at:'2026-11-11'}
   ]},
-  {id:'jh', name:'广西建晖纸业有限公司', cats:[
-    {n:'松木精片', p:1140, at:'2026-11-21'},
+  {id:'jh', name:'广西建晖纸业有限公司', addr:'广西梧州市藤县藤州镇绿色新材料产业园建晖大道1号', loc:'110.957345,23.294600',
+   src:{k:'美伊日报', ch:'美伊重工《木片价格日报》', doc:'公众号「造纸厂木材剥皮切片生产线设备」2026-11-26 期', at:'2026-11-26', first:false},
+   cats:[
+    {n:'松木精片', p:1170, at:'2026-11-26'},
     {n:'杂木精片', p:910, at:'2026-10-27'},
     {n:'竹木精片', p:920, at:'2026-10-27'}
   ]}
 ];
 
 function millById(id){ return MILLS.find(m=> m.id === id) || null; }
+/* 这家厂的价从哪来 —— 用于台账里标渠道，避免把一手和二手混着用 */
+function millSrc(id){
+  const m = millById(id);
+  return (m && m.src) || null;
+}
 function millByName(n){ return MILLS.find(m=> m.name === n) || null; }
+
+/* 内置价换版后，清掉本地遗留的「联网/粘贴」快照——只清 net 项，用户手工改过的价保留。
+   不这么做的话，pxEntry 会一直用 P.px 里的旧价盖住新的内置价，等于白更新。
+   判据：本地采集日早于当前 PX_AT 才清；同版或更新的本地价不动。 */
+function pxMigrate(){
+  if(!P.px || typeof P.px !== 'object') return;
+  const localAt = String(P.pxAt || '');
+  if(localAt && localAt >= PX_AT) return;
+  let n = 0;
+  Object.keys(P.px).forEach(k=>{
+    const v = P.px[k];
+    if(v && typeof v === 'object' && v.src === 'net'){ delete P.px[k]; n++; }
+  });
+  if(n || localAt){
+    P.pxAt = PX_AT;
+    save(K.P, P);
+  }
+}
 /* 一条报价的取值与日期。
    P.px 允许三种存法：旧版纯数字、{p,at}、{p,at,src:'net'}（联网/粘贴更新而来）。
    manual = 用户自己在设置里改过；net = 来自报价更新。 */
@@ -1769,6 +1929,81 @@ function catsOf(mill){
 }
 function refPrice(mid, cat){ return pxEntry(mid, cat).p; }
 function refDate(mid, cat){ return pxEntry(mid, cat).at; }
+
+/* ===== 上一期报价 =====
+   两路来源：
+   1) PX_PREV —— 内置种子，只写有据可查的调价，价来自 prices.json 说明里的调价链；
+   2) P.pxHis —— 本机自动记：每次改价（手改 / 联网 / 粘贴 / 恢复采集值）把旧价压进来。
+   一条价 = {p, at}；p 为 0 表示停收；at 为 '' 表示只知道价、不知道执行日（不编日期）。 */
+const PX_PREV = {
+  /* 太阳南宁 11-25 执行：松一 1170→1200、松二 1020→1050、桉轴 1060→1030、苦楝 1050→1000 */
+  'tynn|松木一级':   [{p:1170, at:''}],
+  'tynn|松木二级':   [{p:1020, at:''}],
+  'tynn|桉木轴木片': [{p:1060, at:''}],
+  'tynn|苦楝木木片': [{p:1050, at:''}],
+  /* 太阳北海 11-26 执行：桉A / 相思 / 松一 各上调 20 至 1200 */
+  'tybh|桉木片A级':   [{p:1180, at:''}],
+  'tybh|广西相思木片':[{p:1180, at:''}],
+  'tybh|松木一级':    [{p:1180, at:''}],
+  /* 建晖松木精片：1120 → 1140（11-21）→ 1170（11-26） */
+  'jh|松木精片': [{p:1140, at:'2026-11-21'}, {p:1120, at:''}]
+};
+
+/* 某档的全部历史：本机记录 + 内置种子，去重后按报价日倒序 */
+function pxHisAll(mid, cat){
+  if(!mid || !cat) return [];
+  const key = mid + '|' + cat;
+  const loc = (P.pxHis && Array.isArray(P.pxHis[key])) ? P.pxHis[key] : [];
+  const out = [], seen = {};
+  loc.concat(PX_PREV[key] || []).forEach(e=>{
+    if(!e || typeof e !== 'object') return;
+    const p = num(e.p), at = String(e.at || '').slice(0, 10);
+    if(!(p > 0) && !at) return;
+    const k = p + '@' + at;
+    if(seen[k]) return;
+    seen[k] = 1;
+    out.push({p, at});
+  });
+  out.sort((a, b)=> String(b.at).localeCompare(String(a.at)));
+  return out;
+}
+/* 记一条旧价（只在价真的变了时调，日期刷新不记，免得把历史灌满同价条目） */
+function pxHisPush(mid, cat, e){
+  if(!mid || !cat || !e) return;
+  const p = num(e.p), at = String(e.at || '').slice(0, 10);
+  if(!(p > 0) && !at) return;
+  const key = mid + '|' + cat;
+  P.pxHis = Object.assign({}, P.pxHis || {});
+  const arr = (P.pxHis[key] || []).filter(x=> !(num(x.p) === p && String(x.at || '') === at));
+  arr.unshift({p, at});
+  P.pxHis[key] = arr.slice(0, 8);
+}
+/* 上一期：历史里既不是当前这条、也不晚于当前的最近一条；没有就返回 null */
+function pxPrev(mid, cat, curP, curAt){
+  const p = num(curP), at = String(curAt || '').slice(0, 10);
+  const list = pxHisAll(mid, cat);
+  for(const e of list){
+    if(e.p === p && e.at === at) continue;
+    if(e.at && at && e.at > at) continue;
+    return e;
+  }
+  return null;
+}
+/* 一条对比文案 + 变动类型，供设置页和测算页共用 */
+function pxCmp(mid, cat, e){
+  const pv = pxPrev(mid, cat, e.p, e.at);
+  if(!pv) return null;
+  const pd = dShort(pv.at);
+  const d = e.p - pv.p;
+  if(e.p <= 0 && pv.p > 0){
+    return {dir:'stop', pv, d:-pv.p,
+      txt:'上期 ' + fmt(pv.p, 0) + (pd ? '（' + pd + '）' : '')};
+  }
+  if(!d) return {dir:'flat', pv, d:0, txt:'上期 ' + fmt(pv.p, 0) + (pd ? '（' + pd + '）' : '')};
+  const pct = pv.p > 0 ? Math.abs(d) / pv.p * 100 : 0;
+  return {dir: d > 0 ? 'up' : 'dn', pv, d, pct,
+    txt:'上期 ' + fmt(pv.p, 0) + (pd ? '（' + pd + '）' : '')};
+}
 
 /* 报价日期的显示：short = 11/01（窄处用，跨年带年后缀 25/11/01），full = 2026-11-01 */
 function dShort(iso){
@@ -1843,28 +2078,81 @@ function updatePxNote(){
     el.className = 'pxn off';
     return;
   }
-  el.textContent = '参考价 ' + fmt(e.p, 0) + ' 元/绝干吨 · '
-    + (d ? (e.manual ? '手工价，' + d + ' 更新' : d + ' 挂牌') : '未标日期')
-    + ' · 含税到厂，可改';
+  const sc = (!e.manual && m.src) ? '（' + m.src.k + '）' : '';
+  const cp = pxCmp(m.id, c.n, e);
+  let cmpTxt = '';
+  if(cp && cp.dir === 'flat') cmpTxt = ' · <b class="flat">与上期持平</b>';
+  else if(cp) cmpTxt = ' · <b class="' + cp.dir + '">较上期' + (cp.dir === 'up' ? '▲' : '▼')
+    + fmt(Math.abs(cp.d), 0)
+    + (cp.pct ? '（' + (cp.dir === 'up' ? '+' : '−') + cp.pct.toFixed(1) + '%）' : '') + '</b>';
+  el.innerHTML = '参考价 ' + fmt(e.p, 0) + ' 元/绝干吨 · '
+    + esc(d ? (e.manual ? '手工价，' + d + ' 更新' : d + ' 挂牌') : '未标日期')
+    + esc(sc) + cmpTxt + ' · 含税到厂，可改';
   el.className = 'pxn';
 }
 
-/* 设置页：reference price editor */
+/* 设置页：reference price editor（本期 vs 上一期） */
 function renderPx(){
   const box = $('pxBox');
   if(!box) return;
-  box.innerHTML = MILLS.map(m=>{
+  const st = {up:0, dn:0, stop:0, flat:0};
+  const body = MILLS.map(m=>{
     const rows = catsOf(m).map(c=>{
       const e = pxEntry(m.id, c.n);
       const dt = dShort(e.at);
-      return '<label class="pxr"><span>' + esc(c.n)
+      const cp = pxCmp(m.id, c.n, e);
+      let cls = '', cm = '';
+      if(cp){
+        st[cp.dir]++;
+        if(cp.dir === 'stop'){
+          cls = 'stop';
+          cm = cp.txt + '<u class="dn">停收</u>';
+        }else if(cp.dir === 'flat'){
+          cm = cp.txt + '<u class="flat">持平</u>';
+        }else{
+          const up = cp.dir === 'up';
+          cls = up ? 'up' : 'dn';
+          cm = cp.txt + '<u class="' + cp.dir + '">' + (up ? '▲' : '▼') + fmt(Math.abs(cp.d), 0) + '</u>'
+            + (cp.pct >= 0.05 ? '<s>' + (up ? '+' : '−') + cp.pct.toFixed(1) + '%</s>' : '');
+        }
+      }
+      return '<label class="pxr ' + cls + '">'
+        + '<span class="lb"><b class="nm">' + esc(c.n)
         + (dt ? '<em class="' + (e.manual ? 'man' : '') + '">' + dt + (e.manual ? '*' : '') + '</em>' : '')
-        + '</span>'
+        + '</b>' + (cm ? '<i class="cm">' + cm + '</i>' : '') + '</span>'
         + '<input type="text" inputmode="decimal" data-px="' + esc(m.id + '|' + c.n) + '"'
         + ' placeholder="停收" value="' + (e.p > 0 ? e.p : '') + '"></label>';
     }).join('');
-    return '<div class="pxg">' + esc(m.name) + '</div>' + rows;
+    const s = m.src;
+    const tag = s ? '<em class="pxs" title="' + esc(s.ch + '（' + s.doc + '）') + '">'
+      + esc(s.k) + (s.at ? ' ' + dShort(s.at) : '') + '</em>' : '';
+    return '<div class="pxg">' + esc(m.name) + tag + '</div>' + rows;
   }).join('');
+
+  /* 顶部汇总：几涨几跌，顺带当色例 */
+  const cmpN = st.up + st.dn + st.stop + st.flat;
+  let sum;
+  if(cmpN){
+    sum = '有上期可比 <b class="flat">' + cmpN + '</b> 档：'
+      + (st.up ? '<b class="up">' + st.up + ' 涨</b>' : '')
+      + (st.dn ? '<b class="dn">' + st.dn + ' 跌</b>' : '')
+      + (st.stop ? '<b class="dn">' + st.stop + ' 停收</b>' : '')
+      + (st.flat ? '<b class="flat">' + st.flat + ' 持平</b>' : '');
+  }else{
+    sum = '还没有可比的上期价：以后每次改价，软件会自动把旧价记成「上期」。';
+  }
+  sum += '<span class="lg"><i class="u"></i>涨<i class="d"></i>跌</span>';
+  box.innerHTML = '<div class="pxc">' + sum + '</div>' + body;
+
+  /* 折叠标题上带个变动数，不展开也能看到今天有没有调价 */
+  const sm = $('pxSummary');
+  if(sm){
+    const parts = [];
+    if(st.up) parts.push(st.up + ' 涨');
+    if(st.dn) parts.push(st.dn + ' 跌');
+    if(st.stop) parts.push(st.stop + ' 停收');
+    sm.textContent = '展开修改（4 家纸厂' + (parts.length ? ' · ' + parts.join(' · ') : '') + '）';
+  }
   if($('pxAt')) $('pxAt').value = P.pxAt || PX_AT;
   if($('pxAtTxt')) $('pxAtTxt').textContent = '采集 ' + (P.pxAt || PX_AT);
 }
@@ -1889,8 +2177,14 @@ $('pxBox').addEventListener('change', e=>{
   const el = e.target.closest('[data-px]');
   if(!el) return;
   P.px = Object.assign({}, P.px || {});
+  const raw = el.dataset.px;
+  const bar = raw.indexOf('|');
+  const mid = bar > 0 ? raw.slice(0, bar) : '';
+  const cat = bar > 0 ? raw.slice(bar + 1) : '';
   const p = el.value.trim() === '' ? 0 : num(el.value);
-  P.px[el.dataset.px] = {p, at: today()};
+  const before = pxEntry(mid, cat);
+  if(before.p !== p) pxHisPush(mid, cat, {p:before.p, at:before.at});  // 旧价留作「上一期」
+  P.px[raw] = {p, at:today()};
   save(K.P, P);
   renderPx();
   updatePxNote();
@@ -1902,7 +2196,13 @@ $('pxAt').onchange = ()=>{
   renderPx();
 };
 $('btnPxReset').onclick = ()=>{
-  if(!confirm('把 4 家纸厂的参考价恢复成采集值？手工改过的价格会丢掉。')) return;
+  if(!confirm('把 4 家纸厂的参考价恢复成采集值？手工改过的价格会丢掉（会留成「上一期」备查）。')) return;
+  /* 恢复前先把现值记成上一期，恢复后一眼能看出差了多少 */
+  MILLS.forEach(m=> catsOf(m).forEach(c=>{
+    const e = pxEntry(m.id, c.n);
+    const b = m.cats.find(x=> x.n === c.n);
+    if(e.p !== (b ? b.p : 0)) pxHisPush(m.id, c.n, {p:e.p, at:e.at});
+  }));
   P.px = {};
   P.pxAt = PX_AT;
   save(K.P, P);
@@ -2076,6 +2376,7 @@ function applyPxItems(items, meta){
   meta = meta || {};
   const snap = {
     px: JSON.parse(JSON.stringify(P.px || {})),
+    pxHis: JSON.parse(JSON.stringify(P.pxHis || {})),
     catAdd: JSON.parse(JSON.stringify(P.catAdd || {})),
     pxAt: P.pxAt || '', pxMeta: JSON.parse(JSON.stringify(P.pxMeta || {}))
   };
@@ -2115,6 +2416,12 @@ function applyPxItems(items, meta){
     } else {
       changed.push({mill:mill.name, cat:name, from:before.p, to:p, at, isNewCat});
     }
+    /* 报价文件如果自带上一期（c.prev），先收进历史；没有就靠本机记的旧价 */
+    if(it.prev !== undefined && it.prev !== null && String(it.prev) !== ''){
+      const pv = num(it.prev);
+      if(pv > 0 && pv !== p) pxHisPush(mill.id, name, {p:pv, at:String(it.prevAt || '').slice(0,10)});
+    }
+    if(before.p !== p && (before.p > 0 || before.at)) pxHisPush(mill.id, name, {p:before.p, at:before.at});
     P.px = Object.assign({}, P.px || {});
     P.px[key] = {p, at, src:'net'};
   });
@@ -2248,7 +2555,7 @@ async function pxDoFetch(btn){
       const mill = millByName(m.name) || millById(m.id);
       if(!mill) return;
       (m.cats || []).forEach(c=>{
-        items.push({mill, cat:c.n, p:c.p, at:c.at || d.at});
+        items.push({mill, cat:c.n, p:c.p, at:c.at || d.at, prev:c.prev, prevAt:c.prevAt});
       });
     });
     if(!items.length) throw new Error('报价文件里没有可用的品类');
@@ -2281,7 +2588,7 @@ async function autoPx(){
     (d.mills || []).forEach(m=>{
       const mill = millByName(m.name) || millById(m.id);
       if(!mill) return;
-      (m.cats || []).forEach(c=> items.push({mill, cat:c.n, p:c.p, at:c.at || d.at}));
+      (m.cats || []).forEach(c=> items.push({mill, cat:c.n, p:c.p, at:c.at || d.at, prev:c.prev, prevAt:c.prevAt}));
     });
     if(!items.length) return;
     const res = applyPxItems(items, {
@@ -2333,6 +2640,7 @@ document.addEventListener('click', e=>{
   if(a === 'pxundo'){
     if(!_pxUndo){ closeSheet(); return; }
     P.px = _pxUndo.px; P.catAdd = _pxUndo.catAdd;
+    P.pxHis = _pxUndo.pxHis || P.pxHis || {};
     P.pxAt = _pxUndo.pxAt; P.pxMeta = _pxUndo.pxMeta;
     save(K.P, P);
     _pxUndo = null;
@@ -2661,6 +2969,11 @@ function fundP(){
   const d = DEF.fund, v = (P.fund && typeof P.fund === 'object') ? P.fund : {};
   const o = {};
   Object.keys(d).forEach(k=>{ o[k] = (v[k] === undefined || v[k] === null) ? d[k] : v[k]; });
+  /* route 是嵌套对象，必须浅合并，否则旧存档会整块覆盖默认值 */
+  if(d.route){
+    const rr = (v.route && typeof v.route === 'object') ? v.route : {};
+    o.route = Object.assign({}, d.route, rr);
+  }
   if(!(num(v.ver) >= 2)){
     /* 旧版口径：账期默认 30 天、日发车上限手填。按现在的「预付 + 化验 + 付尾款」节奏重算一次 */
     o.ver = 2;
@@ -2703,6 +3016,26 @@ function fillTurn(){
   put('fMoist', f.moistOv, false);
   put('fNet', f.netOv, false);
   put('fCost', f.costOv, false);
+  /* 运距 */
+  const rt = f.route || {};
+  /* 起点：市同步、县镇走缓存或接口 */
+  rtFillCity();
+  if($('rtCity')) $('rtCity').value = rt.fromCity || '';
+  rtOpts($('rtCounty'), rtCountyList(rt.fromCity || ''), '县');
+  if($('rtCounty') && rt.fromCounty) $('rtCounty').value = rt.fromCounty;
+  rtFillTown(true);
+  put('rtFromDetail', rt.fromDetail, false);
+  rtSyncFrom();
+  /* 终点：预设纸厂 */
+  rtFillMills();
+  put('rtToSel', rt.toMill, false);
+  put('rtTo', rt.to, false);
+  rtFillCounty(true);   /* 有 Key 时异步把乡镇补齐 */
+  put('rtKm', rt.km ? rt.km : '', true);
+  put('rtHours', rt.hours ? rt.hours : '', true);
+  put('rtTolls', rt.tolls, true);
+  put('rtAxle', rt.axle || '6', false);
+  put('rtKey', rtKey(), false);
 }
 
 function readFundForm(){
@@ -2723,6 +3056,17 @@ function readFundForm(){
   f.moistOv = v('fMoist') === '' ? '' : num(v('fMoist'));
   f.netOv = v('fNet') === '' ? '' : num(v('fNet'));
   f.costOv = v('fCost') === '' ? '' : num(v('fCost'));
+  /* 运距 */
+  const rt = f.route || (f.route = {});
+  rt.from = rtFromText();
+  rt.fromCity = v('rtCity'); rt.fromCounty = v('rtCounty');
+  rt.fromTown = v('rtTown'); rt.fromDetail = v('rtFromDetail');
+  rt.to = v('rtTo'); rt.toMill = v('rtToSel');
+  rt.km = num(v('rtKm')); rt.hours = num(v('rtHours')); rt.tolls = num(v('rtTolls'));
+  rt.axle = v('rtAxle') || '6';
+  /* 老存档里还留着车效成本的字段，顺手清掉 */
+  ['capT','hDay','vL','vE','tL','tU','maxTrip','fuel','oil','driver','fixed','workDays','corr','tollRate','label']
+    .forEach(k=>{ delete rt[k]; });
   return f;
 }
 function saveFund(){ P.fund = readFundForm(); save(K.P, P); }
@@ -2978,6 +3322,8 @@ function renderTurn(){
   const fEff = Object.assign({}, f, {realCapDay: f.realCapDay > 0 ? f.realCapDay : autoReal});
   const r = fundCalc(fEff, base);
   const dn = n => fmt(n, 1).replace(/\.0$/, '');
+  /* 运距卡片：车台数依赖 q，所以每次重算都跟着刷 */
+  try{ renderRoute(); }catch(e){}
 
   if($('btnRealFromLedger')){
     $('btnRealFromLedger').textContent = pace.q > 0 ? ('用 ' + fmt(pace.q,2) + ' 车/天') : '台账不够';
@@ -4290,6 +4636,697 @@ $('btnArcClean').onclick = ()=>{
 };
 
 /* ---- 页面切换 ---- */
+/* ===================== 运距 · 路线规划（高德联网测距） =====================
+   过路费按广西高速公路「货车按车（轴）型」基本费率算，不是小客车价：
+   六轴 2.36 元/车公里，是小客车 0.50 的 4.7 倍，这一栏差得最多。
+   货车限行、限高、村道进不去这些，普通驾车接口不校验，所以：
+   一、只给「高速优先」「省过路费」两条，砍掉容易钻村道的里程最短；
+   二、最后仍建议在高德 App 的货车导航里复核一次。 */
+/* 发布配置：把高德 Web服务 Key 填进 amapKey，GitHub Pages 打开即用。
+   注意 Key 会写进 HTML，公开仓库请留空（或只在私有仓库填），
+   更安全的做法是用 ?k=你的Key 打开一次，页面会存到本机并自动抹掉地址。 */
+const RT_CFG = { amapKey:'', auto:true };
+
+const RT_S = { plan:'0', cache:{}, busy:false, tree:null, autoT:0 };
+
+const RT_STRAT = [
+  { code:'0', key:'fast',  name:'高速优先 · 大车推荐' },
+  { code:'1', key:'cheap', name:'省过路费' }
+];
+/* 广西高速公路货车基本费率，元/车公里（四车道，桥隧 ≥500m 另加 2.95） */
+const RT_FEE = { '2':0.89, '3':1.49, '4':1.89, '5':2.19, '6':2.36 };
+const RT_AXLE = { '2':'2 轴', '3':'3 轴', '4':'4 轴', '5':'5 轴', '6':'6 轴' };
+
+/* 广西地级市 + 主要产材县（离线兜底；有 Key 时用行政区划接口拉全量，含乡镇） */
+const GX = {
+  '南宁市':['兴宁区','青秀区','江南区','西乡塘区','良庆区','邕宁区','武鸣区','隆安县','马山县','上林县','宾阳县','横州市'],
+  '柳州市':['城中区','鱼峰区','柳南区','柳北区','柳江区','柳城县','鹿寨县','融安县','融水苗族自治县','三江侗族自治县'],
+  '桂林市':['秀峰区','叠彩区','象山区','七星区','雁山区','临桂区','阳朔县','灵川县','全州县','兴安县','永福县','灌阳县','资源县','平乐县','恭城瑶族自治县','荔浦市'],
+  '梧州市':['万秀区','长洲区','龙圩区','苍梧县','藤县','蒙山县','岑溪市'],
+  '北海市':['海城区','银海区','铁山港区','合浦县'],
+  '防城港市':['港口区','防城区','上思县','东兴市'],
+  '钦州市':['钦南区','钦北区','灵山县','浦北县'],
+  '贵港市':['港北区','港南区','覃塘区','平南县','桂平市'],
+  '玉林市':['玉州区','福绵区','容县','陆川县','博白县','兴业县','北流市'],
+  '百色市':['右江区','田阳区','田东县','平果市','德保县','那坡县','凌云县','乐业县','田林县','西林县','隆林各族自治县','靖西市'],
+  '贺州市':['八步区','平桂区','昭平县','钟山县','富川瑶族自治县'],
+  '河池市':['金城江区','宜州区','南丹县','天峨县','凤山县','东兰县','罗城仫佬族自治县','环江毛南族自治县','巴马瑶族自治县','都安瑶族自治县','大化瑶族自治县'],
+  '来宾市':['兴宾区','忻城县','象州县','武宣县','金秀瑶族自治县','合山市'],
+  '崇左市':['江州区','扶绥县','宁明县','龙州县','大新县','天等县','凭祥市']
+};
+
+function rtOpts(sel, list, ph){
+  if(!sel) return;
+  sel.innerHTML = '<option value="">' + ph + '</option>'
+    + list.map(n=> '<option value="' + n + '">' + n + '</option>').join('');
+}
+
+function rtFillCity(){
+  rtOpts($('rtCity'), Object.keys(GX), '市');
+  const r = (fundP().route) || {};
+  if(r.fromCity && $('rtCity')) $('rtCity').value = r.fromCity;
+}
+
+/* 行政区划树：keywords=市 & subdistrict=3 一次拿到 县 + 乡镇，缓存进本机 */
+async function rtTree(city, key){
+  if(!city) return null;
+  if(RT_S.tree && RT_S.tree.city === city) return RT_S.tree;
+  const ck = 'wp_m_dist_v1_' + city;
+  try{
+    const raw = ST.get(ck);
+    if(raw){
+      const t = JSON.parse(raw);
+      if(t && t.children && t.children.length){ t.city = city; RT_S.tree = t; return t; }
+    }
+  }catch(e){}
+  if(!key) return null;
+  const u = 'https://restapi.amap.com/v3/config/district?keywords=' + encodeURIComponent(city)
+    + '&subdistrict=3&extensions=base&key=' + key;
+  const d = await rtJSONP(u);
+  if(!d || d.status !== '1' || !d.districts || !d.districts.length) return null;
+  const root = d.districts[0];
+  const t = { city: city, children: (root.districts || []).map(x=>({
+    name: x.name,
+    children: (x.districts || []).map(y=> y.name).filter(Boolean)
+  })) };
+  if(!t.children.length) return null;
+  try{ ST.set(ck, JSON.stringify({children: t.children})); }catch(e){}
+  RT_S.tree = t;
+  return t;
+}
+
+function rtCountyList(city){
+  const t = RT_S.tree;
+  if(t && t.city === city && t.children.length) return t.children.map(x=> x.name);
+  return GX[city] || [];
+}
+
+function rtTownList(city, county){
+  const t = RT_S.tree;
+  if(!t || t.city !== city || !county) return [];
+  const c = t.children.find(x=> x.name === county);
+  return (c && c.children) || [];
+}
+
+async function rtFillCounty(keep){
+  const city = ($('rtCity') || {}).value || '';
+  const cSel = $('rtCounty');
+  const wantC = keep ? ((fundP().route || {}).fromCounty || '') : '';
+  rtOpts(cSel, rtCountyList(city), '县');
+  if(cSel && wantC) cSel.value = wantC;
+  rtFillTown(keep);
+  if(!city) return;
+  const key = (($('rtKey') || {}).value || rtKey()).trim();
+  if(key && !(RT_S.tree && RT_S.tree.city === city)){
+    try{
+      await rtTree(city, key);
+    }catch(e){}
+    if($('rtCity') && $('rtCity').value === city){
+      rtOpts(cSel, rtCountyList(city), '县');
+      if(cSel && wantC) cSel.value = wantC;
+      rtFillTown(keep);
+    }
+  }
+}
+
+/* 镇一级用「输入框 + 候选」，有数据可下拉，没数据可手打，不会出现空着没得选 */
+function rtFillTown(keep){
+  const city = ($('rtCity') || {}).value || '';
+  const county = ($('rtCounty') || {}).value || '';
+  const list = rtTownList(city, county);
+  const dl = $('rtTownDL');
+  if(dl) dl.innerHTML = list.map(n=> '<option value="' + n + '"></option>').join('');
+  const inp = $('rtTown');
+  if(inp){
+    inp.placeholder = list.length ? ('镇/乡 · ' + list.length + ' 个可选') : '镇 / 乡（手填）';
+    if(keep){
+      const w = (fundP().route || {}).fromTown || '';
+      if(w) inp.value = w;
+    }else{
+      inp.value = '';
+    }
+  }
+  rtSyncFrom();
+}
+
+function rtFromText(){
+  const g = id => (($(id) || {}).value || '').trim();
+  const city = g('rtCity'), county = g('rtCounty'), town = g('rtTown'), det = g('rtFromDetail');
+  let t = city + county;
+  if(town && town !== county) t += town;
+  return (t + det).trim();
+}
+
+function rtSyncFrom(){
+  const el = $('rtFromHint'); if(!el) return;
+  const city = (($('rtCity') || {}).value || '').trim();
+  const county = (($('rtCounty') || {}).value || '').trim();
+  const town = (($('rtTown') || {}).value || '').trim();
+  const det = (($('rtFromDetail') || {}).value || '').trim();
+  if(!city){ el.textContent = '先选市，再选县；镇没有选项就直接写，最后补上厂名。'; return; }
+  const parts = [city, county, town, det].filter(Boolean);
+  el.innerHTML = '按这段地址定位：<b>' + parts.join(' ') + '</b>'
+    + (parts.length < 3 ? '　<i style="font-style:normal;color:var(--muted)">写得越具体越准</i>' : '');
+}
+
+function rtFillMills(){
+  const sel = $('rtToSel'); if(!sel) return;
+  sel.innerHTML = '<option value="">选纸厂（或留空，直接填地址）</option>'
+    + MILLS.map(m=> '<option value="' + m.id + '">' + m.name + '</option>').join('');
+  const cur = (fundP().route || {}).toMill || '';
+  if(cur) sel.value = cur;
+}
+
+/* 纸厂地址：用户改过就记住，下次选同一家还用他改的 */
+function rtMillAddr(id){
+  const r = (fundP().route) || {};
+  const map = r.addrMap || {};
+  if(map[id]) return map[id];
+  const m = MILLS.find(x=> x.id === id);
+  return m ? (m.addr || '') : '';
+}
+
+function rtPickMill(){
+  const id = ($('rtToSel') || {}).value || '';
+  if(!id) return;
+  const el = $('rtTo');
+  if(el) el.value = rtMillAddr(id);
+}
+
+function rtSaveMillAddr(){
+  const id = ($('rtToSel') || {}).value || '';
+  const v = ($('rtTo') || {}).value || '';
+  if(!id || !v) return;
+  const f = fundP();
+  const r = f.route || (f.route = {});
+  r.addrMap = r.addrMap || {};
+  r.addrMap[id] = v;
+  P.fund = f;
+  try{ save(K.P, P); }catch(e){}
+}
+
+/* ---------- 轨迹解析 ---------- */
+function rtPolyline(p){
+  const out = [];
+  (p.steps || []).forEach(st=>{
+    String(st.polyline || '').split(';').forEach(s=>{
+      const a = s.split(',');
+      if(a.length === 2 && a[0] && a[1]) out.push([+a[0], +a[1]]);
+    });
+  });
+  return out;
+}
+
+function rtLegs(p){
+  const out = [];
+  (p.steps || []).forEach(st=>{
+    const road = String(st.road || '').trim() || (Number(st.distance) === 0 ? '' : '无名道路');
+    const km = num(st.distance) / 1000;
+    const min = num(st.duration) / 60;
+    if(!road) return;
+    const last = out[out.length - 1];
+    if(last && last.road === road){ last.km += km; last.min += min; }
+    else out.push({road: road, km: km, min: min});
+  });
+  return out;
+}
+
+function rtThin(pts, max){
+  if(pts.length <= max) return pts;
+  const step = (pts.length - 1) / (max - 1);
+  const out = [];
+  for(let i = 0; i < max; i++) out.push(pts[Math.round(i * step)]);
+  return out;
+}
+
+/* ---------- 地图：Leaflet + 高德瓦片（可拖动缩放，像导航一样） ---------- */
+const RT_M = { ok:false, dead:false, loading:false, cbs:[], map:null, layer:null, tiles:null, tileOk:0, tileErr:0 };
+
+function rtLfLoad(cb){
+  if(RT_M.ok) return cb(true);
+  if(RT_M.dead) return cb(false);
+  RT_M.cbs.push(cb);
+  if(RT_M.loading) return;
+  RT_M.loading = true;
+  let fired = false;
+  const fire = ok => {
+    if(fired) return; fired = true;
+    clearTimeout(timer);
+    RT_M.loading = false; RT_M.ok = ok; RT_M.dead = !ok;
+    const q = RT_M.cbs; RT_M.cbs = [];
+    q.forEach(f=>{ try{ f(ok); }catch(e){} });
+  };
+  const timer = setTimeout(()=> fire(!!window.L), 9000);
+  if(!document.getElementById('lfCss')){
+    const l = document.createElement('link');
+    l.id = 'lfCss'; l.rel = 'stylesheet';
+    l.href = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(l);
+  }
+  const srcs = [
+    'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+    'https://cdn.staticfile.org/leaflet/1.9.4/leaflet.js',
+    'https://cdn.bootcdn.net/ajax/libs/leaflet/1.9.4/leaflet.js'
+  ];
+  let i = 0;
+  const next = ()=>{
+    if(window.L) return fire(true);
+    if(i >= srcs.length) return fire(false);
+    const sc = document.createElement('script');
+    sc.src = srcs[i++];
+    sc.onload = ()=> fire(!!window.L);
+    sc.onerror = ()=>{ if(sc.parentNode) sc.parentNode.removeChild(sc); next(); };
+    document.head.appendChild(sc);
+  };
+  next();
+}
+
+function rtMapInit(){
+  if(RT_M.map) return RT_M.map;
+  const box = $('rtMapCanvas');
+  if(!box || !window.L) return null;
+  box.innerHTML = '';
+  const m = L.map(box, {
+    zoomControl:true, attributionControl:false, scrollWheelZoom:false,
+    doubleClickZoom:true, zoomSnap:0.5, preferCanvas:true
+  }).setView([23.6, 108.7], 7);
+  RT_M.tiles = L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+    subdomains:['1','2','3','4'], maxZoom:18, minZoom:4, keepBuffer:2
+  });
+  RT_M.tiles.on('tileload', ()=>{ RT_M.tileOk++; });
+  RT_M.tiles.on('tileerror', ()=>{
+    RT_M.tileErr++;
+    if(!RT_M.tileOk && RT_M.tileErr >= 6) rtMapFallback();
+  });
+  RT_M.tiles.addTo(m);
+  RT_M.layer = L.layerGroup().addTo(m);
+  RT_M.map = m;
+  return m;
+}
+
+function rtStaticURL(r, key){
+  const pts = rtThin(r.pts || [], 50);
+  if(pts.length < 2) return '';
+  let mnx = 1e9, mxx = -1e9, mny = 1e9, mxy = -1e9;
+  pts.forEach(p=>{
+    mnx = Math.min(mnx, p[0]); mxx = Math.max(mxx, p[0]);
+    mny = Math.min(mny, p[1]); mxy = Math.max(mxy, p[1]);
+  });
+  const cx = ((mnx + mxx) / 2).toFixed(6), cy = ((mny + mxy) / 2).toFixed(6);
+  const span = Math.max(mxx - mnx, (mxy - mny) * 1.35, 0.01);
+  let z = Math.floor(Math.log(420 * 360 / (256 * span * 0.85)) / Math.LN2);
+  z = Math.max(4, Math.min(16, z));
+  const line = pts.map(p=> p[0].toFixed(5) + ',' + p[1].toFixed(5)).join(';');
+  const a = pts[0], c = pts[pts.length - 1];
+  return 'https://restapi.amap.com/v3/staticmap?location=' + cx + ',' + cy + '&zoom=' + z
+    + '&size=750*400&scale=1&paths=6,0x1e5442,0.9:' + line
+    + '&markers=mid,0x1e5442,A:' + a[0].toFixed(5) + ',' + a[1].toFixed(5)
+    + '|mid,0xb93b2f,B:' + c[0].toFixed(5) + ',' + c[1].toFixed(5)
+    + '&key=' + key;
+}
+
+/* 地图组件或瓦片废了，退回静态图；再不行就只留文字 */
+function rtMapFallback(){
+  const box = $('rtMapCanvas'); if(!box) return;
+  const r = RT_S.cache[RT_S.plan];
+  const key = rtKey();
+  if(RT_M.map){ try{ RT_M.map.remove(); }catch(e){} RT_M.map = null; }
+  if(key && r && r.pts && r.pts.length > 1){
+    box.innerHTML = '<img src="' + rtStaticURL(r, key) + '" alt="路线图" '
+      + 'style="width:100%;height:100%;object-fit:cover;display:block">';
+    if($('rtMapTag')) $('rtMapTag').textContent = '静态路线图';
+  }else{
+    box.innerHTML = '<div class="rt-mapempty">底图没加载出来（离线或网络受限）。下面的里程、过路费和路书照样能用。</div>';
+    if($('rtMapTag')) $('rtMapTag').textContent = '底图不可用';
+  }
+}
+
+function rtMapDraw(r){
+  const box = $('rtMapCanvas'); if(!box) return;
+  const pts = (r && r.pts) || [];
+  if(pts.length < 2){
+    if(RT_M.map && RT_M.layer) RT_M.layer.clearLayers();
+    if(!RT_M.map) box.innerHTML = '<div class="rt-mapempty">填好起终点，按上面按钮出路线图</div>';
+    return;
+  }
+  rtLfLoad(ok=>{
+    if(!ok || !window.L){ rtMapFallback(); return; }
+    const m = rtMapInit();
+    if(!m){ rtMapFallback(); return; }
+    setTimeout(()=> m.invalidateSize(), 60);
+    RT_M.layer.clearLayers();
+    const ll = pts.map(p=> [p[1], p[0]]);
+    L.polyline(ll, {color:'#ffffff', weight:11, opacity:.6}).addTo(RT_M.layer);
+    L.polyline(ll, {color:'#1e5442', weight:6, opacity:.95, lineJoin:'round', lineCap:'round'}).addTo(RT_M.layer);
+    const pin = (txt, bg)=> L.divIcon({
+      className:'rt-pin',
+      html:'<b style="background:' + bg + '">' + txt + '</b>',
+      iconSize:[26,26], iconAnchor:[13,13]
+    });
+    L.marker(ll[0], {icon:pin('A','#1e5442'), keyboard:false}).addTo(RT_M.layer);
+    L.marker(ll[ll.length - 1], {icon:pin('B','#b93b2f'), keyboard:false}).addTo(RT_M.layer);
+    try{ m.fitBounds(L.latLngBounds(ll).pad(0.14), {animate:false}); }catch(e){}
+    if($('rtMapTag')) $('rtMapTag').textContent = '路线图 · ' + fmt(r.km, 1) + ' km · ' + fmt(r.min, 0) + ' 分';
+  });
+}
+
+function rtRoadRender(r){
+  const box = $('rtRoad'); if(!box) return;
+  const legs = ((r && r.legs) || []).filter(x=> x.km >= 0.3);
+  if(!legs.length){ box.innerHTML = '<div class="hint" style="margin:0">算过之后这里出分段路书。</div>'; return; }
+  let h = '';
+  legs.slice(0, 14).forEach(x=> h += lineHTML(x.road, fmt(x.km, 1) + ' km · ' + fmt(x.min, 0) + ' 分'));
+  if(legs.length > 14) h += '<div class="hint" style="margin:7px 0 0">还有 ' + (legs.length - 14) + ' 段短路口，略去。</div>';
+  box.innerHTML = h;
+}
+
+function rtKey(){
+  const dom = ($('rtKey') || {}).value;
+  if(dom && String(dom).trim()) return String(dom).trim();
+  let ls = '';
+  try{ ls = String(ST.get(K.AK) || '').trim(); }catch(e){}
+  if(ls) return ls;
+  const cfg = String((RT_CFG && RT_CFG.amapKey) || '').trim();
+  if(cfg){ try{ ST.set(K.AK, cfg); }catch(e){} return cfg; }
+  return '';
+}
+
+/* 支持 https://xxx/mobile.html?k=你的Key 带一次，存本机后把地址抹干净 */
+function rtKeyFromUrl(){
+  let k = '';
+  try{
+    k = new URLSearchParams(location.search).get('k') || '';
+    if(!k && location.hash.length > 1){
+      k = new URLSearchParams(location.hash.slice(1)).get('k') || '';
+    }
+  }catch(e){ return ''; }
+  k = String(k || '').trim();
+  if(!k) return '';
+  try{ ST.set(K.AK, k); }catch(e){}
+  try{ history.replaceState(null, '', location.pathname); }catch(e){}
+  return k;
+}
+
+function rtJSONP(url, ms){
+  return new Promise((res, rej)=>{
+    const cb = 'amapcb_' + Math.random().toString(36).slice(2, 9);
+    const s = document.createElement('script');
+    let done = false;
+    const fin = (ok, d)=>{
+      if(done) return; done = true;
+      try{ delete window[cb]; }catch(e){ window[cb] = undefined; }
+      if(s.parentNode) s.parentNode.removeChild(s);
+      ok ? res(d) : rej(d);
+    };
+    window[cb] = d => fin(true, d);
+    s.onerror = ()=> fin(false, new Error('网络不通：本地文件打开时多数浏览器禁止联网'));
+    s.src = url + '&callback=' + cb;
+    document.head.appendChild(s);
+    setTimeout(()=> fin(false, new Error('请求超时')), ms || 13000);
+  });
+}
+
+function rtAmapErr(d){
+  const i = (d && d.info) || '未知错误';
+  if(/INVALID|USERKEY|USER_KEY|QUOTA|DAILY_QUERY_OVER_LIMIT|OVER_LIMIT|FORBIDDEN/i.test(i))
+    return '高德拒绝了这次请求：' + i + '（Key 不对、类型不是「Web服务」，或当天配额用完）';
+  return i;
+}
+
+async function rtGeo(addr, key){
+  const a = encodeURIComponent(addr);
+  let d = await rtJSONP('https://restapi.amap.com/v3/geocode/geo?address=' + a + '&key=' + key);
+  if(d && d.status === '0' && /INVALID|USERKEY|USER_KEY|QUOTA|LIMIT|FORBIDDEN/i.test(d.info || ''))
+    throw new Error(rtAmapErr(d));
+  if(d && d.status === '1' && d.geocodes && d.geocodes.length) return d.geocodes[0].location;
+  d = await rtJSONP('https://restapi.amap.com/v3/place/text?keywords=' + a + '&offset=1&page=1&key=' + key);
+  if(d && d.status === '0' && /INVALID|USERKEY|USER_KEY|QUOTA|LIMIT|FORBIDDEN/i.test(d.info || ''))
+    throw new Error(rtAmapErr(d));
+  if(d && d.status === '1' && d.pois && d.pois.length) return d.pois[0].location;
+  throw new Error('定位不到「' + addr + '」，写成「市+县+镇+厂名」再试');
+}
+
+async function rtDrive(ori, dst, strat, key){
+  const u = 'https://restapi.amap.com/v3/direction/driving?origin=' + ori + '&destination=' + dst
+    + '&strategy=' + strat + '&extensions=base&key=' + key;
+  const d = await rtJSONP(u);
+  if(!d || d.status !== '1' || !d.route || !d.route.paths || !d.route.paths.length)
+    throw new Error((d && d.status === '0') ? rtAmapErr(d) : '没算出路线');
+  const p = d.route.paths[0];
+  const carToll = num(p.tolls);
+  let tollKm = num(p.toll_distance) / 1000;
+  /* 有的 Key 只回过路费不回收费里程，按小客车 0.5 元/km 反推 */
+  if(!(tollKm > 0) && carToll > 0) tollKm = carToll / 0.5;
+  return {
+    strat: String(strat),
+    km: num(p.distance) / 1000,
+    min: num(p.duration) / 60,
+    carToll: carToll,
+    tollKm: tollKm,
+    pts: rtPolyline(p),
+    legs: rtLegs(p)
+  };
+}
+
+/* 在途 = 装车 60 分 + 高德单程时长 + 磅房 30 分，折天取 0.5 的整数倍，最少 0.5 */
+function rtInTransit(min){
+  const h = (Math.max(0, num(min)) + 90) / 60;
+  return Math.max(0.5, Math.round(h / 24 * 2) / 2);
+}
+
+function rtRead(){
+  const v = id => { const el = $(id); return el ? String(el.value).trim() : ''; };
+  const n = (id, d) => { const s = v(id); return s === '' ? d : num(s); };
+  return { km: n('rtKm', 0), hours: n('rtHours', 0), tolls: n('rtTolls', 0), axle: v('rtAxle') || '6' };
+}
+
+function rtFee(r){
+  const axle = (($('rtAxle') || {}).value) || '6';
+  const rate = RT_FEE[axle] || RT_FEE['6'];
+  const km = (r && r.tollKm > 0) ? r.tollKm : 0;
+  return { axle: axle, rate: rate, fee: km * rate };
+}
+
+function rtApply(r){
+  if($('rtKm')) $('rtKm').value = String(Math.round(r.km * 10) / 10);
+  if($('rtHours')) $('rtHours').value = String(Math.round(r.min / 6) / 10);
+  const f = rtFee(r);
+  if($('rtTolls')) $('rtTolls').value = String(Math.round(f.fee));
+  try{ saveFund(); }catch(e){}   /* 程序写值不触发 change，得手动存 */
+}
+
+function rtBadgeSet(){
+  const bd = $('rtBadge'); if(!bd) return;
+  const r = RT_S.cache[RT_S.plan];
+  const p = rtRead();
+  if(r) bd.textContent = fmt(r.km, 1) + ' km · ' + fmt(r.min, 0) + ' 分';
+  else if(p.km > 0) bd.textContent = fmt(p.km, 1) + ' km';
+  else bd.textContent = '未测算';
+}
+
+function renderRoute(){
+  const out = $('rtOut'); if(!out) return;
+  let h = '';
+
+  h += '<div class="sheet-t">两条路 · 点一条看地图</div>';
+  RT_STRAT.forEach(st=>{
+    const r = RT_S.cache[st.code];
+    const on = (RT_S.plan === st.code);
+    if(r){
+      const f = rtFee(r);
+      const hw = r.km > 0 ? (r.tollKm / r.km * 100) : 0;
+      h += '<button type="button" class="rt-plan' + (on ? ' on' : '') + '" data-st="' + st.code + '">'
+        + '<span><b>' + st.name + '</b><small>' + fmt(r.km, 1) + ' km · ' + fmt(r.min, 0) + ' 分 · 高速 '
+        + fmt(hw, 0) + '%</small></span>'
+        + '<span class="rt-p">¥' + fmt(f.fee, 0) + '</span></button>';
+    }else{
+      h += '<button type="button" class="rt-plan pend' + (on ? ' on' : '') + '" data-st="' + st.code + '">'
+        + '<span><b>' + st.name + '</b><small>还没算 · 点一下出这条</small></span>'
+        + '<span class="rt-p">—</span></button>';
+    }
+  });
+
+  const p = rtRead();
+  if(!(p.km > 0)){
+    h += '<div class="hint" style="margin:8px 0 0">也可以在「单程里程」直接手填公里数、过路费自己填，下面的数字照样算，只是没有地图。</div>';
+    out.innerHTML = h;
+    rtBadgeSet();
+    return;
+  }
+
+  /* 有过路费缓存就按车型折算显示，但不覆盖手填的值（桥隧多的路段要能自己改） */
+  const cur = RT_S.cache[RT_S.plan];
+  const tollAuto = (cur && cur.tollKm > 0) ? Math.round(rtFee(cur).fee) : null;
+  const tollShow = p.tolls;
+  const axle = p.axle;
+  const rate = RT_FEE[axle] || RT_FEE['6'];
+
+  h += '<div class="sheet-t">这条线的账</div>';
+  h += lineHTML('单程', '<b>' + fmt(p.km, 1) + ' km</b>');
+  h += lineHTML('往返', fmt(p.km * 2, 1) + ' km');
+  const mins = cur ? cur.min : p.hours * 60;
+  h += lineHTML('单程耗时', mins > 0 ? fmt(mins, 0) + ' 分钟' : '—');
+  h += lineHTML('过路费（单程）', '<b>¥' + fmt(tollShow, 0) + '</b>　<span style="font-weight:400;color:var(--muted);font-size:12px">'
+    + RT_AXLE[axle] + ' · ' + fmt(rate, 2) + ' 元/km</span>'
+    + (tollAuto !== null && tollAuto !== Math.round(tollShow) ? '<div style="font-size:11.5px;color:var(--muted);font-weight:400;margin-top:2px">按车型应为 ¥' + fmt(tollAuto, 0) + '</div>' : ''));
+  if(cur && cur.tollKm > 0 && cur.tollKm < cur.km * 0.5){
+    h += '<div class="hint" style="margin:2px 0 0;color:var(--warn)">高速只占 '
+      + fmt(cur.tollKm / cur.km * 100, 0) + '%，剩下是国道县道——13 米挂车走这段，先问一句车队限高限重。</div>';
+  }
+  const inT = rtInTransit(cur ? cur.min : p.hours * 60);
+  const filled = Math.abs(num((($('fTransit') || {}).value)) - inT) < 0.01;
+  h += lineHTML('一趟在途', '<b>' + fmt(inT, 1) + ' 天</b>'
+    + '<div style="font-size:11.5px;color:var(--muted);font-weight:400;margin-top:2px">'
+    + (cur ? '高德单程 ' + fmt(cur.min, 0) + ' 分钟' : '按手填里程估') + ' + 装车磅房 90 分钟</div>');
+  h += '<div class="fs" style="margin:10px 0 0"><button type="button" data-act="rt-transit" data-v="'
+    + inT + '">' + (filled ? '已填入在途 · 点此重填' : '把 ' + fmt(inT, 1) + ' 天填入在途') + '</button></div>';
+
+  out.innerHTML = h;
+  rtBadgeSet();
+}
+
+async function rtGo(onlyCode, silent){
+  if(RT_S.busy) return;
+  const code = (onlyCode !== undefined) ? String(onlyCode) : RT_S.plan;
+  const from = rtFromText();
+  const to = ($('rtTo') || {}).value ? $('rtTo').value.trim() : '';
+  const keyEl = $('rtKey');
+  const key = (keyEl && keyEl.value.trim()) || rtKey();
+  if(keyEl && keyEl.value.trim()){ try{ ST.set(K.AK, keyEl.value.trim()); }catch(e){} }
+  const say = m => {
+    if(silent){
+      const bd = $('rtBadge'); if(bd) bd.textContent = m;
+      return;
+    }
+    alert(m);
+  };
+  if(!from){ say('先选起点的市、县，再写镇或厂名'); return; }
+  if(!to){ say('先选一个纸厂，或者手填纸厂地址'); return; }
+  if(!key){ say('要联网测算，得先填一个高德 Web 服务 Key（展开最下面「高德 Key」那一栏）。不填也行，直接手填里程。'); if(!silent && $('detRouteK')) $('detRouteK').open = true; return; }
+  RT_S.busy = true;
+  const btn = $('btnRouteGo'), old = btn ? btn.textContent : '';
+  if(btn){ btn.textContent = '测算中…'; btn.disabled = true; }
+  try{
+    const ori = await rtGeo(from, key);
+    /* 预设纸厂有精确坐标就直接用，比地址解析准，也省一次请求 */
+    const mid = ($('rtToSel') || {}).value || '';
+    const mm = mid ? MILLS.find(x=> x.id === mid) : null;
+    const dst = (mm && mm.loc && (!to || to === (mm.addr || ''))) ? mm.loc : await rtGeo(to, key);
+    const r = await rtDrive(ori, dst, code, key);
+    r.picked = true;
+    RT_S.cache[code] = r;
+    RT_S.plan = code;
+    rtApply(r);
+    /* 在途是纯测算值，高德算完直接填进周转，省得再点一次 */
+    const inT = rtInTransit(r.min);
+    if($('fTransit')) $('fTransit').value = String(inT);
+    try{ saveFund(); }catch(e){}
+    renderTurn();
+    renderRoute();
+    rtMapDraw(r);
+    rtRoadRender(r);
+    rtSyncPlanBtns();
+  }catch(e){
+    const m = (e && e.message ? e.message : String(e));
+    if(silent){
+      const bd = $('rtBadge'); if(bd) bd.textContent = '自动测算失败';
+      const out = $('rtOut');
+      if(out) out.insertAdjacentHTML('afterbegin', '<div class="hint" style="margin:0 0 8px;color:var(--warn)">自动测算没成：' + m + '　（点按钮重试，或手填里程）</div>');
+    }else{
+      alert('测算失败：' + m);
+    }
+  }finally{
+    RT_S.busy = false;
+    if(btn){ btn.textContent = old || '联网测算这条路线'; btn.disabled = false; }
+  }
+}
+
+/* 起终点一改就自动联网算一次，1.6 秒内的连续修改只发一次请求 */
+function rtAutoSoon(){
+  if(!RT_CFG.auto) return;
+  if(RT_S.autoT) clearTimeout(RT_S.autoT);
+  RT_S.autoT = setTimeout(()=>{
+    if(RT_S.busy) return;
+    if(!rtKey()) return;
+    if(!rtFromText()) return;
+    if(!(($('rtTo') || {}).value || '').trim()) return;
+    rtGo(undefined, true);
+  }, 1600);
+}
+
+function rtPick(code){
+  code = String(code);
+  RT_S.plan = code;
+  rtSyncPlanBtns();
+  const r = RT_S.cache[code];
+  if(r){
+    rtApply(r);
+    renderRoute();
+    rtMapDraw(r);
+    rtRoadRender(r);
+  }else{
+    renderRoute();
+    rtGo(code);
+  }
+}
+
+function rtSyncPlanBtns(){
+  const st = RT_STRAT.find(x=> x.code === RT_S.plan);
+  document.querySelectorAll('#rtPlans button').forEach(b=> b.classList.toggle('on', !!st && b.dataset.rt === st.key));
+}
+
+function rtTransit(v){
+  if($('fTransit')) $('fTransit').value = String(v);
+  try{ saveFund(); }catch(e){}
+  renderTurn();
+}
+
+/* 事件：全部挂委托，不占 init 的位置 */
+document.addEventListener('click', ev=>{
+  const pl = ev.target.closest ? ev.target.closest('#rtPlans button') : null;
+  if(pl){
+    const st = RT_STRAT.find(x=> x.key === pl.dataset.rt);
+    if(st) rtPick(st.code);
+    return;
+  }
+  const pick = ev.target.closest ? ev.target.closest('.rt-plan') : null;
+  if(pick && pick.dataset.st !== undefined){ rtPick(pick.dataset.st); return; }
+  const t = ev.target.closest ? ev.target.closest('[data-act="rt-transit"]') : null;
+  if(t){ rtTransit(num(t.dataset.v)); return; }
+  if(ev.target.id === 'btnRouteGo'){ rtGo(); return; }
+});
+
+document.addEventListener('change', ev=>{
+  const id = ev.target && ev.target.id;
+  if(!id || id.indexOf('rt') !== 0) return;
+  if(id === 'rtKey'){
+    try{ ST.set(K.AK, String(ev.target.value).trim()); }catch(e){}
+    if($('rtCity') && $('rtCity').value){ RT_S.tree = null; rtFillCounty(true); }
+    rtAutoSoon();
+    return;
+  }
+  if(id === 'rtAxle'){
+    const r = RT_S.cache[RT_S.plan];
+    if(r && r.tollKm > 0 && $('rtTolls')) $('rtTolls').value = String(Math.round(rtFee(r).fee));
+    renderRoute();
+    try{ saveFund(); }catch(e){}
+    return;
+  }
+  if(id === 'rtCity'){ RT_S.tree = null; rtFillCounty(); }
+  else if(id === 'rtCounty'){ rtFillTown(); rtAutoSoon(); }
+  else if(id === 'rtTown' || id === 'rtFromDetail'){ rtSyncFrom(); rtAutoSoon(); }
+  else if(id === 'rtToSel'){ rtPickMill(); rtSaveMillAddr(); rtAutoSoon(); }
+  else if(id === 'rtTo'){ rtSaveMillAddr(); rtAutoSoon(); }
+  /* select 不在 [data-page=turn] input 的绑定范围里，得自己存一次 */
+  try{ saveFund(); }catch(e){}
+});
+
+document.addEventListener('input', ev=>{
+  const id = ev.target && ev.target.id;
+  if(id === 'rtFromDetail' || id === 'rtTown'){ rtSyncFrom(); rtAutoSoon(); }
+});
+
 function go(page){
   document.querySelectorAll('[data-page]').forEach(sec=>{
     sec.style.display = (sec.dataset.page === page) ? '' : 'none';
@@ -4300,7 +5337,11 @@ function go(page){
   if(page === 'ledger') renderRec();
   if(page === 'sum') renderSum();
   if(page === 'set') fillSet();
-  if(page === 'turn'){ fillTurn(); renderTurn(); }
+  if(page === 'turn'){
+    fillTurn(); renderTurn();
+    /* 页面曾 display:none，回来时地图容器尺寸变了，得重新量一次 */
+    if(RT_M.map) setTimeout(()=>{ try{ RT_M.map.invalidateSize(); }catch(e){} }, 120);
+  }
   if(page === 'pool'){ fillPool(); renderPool(); }
 }
 document.querySelectorAll('[data-nav]').forEach(b=> b.onclick = ()=> go(b.dataset.nav));
@@ -4411,12 +5452,15 @@ if(_poolSec) _poolSec.addEventListener('click', e=>{
 (function init(){
   $('date').value = today();
   applyParams();
+  try{ pxMigrate(); }catch(e){}
   setMode('1');
   fillSet();
   renderChips();
   renderRec();
   renderSum();
   fillPool();
+  try{ rtKeyFromUrl(); }catch(e){}
+  try{ rtFillCity(); rtFillMills(); }catch(e){}
   go('calc');
   render();
   /* 打开就静默拉一次最新报价；900ms 让首屏先画完，别抢资源 */
