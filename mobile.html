@@ -1029,7 +1029,7 @@ details .body{padding-bottom:2px}
         </div>
       </details>
       <div class="hint">改完立即生效，不用点下面的「保存设置」。留空表示该品类停收。</div>
-      <div class="hint" style="margin-top:8px">打开页面会自动拉一次最新报价（<b>你手工改过的价不会被覆盖</b>）。</div>
+      <div class="hint" style="margin-top:8px">打开页面、从后台切回、断网恢复时会自动拉一次最新报价。你手工改过的价不会被同级或更旧的日报覆盖；只有日报那一版<b>比你的价更新</b>时才会换成日报价（结果里会标「你 X 的价」）。</div>
       <div class="fs" id="autoPxChips">
         <button data-ap="1">打开时自动刷新</button>
         <button data-ap="0">不自动刷新</button>
@@ -1070,11 +1070,12 @@ details .body{padding-bottom:2px}
     </div>
 
     <div class="card" style="margin-top:11px">
-      <div class="card-h"><b>版本</b><span>当前：手机全能版</span></div>
+      <div class="card-h"><b>版本</b><span id="verTag">当前：手机全能版</span></div>
       <div class="btns">
-        <a class="btn" href="index.html?pc=1" style="display:flex;align-items:center;justify-content:center;text-decoration:none">打开电脑完整版</a>
+        <a class="btn" href="index.html?pc=1" onclick="return confirm('电脑版是另一套排版，手机上会挤；而且电脑版的纸厂价是写死的，不跟 prices.json 自动更新。确定要过去吗？')" style="display:flex;align-items:center;justify-content:center;text-decoration:none">打开电脑完整版</a>
       </div>
       <div class="hint">本页已包含测算、台账、汇总、参数、备份合并、按年归档全部功能，日常只用这一页即可。电脑版适合横屏看汇总；两边数据各存本机，靠「导出 → 另一台合并导入」互传，合并不会冲掉对方已有的记录。</div>
+      <div class="hint" id="verHint">看标题栏的构建时间对不对：手机如果显示的比电脑旧，说明浏览器还存着旧页面，下拉刷新或清一下缓存再开。</div>
     </div>
   </section>
 
@@ -1229,6 +1230,9 @@ const K = {
   S:'wp_m_snapshot_v1', H:'wp_m_bkbar_hide', POOL:'wp_m_pool_v1',
   AK:'wp_m_amap_key'
 };
+/* 构建号：手机端怀疑「没更新」时，先看设置页最下面的版本号对不对得上。
+   每次改完这页记得改这个时间，再同步到 发布到GitHub/mobile.html。 */
+const APP_BUILD = '2026-11-27 22:41';
 
 /* 存储层：现在落在 localStorage。将来要换 IndexedDB 时只改 ST 的 get/set/del，
    业务代码和计算内核都不用动。set 失败（多为配额满）返回 false 并提示归档。 */
@@ -1362,6 +1366,14 @@ function today(){
   const d = new Date();
   const p = n => (n<10?'0':'') + n;
   return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate());
+}
+/* 本机时间戳（当地时区）。不要用 toISOString()——那是 UTC，
+   界面上「今天 14:39 获取」实际是 22:39，看着像几小时前查的。 */
+function nowStamp(){
+  const d = new Date();
+  const p = n => (n<10?'0':'') + n;
+  return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate())
+    + 'T' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
 }
 function esc(s){
   return String(s === undefined || s === null ? '' : s).replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
@@ -2397,10 +2409,17 @@ function applyPxItems(items, meta){
     const before = pxEntry(mill.id, name);
     const isNewCat = !mill.cats.some(x=> x.n === name);
 
-    /* 自动刷新时不动手工改过的价：那是用户从业务员/地磅拿到的，比日报新 */
+    /* 自动刷新一般不动手工改过的价（那是从业务员/地磅拿的）——
+       但日报这一版比手工价还新时得跟上，否则这台机器一改过价就永远停在旧价，
+       手机端「一直更新不到最新」多半就是这个原因。同日只差价的仍以手工价为准。 */
+    let manFrom = '';
     if(meta.skipManual && before.manual){
-      skipped.push({mill:mill.name, cat:name, p:before.p, at:dFull(before.at), to:p});
-      return;
+      const manAt = String(before.at || '').slice(0, 10);
+      if(!manAt || !at || at <= manAt){
+        skipped.push({mill:mill.name, cat:name, p:before.p, at:dFull(before.at), to:p});
+        return;
+      }
+      manFrom = dFull(before.at);
     }
     if(isNewCat){
       P.catAdd = P.catAdd || {};
@@ -2414,7 +2433,7 @@ function applyPxItems(items, meta){
       /* 价没动、只是纸厂重新报了一次（或日报把报价日推后了）——不算调价 */
       dated.push({mill:mill.name, cat:name, p, at, fromAt: dFull(before.at)});
     } else {
-      changed.push({mill:mill.name, cat:name, from:before.p, to:p, at, isNewCat});
+      changed.push({mill:mill.name, cat:name, from:before.p, to:p, at, isNewCat, manFrom});
     }
     /* 报价文件如果自带上一期（c.prev），先收进历史；没有就靠本机记的旧价 */
     if(it.prev !== undefined && it.prev !== null && String(it.prev) !== ''){
@@ -2440,7 +2459,7 @@ function applyPxItems(items, meta){
     srcAt: meta.at || '',
     src: meta.src || '',
     by: meta.by || '',
-    checked: new Date().toISOString(),
+    checked: nowStamp(),
     n: changed.length + dated.length + added.length
   };
   save(K.P, P);
@@ -2453,6 +2472,7 @@ function pxResultHTML(res){
   const n = res.changed.length, a = res.added.length, s = res.same.length;
   const dt = (res.dated || []).length;
   const sk = (res.skipped || []).length;
+  const mn = res.changed.filter(c=> c.manFrom).length;
   let h = '<div class="pxr-h">更新到 ' + esc(dFull(res.at) || '未标日期')
     + (res.srcAt && dFull(res.srcAt) !== dFull(res.at) ? '<span class="pxr-hop">· ' + esc(dShort(res.srcAt)) + ' 日报</span>' : '')
     + '</div>';
@@ -2460,7 +2480,8 @@ function pxResultHTML(res){
     + '价格变动 <b>' + n + '</b> 项'
     + (dt ? ' · 仅刷新报价日 <b>' + dt + '</b> 项' : '')
     + ' · 新增品类 <b>' + a + '</b> 项 · 未变 <b>' + s + '</b> 项'
-    + (sk ? ' · 保留手工价 <b>' + sk + '</b> 项' : '') + '</div>';
+    + (sk ? ' · 保留手工价 <b>' + sk + '</b> 项' : '')
+    + (mn ? ' · 覆盖旧手工价 <b>' + mn + '</b> 项' : '') + '</div>';
   if(n){
     h += '<div class="sheet-t">价格变动</div>';
     h += res.changed.map(c=>{
@@ -2469,6 +2490,7 @@ function pxResultHTML(res){
       return '<div class="pxr-row"><span class="m">' + esc(c.mill) + '<em>' + esc(c.cat) + '</em></span>'
         + '<span class="v">' + (c.from > 0 ? fmt(c.from,0) + ' → ' : '') + '<b>' + fmt(c.to,0) + '</b>'
         + (diff ? '<i class="' + (up ? 'up' : 'dn') + '">' + (up ? '▲' : '▼') + fmt(Math.abs(diff),0) + '</i>' : '')
+        + (c.manFrom ? '<i class="dt">你 ' + esc(dShort(c.manFrom)) + ' 的价</i>' : '')
         + '</span></div>';
     }).join('');
   }
@@ -2509,9 +2531,17 @@ function renderPxUpd(){
   const el = $('pxUpd');
   if(!el) return;
   const m = P.pxMeta || {};
+  const errLine = _pxLastErr
+    ? '<br>刚才自动拉取没成功（' + esc(_pxLastErr) + '）。本机价照旧可用，切回前台或点「一键查最新报价」会再试。'
+    : '';
+  const offLine = P.autoPx === false
+    ? '<br>「打开时自动刷新」现在是关的，只有点「一键查最新报价」或粘贴日报才会取新价。'
+    : '';
   if(!m.checked){
-    el.className = 'pxu';
-    el.textContent = '还没成功刷新过。内置价截至 ' + PX_AT + '。打开页面会自动试一次；如果一直停在这句，说明没网或被拦截，可手动点上面按钮，或改用粘贴日报。';
+    el.className = 'pxu' + (_pxLastErr ? ' warn' : '');
+    el.innerHTML = '还没成功刷新过。内置价截至 ' + esc(PX_AT)
+      + '。打开页面、从后台切回、断网恢复时都会自动试一次；一直停在这句就是没网或被拦了，可手动点上面按钮，或改用「粘贴日报更新」。'
+      + errLine + offLine;
     return;
   }
   const cIso = String(m.checked).slice(0, 10), cTime = String(m.checked).slice(11, 16);
@@ -2520,12 +2550,13 @@ function renderPxUpd(){
   /* 木讯网日报只在工作日发，周末与节假日不出；阈值定 6 天，
      这样周五查过、周一早上打开不会误报「过期」。 */
   const stale = days !== null && days >= 6;
-  el.className = 'pxu' + (stale ? ' warn' : '');
+  el.className = 'pxu' + (stale || _pxLastErr ? ' warn' : '');
   el.innerHTML = '上次更新：<b>' + esc(dFull(m.at) || '—') + '</b> 的报价'
     + (m.srcAt && dFull(m.srcAt) !== dFull(m.at) ? ' · ' + esc(dShort(m.srcAt)) + ' 日报' : '')
     + ' · ' + esc(when) + ' 获取' + (m.src ? '，来源 ' + esc(m.src) : '')
-    + (m.by === 'auto' ? '（打开页面时自动刷新）' : '')
-    + (stale ? '<br>已经是 ' + days + ' 天前的价：可能纸厂确实没调，也可能日报还没更新。要更准就点「粘贴日报更新」。' : '');
+    + (m.by === 'auto' ? '（自动刷新）' : '')
+    + (stale ? '<br>已经是 ' + days + ' 天前的价：可能纸厂确实没调，也可能日报还没更新。要更准就点「粘贴日报更新」。' : '')
+    + errLine + offLine;
 }
 
 /* 自动刷新开关 */
@@ -2575,13 +2606,16 @@ async function pxDoFetch(btn){
    2) 绝不覆盖用户手工改过的价 —— 那是业务员/地磅给的一手价，比日报新；
    3) 只在真有调价时才轻提示一句。 */
 let _pxAutoing = false;
+let _pxLastTry = 0;      // 上次尝试时间：切前台/切窗口会频繁触发，60 秒内不重复
+let _pxRetry = 0;        // 移动网络容易一次失败，失败后自动补一次
+let _pxLastErr = '';     // 最近一次自动拉取的失败原因，显示在设置页
 async function autoPx(){
   if(_pxAutoing) return;
   if(P.autoPx === false) return;
   try{ if(location.protocol === 'file:') return; }catch(e){ return; }
   if(typeof fetch !== 'function') return;
   if(typeof navigator !== 'undefined' && navigator.onLine === false) return;
-  _pxAutoing = true;
+  _pxAutoing = true; _pxLastTry = Date.now();
   try{
     const d = await pxFetchLatest();
     const items = [];
@@ -2598,13 +2632,39 @@ async function autoPx(){
       skipManual: true
     });
     renderPx(); updatePxNote(); renderPxUpd();
-    if(res.changed.length) toast('报价已自动更新 · ' + res.changed.length + ' 项调价');
+    if(res.changed.length){
+      toast('报价已自动更新 · ' + res.changed.length + ' 项调价');
+    }
+    _pxRetry = 0; _pxLastErr = '';
   }catch(e){
     if(typeof console !== 'undefined' && console.info) console.info('[autoPx]', e && e.message);
+    _pxLastErr = (e && e.message) || '未知错误';
+    try{ renderPxUpd(); }catch(err){}
+    /* 只补一次，别在弱网下死循环 */
+    if(_pxRetry < 1){
+      _pxRetry++;
+      setTimeout(()=>{ _pxAutoing = false; try{ autoPx(); }catch(err){} }, 8000);
+      return;
+    }
   }finally{
     _pxAutoing = false;
   }
 }
+
+/* 手机浏览器的坑：页面被切到后台后再打开，是「恢复」不是重新加载，
+   首屏那次 900ms 的自动刷新根本不会重跑，所以手机上看到的永远是上次打开时的价。
+   这里在回到前台 / 从返回缓存恢复 / 窗口重新获得焦点时补一次（60 秒内不重复）。 */
+function pxRefreshIfStale(){
+  if(P.autoPx === false) return;
+  if(Date.now() - _pxLastTry < 60000) return;
+  try{ autoPx(); }catch(e){}
+}
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState === 'visible') pxRefreshIfStale();
+});
+window.addEventListener('pageshow', e=>{ if(e.persisted) pxRefreshIfStale(); });
+window.addEventListener('focus', pxRefreshIfStale);
+window.addEventListener('online', ()=>{ _pxRetry = 0; pxRefreshIfStale(); });
 if($('btnPxFetch')) $('btnPxFetch').onclick = ()=> pxDoFetch($('btnPxFetch'));
 if($('btnPxFetch2')) $('btnPxFetch2').onclick = ()=> pxDoFetch($('btnPxFetch2'));
 
@@ -5463,6 +5523,7 @@ if(_poolSec) _poolSec.addEventListener('click', e=>{
   try{ rtFillCity(); rtFillMills(); }catch(e){}
   go('calc');
   render();
+  try{ if($('verTag')) $('verTag').textContent = '当前：手机全能版 · ' + APP_BUILD; }catch(e){}
   /* 打开就静默拉一次最新报价；900ms 让首屏先画完，别抢资源 */
   setTimeout(()=>{ try{ autoPx(); }catch(e){} }, 900);
 })();
