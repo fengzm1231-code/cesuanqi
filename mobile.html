@@ -273,14 +273,15 @@ details .body{padding-bottom:2px}
 .pxr .lb{display:flex;flex-direction:column;gap:3px;min-width:0}
 .pxr .nm{display:block;font-size:12.5px;font-weight:400;color:var(--sub);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pxr .nm em{font-style:normal;font-size:11px;color:#8b948c;margin-left:6px}
-.pxr .nm em.man{color:#9a5f14;font-weight:600}
+
 .pxr .cm{font-style:normal;font-size:11px;line-height:1.4;color:#46524a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pxr .cm u{text-decoration:none;font-weight:700;margin-left:6px}
 .pxr .cm u.up{color:#a42a16}
 .pxr .cm u.dn{color:#11563a}
 .pxr .cm u.flat{color:#5f6c64;font-weight:500}
 .pxr .cm s{text-decoration:none;color:#4f5c54;font-weight:500;margin-left:5px}
-.pxr.up input,.pxr.dn input,.pxr.stop input{background:#fff;border-color:rgba(0,0,0,.18)}
+.pxr .pv{flex:0 0 auto;min-width:74px;text-align:right;font-size:16px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.2px}
+.pxr .pv.off{font-size:12.5px;font-weight:400;color:#8a5407}
 /* 参考价变动汇总条 */
 .pxc{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:11.5px;color:#3f4c44;background:#e9efe7;border:1px solid #c9d5c3;border-radius:8px;padding:7px 9px;margin:0 0 9px;line-height:1.5}
 .pxc b{font-weight:700}
@@ -291,11 +292,7 @@ details .body{padding-bottom:2px}
 .pxc .lg i{width:10px;height:10px;border-radius:2px;display:inline-block}
 .pxc .lg i.u{background:#f0bdaa;border:1px solid #d1846d}
 .pxc .lg i.d{background:#a9d3ba;border:1px solid #6fae8c}
-.pxr input{
-  width:104px;height:38px;border:1px solid #dde2da;border-radius:9px;padding:0 10px;
-  font-size:15px;text-align:right;background:#fbfcf9;color:var(--ink);
-}
-.pxr input:focus{outline:none;border-color:var(--p2);background:#fff}
+/* 参考价：只读展示，本页不提供改价入口 */
 /* 报价更新 */
 .pxu{font-size:11.5px;color:var(--muted);line-height:1.65;margin:2px 0 10px}
 .pxu.warn{color:#9a5a12}
@@ -305,7 +302,7 @@ details .body{padding-bottom:2px}
 .pxu b{color:var(--p)}
 .pxr-h{font-size:15px;font-weight:700;color:var(--ink)}
 .pxr-h .pxr-hop{font-weight:400;font-size:11.5px;color:var(--muted);margin-left:6px}
-.pxr-s{font-size:12px;color:var(--sub);line-height:1.75;margin-top:5px}
+.pxr-s{font-size:12px;color:var(--sub);line-height:1.7;margin-top:5px;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
 .pxr-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
 .pxr-row .m{font-size:12.5px;color:var(--ink);min-width:0;line-height:1.5}
 .pxr-row .m em{font-style:normal;color:var(--muted);margin-left:6px;font-size:11.5px}
@@ -1018,18 +1015,12 @@ details .body{padding-bottom:2px}
         <button class="btn" id="btnPxPaste">粘贴日报更新</button>
       </div>
       <div class="pxu" id="pxUpd">还没查过。内置价截至 2026-11-27，点上面按钮可联网取最新一版。</div>
-      <div class="hint" style="margin:0">含税绝干到厂挂牌价，留空＝停收。品类名后面是这条价的<b>报价日期</b>；带 <b style="color:#b0742a">*</b> 的表示你手工改过，日期为改价那天。<br><b>每档下面一行是上一期</b>：价有变动的整行带底色（<b style="color:#a42a16">红＝上调</b>、<b style="color:#11563a">绿＝下调</b>、<b style="color:#8a5407">黄＝停收</b>）。上期由软件自动记录，第一次改价后会一直留着比。<br><b>取证渠道按厂分工</b>：太阳南宁、太阳北海 → <b>公众号「广西太阳纸业国内木片部」</b>官方价目表（厂方直发，第一手）；广西仙鹤、广西建晖 → <b>美伊重工《木片价格日报》</b>最新一期（行业汇总，二手）。厂名后面的小标就是该厂当前用的渠道和日报日期。</div>
+      <div class="hint" style="margin:0">含税绝干到厂挂牌价，<b>只读</b>，由联网报价自动写入，本页不提供改价。品类名后面是这条价的<b>报价日期</b>。<br><b>每档下面一行是上一期</b>：价有变动的整行带底色（<b style="color:#a42a16">红＝上调</b>、<b style="color:#11563a">绿＝下调</b>、<b style="color:#8a5407">黄＝停收</b>）。上期由软件自动记录，第一次改价后会一直留着比。<br><b>取证渠道按厂分工</b>：太阳南宁、太阳北海 → <b>公众号「广西太阳纸业国内木片部」</b>官方价目表（厂方直发，第一手）；广西仙鹤、广西建晖 → <b>美伊重工《木片价格日报》</b>最新一期（行业汇总，二手）。厂名后面的小标就是该厂当前用的渠道和日报日期。</div>
       <details style="margin-top:8px">
-        <summary id="pxSummary">展开修改（4 家纸厂）</summary>
+        <summary id="pxSummary">展开看价（4 家纸厂）</summary>
         <div class="body" id="pxBox"></div>
-        <label class="f" style="margin-top:10px"><span>整表采集日</span>
-          <input type="date" id="pxAt"></label>
-        <div class="btns" style="margin-top:10px">
-          <button class="btn" id="btnPxReset">恢复采集值</button>
-        </div>
       </details>
-      <div class="hint">改完立即生效，不用点下面的「保存设置」。留空表示该品类停收。</div>
-      <div class="hint" style="margin-top:8px">打开页面、从后台切回、断网恢复时会自动拉一次最新报价。你手工改过的价不会被同级或更旧的日报覆盖；只有日报那一版<b>比你的价更新</b>时才会换成日报价（结果里会标「你 X 的价」）。</div>
+      <div class="hint">价格全部取自网上最新一版，本机不留可改的第二套价。<b>只改报价文件里确实有的厂和档</b>，没出现的档原样不动。</div>
       <div class="fs" id="autoPxChips">
         <button data-ap="1">打开时自动刷新</button>
         <button data-ap="0">不自动刷新</button>
@@ -1232,7 +1223,7 @@ const K = {
 };
 /* 构建号：手机端怀疑「没更新」时，先看设置页最下面的版本号对不对得上。
    每次改完这页记得改这个时间，再同步到 发布到GitHub/mobile.html。 */
-const APP_BUILD = '2026-11-27 22:41';
+const APP_BUILD = '2026-11-27 23:18';
 
 /* 存储层：现在落在 localStorage。将来要换 IndexedDB 时只改 ST 的 get/set/del，
    业务代码和计算内核都不用动。set 失败（多为配额满）返回 false 并提示归档。 */
@@ -1893,42 +1884,59 @@ function millSrc(id){
 }
 function millByName(n){ return MILLS.find(m=> m.name === n) || null; }
 
-/* 内置价换版后，清掉本地遗留的「联网/粘贴」快照——只清 net 项，用户手工改过的价保留。
-   不这么做的话，pxEntry 会一直用 P.px 里的旧价盖住新的内置价，等于白更新。
-   判据：本地采集日早于当前 PX_AT 才清；同版或更新的本地价不动。 */
+/* 报价只有一个真源：联网/粘贴拿到的 prices.json。
+   本地不保留任何「手工价」，P.px 只当缓存用——内置价换版（PX_AT 前进）就整个作废。
+   老格式（纯数字 / {p,at} 无 src）一并清掉，旧价记进上期历史，不丢对比信息。 */
 function pxMigrate(){
   if(!P.px || typeof P.px !== 'object') return;
   const localAt = String(P.pxAt || '');
-  if(localAt && localAt >= PX_AT) return;
+  const fresh = !!(localAt && localAt >= PX_AT);
   let n = 0;
   Object.keys(P.px).forEach(k=>{
     const v = P.px[k];
-    if(v && typeof v === 'object' && v.src === 'net'){ delete P.px[k]; n++; }
+    const [mid, ...rest] = k.split('|');
+    if(!v || typeof v !== 'object' || !String(v.src || '')){
+      const p0 = (v && typeof v === 'object') ? num(v.p) : num(v);
+      const at0 = (v && typeof v === 'object') ? String(v.at || '').slice(0, 10) : localAt;
+      if(p0 >= 0 && mid && rest.length && at0) pxHisPush(mid, rest.join('|'), {p:p0, at:at0});
+      delete P.px[k]; n++; return;
+    }
+    /* 内置价换版：缓存全部作废，下次联网重取 */
+    if(!fresh){ delete P.px[k]; n++; return; }
+    /* 非联网来源（旧版的本地临时改价 'local' / 'man'）一律清掉：
+       报价只认网上最新价，本机不保留任何可改的第二套价。 */
+    if(String(v.src) !== 'net'){
+      const p0 = num(v.p), at0 = String(v.at || '').slice(0, 10);
+      if(p0 >= 0 && mid && rest.length) pxHisPush(mid, rest.join('|'), {p:p0, at:at0 || localAt});
+      delete P.px[k]; n++; return;
+    }
   });
-  if(n || localAt){
+  if(n || (localAt && !fresh)){
     P.pxAt = PX_AT;
     save(K.P, P);
   }
 }
 /* 一条报价的取值与日期。
-   P.px 允许三种存法：旧版纯数字、{p,at}、{p,at,src:'net'}（联网/粘贴更新而来）。
-   manual = 用户自己在设置里改过；net = 来自报价更新。 */
+   P.px 只是联网报价的缓存：{p, at, src:'net'}。旧版本留下的纯数字、
+   {p,at}、src:'local'/'man' 都算历史遗留，由 pxMigrate 清掉并记进上期。 */
 function pxEntry(mid, cat){
-  if(!mid || !cat) return {p:0, at:'', manual:false, net:false};
+  if(!mid || !cat) return {p:0, at:'', net:false, legacy:false, src:''};
   const key = mid + '|' + cat;
   if(P.px && Object.prototype.hasOwnProperty.call(P.px, key)){
     const raw = P.px[key];
     if(raw && typeof raw === 'object'){
       const p = (raw.p === '' || raw.p === null || raw.p === undefined) ? 0 : num(raw.p);
-      const net = raw.src === 'net';
-      return {p, at: raw.at || P.pxAt || PX_AT, manual: !net, net};
+      const src = String(raw.src || '');
+      return {p, at: raw.at || P.pxAt || PX_AT, net: src === 'net', legacy: !src, src};
     }
+    /* 更老的写法：纯数字。当历史遗留，下次迁移就清掉 */
     return {p: raw === '' || raw === null || raw === undefined ? 0 : num(raw),
-            at: P.pxAt || PX_AT, manual:true, net:false};
+            at: P.pxAt || PX_AT, net:false, legacy:true, src:''};
   }
   const m = millById(mid);
   const c = m && m.cats.find(x=> x.n === cat);
-  return c ? {p:c.p, at:c.at, manual:false, net:false} : {p:0, at:'', manual:false, net:false};
+  return c ? {p:c.p, at:c.at, net:false, legacy:false, src:''}
+           : {p:0, at:'', net:false, legacy:false, src:''};
 }
 /* 某纸厂的全部品类：内置 + 联网/粘贴新增的 */
 function catsOf(mill){
@@ -1945,7 +1953,7 @@ function refDate(mid, cat){ return pxEntry(mid, cat).at; }
 /* ===== 上一期报价 =====
    两路来源：
    1) PX_PREV —— 内置种子，只写有据可查的调价，价来自 prices.json 说明里的调价链；
-   2) P.pxHis —— 本机自动记：每次改价（手改 / 联网 / 粘贴 / 恢复采集值）把旧价压进来。
+   2) P.pxHis —— 本机自动记：每次新报价写入（联网 / 粘贴日报）前把旧价压进来。
    一条价 = {p, at}；p 为 0 表示停收；at 为 '' 表示只知道价、不知道执行日（不编日期）。 */
 const PX_PREV = {
   /* 太阳南宁 11-25 执行：松一 1170→1200、松二 1020→1050、桉轴 1060→1030、苦楝 1050→1000 */
@@ -2090,7 +2098,7 @@ function updatePxNote(){
     el.className = 'pxn off';
     return;
   }
-  const sc = (!e.manual && m.src) ? '（' + m.src.k + '）' : '';
+  const sc = m.src ? '（' + m.src.k + '）' : '';
   const cp = pxCmp(m.id, c.n, e);
   let cmpTxt = '';
   if(cp && cp.dir === 'flat') cmpTxt = ' · <b class="flat">与上期持平</b>';
@@ -2098,8 +2106,8 @@ function updatePxNote(){
     + fmt(Math.abs(cp.d), 0)
     + (cp.pct ? '（' + (cp.dir === 'up' ? '+' : '−') + cp.pct.toFixed(1) + '%）' : '') + '</b>';
   el.innerHTML = '参考价 ' + fmt(e.p, 0) + ' 元/绝干吨 · '
-    + esc(d ? (e.manual ? '手工价，' + d + ' 更新' : d + ' 挂牌') : '未标日期')
-    + esc(sc) + cmpTxt + ' · 含税到厂，可改';
+    + esc(d ? d + ' 挂牌' : '未标日期')
+    + esc(sc) + cmpTxt + ' · 含税到厂';
   el.className = 'pxn';
 }
 
@@ -2128,12 +2136,12 @@ function renderPx(){
             + (cp.pct >= 0.05 ? '<s>' + (up ? '+' : '−') + cp.pct.toFixed(1) + '%</s>' : '');
         }
       }
-      return '<label class="pxr ' + cls + '">'
+      return '<div class="pxr ' + cls + '">'
         + '<span class="lb"><b class="nm">' + esc(c.n)
-        + (dt ? '<em class="' + (e.manual ? 'man' : '') + '">' + dt + (e.manual ? '*' : '') + '</em>' : '')
+        + (dt ? '<em>' + dt + '</em>' : '')
         + '</b>' + (cm ? '<i class="cm">' + cm + '</i>' : '') + '</span>'
-        + '<input type="text" inputmode="decimal" data-px="' + esc(m.id + '|' + c.n) + '"'
-        + ' placeholder="停收" value="' + (e.p > 0 ? e.p : '') + '"></label>';
+        + (e.p > 0 ? '<b class="pv">' + fmt(e.p, 0) + '</b>'
+                   : '<b class="pv off">停收</b>') + '</div>';
     }).join('');
     const s = m.src;
     const tag = s ? '<em class="pxs" title="' + esc(s.ch + '（' + s.doc + '）') + '">'
@@ -2163,9 +2171,8 @@ function renderPx(){
     if(st.up) parts.push(st.up + ' 涨');
     if(st.dn) parts.push(st.dn + ' 跌');
     if(st.stop) parts.push(st.stop + ' 停收');
-    sm.textContent = '展开修改（4 家纸厂' + (parts.length ? ' · ' + parts.join(' · ') : '') + '）';
+    sm.textContent = '展开看价（4 家纸厂' + (parts.length ? ' · ' + parts.join(' · ') : '') + '）';
   }
-  if($('pxAt')) $('pxAt').value = P.pxAt || PX_AT;
   if($('pxAtTxt')) $('pxAtTxt').textContent = '采集 ' + (P.pxAt || PX_AT);
 }
 
@@ -2185,43 +2192,8 @@ $('cat').onchange = ()=>{
   updatePxNote();
   render();
 };
-$('pxBox').addEventListener('change', e=>{
-  const el = e.target.closest('[data-px]');
-  if(!el) return;
-  P.px = Object.assign({}, P.px || {});
-  const raw = el.dataset.px;
-  const bar = raw.indexOf('|');
-  const mid = bar > 0 ? raw.slice(0, bar) : '';
-  const cat = bar > 0 ? raw.slice(bar + 1) : '';
-  const p = el.value.trim() === '' ? 0 : num(el.value);
-  const before = pxEntry(mid, cat);
-  if(before.p !== p) pxHisPush(mid, cat, {p:before.p, at:before.at});  // 旧价留作「上一期」
-  P.px[raw] = {p, at:today()};
-  save(K.P, P);
-  renderPx();
-  updatePxNote();
-  toast('参考价已更新 · 报价日 ' + today());
-});
-$('pxAt').onchange = ()=>{
-  P.pxAt = $('pxAt').value || PX_AT;
-  save(K.P, P);
-  renderPx();
-};
-$('btnPxReset').onclick = ()=>{
-  if(!confirm('把 4 家纸厂的参考价恢复成采集值？手工改过的价格会丢掉（会留成「上一期」备查）。')) return;
-  /* 恢复前先把现值记成上一期，恢复后一眼能看出差了多少 */
-  MILLS.forEach(m=> catsOf(m).forEach(c=>{
-    const e = pxEntry(m.id, c.n);
-    const b = m.cats.find(x=> x.n === c.n);
-    if(e.p !== (b ? b.p : 0)) pxHisPush(m.id, c.n, {p:e.p, at:e.at});
-  }));
-  P.px = {};
-  P.pxAt = PX_AT;
-  save(K.P, P);
-  renderPx();
-  updatePxNote();
-  toast('已恢复采集值');
-};
+/* 参考价只读：本页不再提供改价入口，价格一律由 prices.json / 粘贴日报写入。
+   pxBox 上不再挂 change 监听，避免出现「本地改价」这条旁路。 */
 
 /* ---- 报价更新：一键联网 / 粘贴日报 -------------------------------------
    数据源是一个 JSON（默认同目录 prices.json），结构：
@@ -2392,7 +2364,7 @@ function applyPxItems(items, meta){
     catAdd: JSON.parse(JSON.stringify(P.catAdd || {})),
     pxAt: P.pxAt || '', pxMeta: JSON.parse(JSON.stringify(P.pxMeta || {}))
   };
-  const changed = [], added = [], same = [], dated = [], skipped = [];
+  const changed = [], added = [], same = [], dated = [];
   const seen = new Set();
 
   items.forEach(it=>{
@@ -2409,18 +2381,7 @@ function applyPxItems(items, meta){
     const before = pxEntry(mill.id, name);
     const isNewCat = !mill.cats.some(x=> x.n === name);
 
-    /* 自动刷新一般不动手工改过的价（那是从业务员/地磅拿的）——
-       但日报这一版比手工价还新时得跟上，否则这台机器一改过价就永远停在旧价，
-       手机端「一直更新不到最新」多半就是这个原因。同日只差价的仍以手工价为准。 */
-    let manFrom = '';
-    if(meta.skipManual && before.manual){
-      const manAt = String(before.at || '').slice(0, 10);
-      if(!manAt || !at || at <= manAt){
-        skipped.push({mill:mill.name, cat:name, p:before.p, at:dFull(before.at), to:p});
-        return;
-      }
-      manFrom = dFull(before.at);
-    }
+    /* 报价只有一个真源：网上最新。本地任何值（含当天临时改的）都被直接覆盖 */
     if(isNewCat){
       P.catAdd = P.catAdd || {};
       const add = (P.catAdd[mill.name] = P.catAdd[mill.name] || []);
@@ -2433,7 +2394,7 @@ function applyPxItems(items, meta){
       /* 价没动、只是纸厂重新报了一次（或日报把报价日推后了）——不算调价 */
       dated.push({mill:mill.name, cat:name, p, at, fromAt: dFull(before.at)});
     } else {
-      changed.push({mill:mill.name, cat:name, from:before.p, to:p, at, isNewCat, manFrom});
+      changed.push({mill:mill.name, cat:name, from:before.p, to:p, at, isNewCat});
     }
     /* 报价文件如果自带上一期（c.prev），先收进历史；没有就靠本机记的旧价 */
     if(it.prev !== undefined && it.prev !== null && String(it.prev) !== ''){
@@ -2446,42 +2407,47 @@ function applyPxItems(items, meta){
   });
 
   const written = changed.length + dated.length + added.length + same.length;
-  const allSkipped = written === 0 && skipped.length > 0;
   /* 整表采集日优先用日报日（meta.at）；没有才退回各行报价日的最大值。
      两者语义不同：meta.at = 哪天抓的，各行 at = 该档厂方哪天执行。 */
   const stamps = items.map(it=> String(it.at || '')).filter(s=> s.length >= 10).sort();
   const metaAt = String(meta.at || '').slice(0, 10);
   const at = metaAt.length === 10 ? metaAt
     : (stamps.length ? stamps[stamps.length - 1].slice(0, 10) : '');
-  if(at && !allSkipped) P.pxAt = at;
+  if(at) P.pxAt = at;
   P.pxMeta = {
-    at: allSkipped ? ((P.pxMeta && P.pxMeta.at) || '') : (at || (P.pxMeta && P.pxMeta.at) || ''),
+    at: at || (P.pxMeta && P.pxMeta.at) || '',
     srcAt: meta.at || '',
     src: meta.src || '',
     by: meta.by || '',
     checked: nowStamp(),
+    build: meta.build || (P.pxMeta && P.pxMeta.build) || '',
     n: changed.length + dated.length + added.length
   };
   save(K.P, P);
   _pxUndo = snap;
-  return {at, srcAt: meta.at || '', src: meta.src || '', changed, dated, added, same, skipped, allSkipped};
+  return {at, srcAt: meta.at || '', src: meta.src || '', changed, dated, added, same};
 }
 
 /* 摘要面板 */
 function pxResultHTML(res){
   const n = res.changed.length, a = res.added.length, s = res.same.length;
   const dt = (res.dated || []).length;
-  const sk = (res.skipped || []).length;
-  const mn = res.changed.filter(c=> c.manFrom).length;
+  const touched = {};
+  ['changed','dated','added'].forEach(k=>{
+    (res[k] || []).forEach(x=>{ if(x.mill) touched[x.mill] = 1; });
+  });
+  const millsN = Object.keys(touched).length;
   let h = '<div class="pxr-h">更新到 ' + esc(dFull(res.at) || '未标日期')
     + (res.srcAt && dFull(res.srcAt) !== dFull(res.at) ? '<span class="pxr-hop">· ' + esc(dShort(res.srcAt)) + ' 日报</span>' : '')
     + '</div>';
-  h += '<div class="pxr-s">' + (res.src ? esc(res.src) + '<br>' : '')
+  /* 来源那段太长，一行放不下；截短显示，长按能看全文 */
+  const srcTxt = res.src ? String(res.src) : '';
+  const srcShort = srcTxt.length > 40 ? srcTxt.slice(0, 40) + '…' : srcTxt;
+  h += '<div class="pxr-s">' + (srcShort ? '<span title="' + esc(srcTxt) + '">' + esc(srcShort) + '</span><br>' : '')
     + '价格变动 <b>' + n + '</b> 项'
     + (dt ? ' · 仅刷新报价日 <b>' + dt + '</b> 项' : '')
     + ' · 新增品类 <b>' + a + '</b> 项 · 未变 <b>' + s + '</b> 项'
-    + (sk ? ' · 保留手工价 <b>' + sk + '</b> 项' : '')
-    + (mn ? ' · 覆盖旧手工价 <b>' + mn + '</b> 项' : '') + '</div>';
+    + (millsN ? '<br>实际改了 <b>' + millsN + '</b> 家厂的价，其余厂与档位没碰' : '') + '</div>';
   if(n){
     h += '<div class="sheet-t">价格变动</div>';
     h += res.changed.map(c=>{
@@ -2490,7 +2456,6 @@ function pxResultHTML(res){
       return '<div class="pxr-row"><span class="m">' + esc(c.mill) + '<em>' + esc(c.cat) + '</em></span>'
         + '<span class="v">' + (c.from > 0 ? fmt(c.from,0) + ' → ' : '') + '<b>' + fmt(c.to,0) + '</b>'
         + (diff ? '<i class="' + (up ? 'up' : 'dn') + '">' + (up ? '▲' : '▼') + fmt(Math.abs(diff),0) + '</i>' : '')
-        + (c.manFrom ? '<i class="dt">你 ' + esc(dShort(c.manFrom)) + ' 的价</i>' : '')
         + '</span></div>';
     }).join('');
   }
@@ -2505,16 +2470,10 @@ function pxResultHTML(res){
       + '<span class="v"><b>' + fmt(c.p,0) + '</b><i class="dt">'
       + esc(dShort(c.fromAt) || '—') + ' → ' + esc(dShort(c.at) || '—') + '</i></span></div>').join('');
   }
-  if(sk){
-    h += '<div class="sheet-t">保留你手工改的价（未覆盖）</div>';
-    h += res.skipped.map(c=> '<div class="pxr-row"><span class="m">' + esc(c.mill) + '<em>' + esc(c.cat) + '</em></span>'
-      + '<span class="v"><b>' + fmt(c.p,0) + '</b><i class="dt">你的 · '
-      + (c.to > 0 ? '日报 ' + fmt(c.to,0) : '日报停收') + '</i></span></div>').join('');
-  }
-  if(!n && !a && !dt && !sk) h += '<div class="hint" style="margin-top:10px">价格和本机一致，没有需要改的。</div>';
-  h += '<div class="btns" style="margin-top:14px">'
-    + '<button class="btn" data-act="pxundo">撤销这次更新</button>'
-    + '<button class="btn pri" data-act="pxclose">知道了</button></div>';
+  if(!n && !a && !dt) h += '<div class="hint" style="margin-top:10px">价格和本机一致，没有需要改的。</div>';
+  h += '<div class="btns" style="margin-top:12px;flex-direction:column;gap:8px">'
+    + '<button class="btn" data-act="pxundo" style="width:100%">撤销这次更新</button>'
+    + '<button class="btn pri" data-act="pxclose" style="width:100%">知道了</button></div>';
   return h;
 }
 
@@ -2522,9 +2481,8 @@ function pxShowResult(res){
   openSheet('报价已更新', pxResultHTML(res));
   renderPx(); updatePxNote(); renderPxUpd();
   const n2 = res.changed.length + (res.dated || []).length + res.added.length;
-  const sk = (res.skipped || []).length;
   toast(n2 ? '已更新 ' + n2 + ' 项 · 报价日 ' + (dFull(res.at) || '未标')
-    : (sk ? '你的手工价没动 · 日报有 ' + sk + ' 项差异' : '已是最新，没有变化'));
+    : '已是最新，没有变化');
 }
 
 function renderPxUpd(){
@@ -2532,7 +2490,9 @@ function renderPxUpd(){
   if(!el) return;
   const m = P.pxMeta || {};
   const errLine = _pxLastErr
-    ? '<br>刚才自动拉取没成功（' + esc(_pxLastErr) + '）。本机价照旧可用，切回前台或点「一键查最新报价」会再试。'
+    ? '<br>刚才自动拉取没成功（' + esc(_pxLastErr) + '）。<br>报价文件地址：<b>' + esc(absUrl(pxSrcUrl()))
+      + '</b>　确认这个文件已经和网页一起上传到仓库根目录。'
+      + '本机价照旧可用，切回前台或点「一键查最新报价」会再试。'
     : '';
   const offLine = P.autoPx === false
     ? '<br>「打开时自动刷新」现在是关的，只有点「一键查最新报价」或粘贴日报才会取新价。'
@@ -2550,11 +2510,17 @@ function renderPxUpd(){
   /* 木讯网日报只在工作日发，周末与节假日不出；阈值定 6 天，
      这样周五查过、周一早上打开不会误报「过期」。 */
   const stale = days !== null && days >= 6;
-  el.className = 'pxu' + (stale || _pxLastErr ? ' warn' : '');
+  /* 页面是不是旧版：报价文件里的 build 与本地内置的对不上，
+     说明手机加载的是浏览器缓存的老 HTML，功能（含自动刷新）也是老的。 */
+  const oldPage = !!(m.build && m.build !== APP_BUILD);
+  el.className = 'pxu' + (stale || _pxLastErr || oldPage ? ' warn' : '');
   el.innerHTML = '上次更新：<b>' + esc(dFull(m.at) || '—') + '</b> 的报价'
     + (m.srcAt && dFull(m.srcAt) !== dFull(m.at) ? ' · ' + esc(dShort(m.srcAt)) + ' 日报' : '')
     + ' · ' + esc(when) + ' 获取' + (m.src ? '，来源 ' + esc(m.src) : '')
     + (m.by === 'auto' ? '（自动刷新）' : '')
+    + (oldPage ? '<br>⚠ 你现在打开的是 <b>' + esc(APP_BUILD) + '</b> 那版页面，服务器上已经是 <b>'
+        + esc(m.build) + '</b>。旧页面不一定带最新的刷新逻辑，'
+        + '<a href="javascript:void(0)" data-act="pxreload" style="color:#a42a16;font-weight:700">点这里强制重载</a>。' : '')
     + (stale ? '<br>已经是 ' + days + ' 天前的价：可能纸厂确实没调，也可能日报还没更新。要更准就点「粘贴日报更新」。' : '')
     + errLine + offLine;
 }
@@ -2590,7 +2556,8 @@ async function pxDoFetch(btn){
       });
     });
     if(!items.length) throw new Error('报价文件里没有可用的品类');
-    const res = applyPxItems(items, {at:d.at, src:d.src || '联网报价', by:'net', skipManual:true});
+    const meta = {at:d.at, src:d.src || '联网报价', by:'net', build:d.build || ''};
+    const res = applyPxItems(items, meta);
     pxShowResult(res);
   }catch(e){
     openSheet('没查成', '<div class="hint" style="margin:0">' + esc(e.message || '未知错误')
@@ -2603,10 +2570,10 @@ async function pxDoFetch(btn){
 }
 /* 打开页面自动刷一次报价。三条铁律：
    1) 全程静默，失败不弹窗（本机价照旧可用）；
-   2) 绝不覆盖用户手工改过的价 —— 那是业务员/地磅给的一手价，比日报新；
+   2) 网上最新价是唯一真源，本地任何值（含设置页临时改的）一律被覆盖；
    3) 只在真有调价时才轻提示一句。 */
 let _pxAutoing = false;
-let _pxLastTry = 0;      // 上次尝试时间：切前台/切窗口会频繁触发，60 秒内不重复
+let _pxLastTry = 0;      // 上次尝试时间：切前台/切窗口会频繁触发，30 秒内不重复
 let _pxRetry = 0;        // 移动网络容易一次失败，失败后自动补一次
 let _pxLastErr = '';     // 最近一次自动拉取的失败原因，显示在设置页
 async function autoPx(){
@@ -2629,7 +2596,7 @@ async function autoPx(){
       at: d.at,
       src: d.src || '联网报价',
       by: 'auto',
-      skipManual: true
+      build: d.build || ''
     });
     renderPx(); updatePxNote(); renderPxUpd();
     if(res.changed.length){
@@ -2656,7 +2623,7 @@ async function autoPx(){
    这里在回到前台 / 从返回缓存恢复 / 窗口重新获得焦点时补一次（60 秒内不重复）。 */
 function pxRefreshIfStale(){
   if(P.autoPx === false) return;
-  if(Date.now() - _pxLastTry < 60000) return;
+  if(Date.now() - _pxLastTry < 30000) return;
   try{ autoPx(); }catch(e){}
 }
 document.addEventListener('visibilitychange', ()=>{
@@ -2665,6 +2632,11 @@ document.addEventListener('visibilitychange', ()=>{
 window.addEventListener('pageshow', e=>{ if(e.persisted) pxRefreshIfStale(); });
 window.addEventListener('focus', pxRefreshIfStale);
 window.addEventListener('online', ()=>{ _pxRetry = 0; pxRefreshIfStale(); });
+/* 手机上经常几小时不关页面，也不切后台（微信里看完再回来还算可见），
+   光靠事件不够，前台每 5 分钟自查一次。 */
+setInterval(()=>{
+  if(document.visibilityState === 'visible') pxRefreshIfStale();
+}, 300000);
 if($('btnPxFetch')) $('btnPxFetch').onclick = ()=> pxDoFetch($('btnPxFetch'));
 if($('btnPxFetch2')) $('btnPxFetch2').onclick = ()=> pxDoFetch($('btnPxFetch2'));
 
@@ -2683,6 +2655,12 @@ document.addEventListener('click', e=>{
   const el = e.target.closest('[data-act]');
   if(!el) return;
   const a = el.dataset.act;
+  if(a === 'pxreload'){
+    /* 带随机参数重载，绕过手机浏览器的强缓存 */
+    try{ location.replace(location.pathname + '?v=' + Date.now()); }
+    catch(e){ try{ location.reload(true); }catch(e2){} }
+    return;
+  }
   if(a === 'pxpaste'){ pxOpenPaste(); return; }
   if(a === 'pxclose'){ closeSheet(); return; }
   if(a === 'pxparse'){
@@ -2693,7 +2671,8 @@ document.addEventListener('click', e=>{
       toast('没认出这 4 家厂的价格，检查文字里有没有厂名和数字');
       return;
     }
-    const res = applyPxItems(items, {at:pxBaseDate(txt), src:'粘贴日报', by:'paste'});
+    const meta = {at:pxBaseDate(txt), src:'粘贴日报', by:'paste'};
+    const res = applyPxItems(items, meta);
     pxShowResult(res);
     return;
   }
